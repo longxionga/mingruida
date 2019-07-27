@@ -13,6 +13,6 @@ public class test {
         int sm = Integer.valueOf(m.get("s").toString());
         m.put("s",sm+3);
         int smw = Integer.valueOf(m.get("s").toString());
-
+        int qwe = Integer.valueOf(m.get("s").toString());
     }
 }
