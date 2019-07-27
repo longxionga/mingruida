@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.UserInfoDao">
+  <resultMap id="BaseResultMap" type="com.acl.pojo.UserInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="account_type" jdbcType="VARCHAR" property="accountType" />
+    <result column="account_level" jdbcType="INTEGER" property="accountLevel" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="id_card" jdbcType="VARCHAR" property="idCard" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="up_password" jdbcType="VARCHAR" property="upPassword" />
+    <result column="nick_icon" jdbcType="VARCHAR" property="nickIcon" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="job" jdbcType="VARCHAR" property="job" />
+    <result column="job_day" jdbcType="VARCHAR" property="jobDay" />
+    <result column="word_days" jdbcType="VARCHAR" property="wordDays" />
+    <result column="leave_days" jdbcType="VARCHAR" property="leaveDays" />
+    <result column="month_check" jdbcType="VARCHAR" property="monthCheck" />
+    <result column="month_uncheck" jdbcType="VARCHAR" property="monthUncheck" />
+    <result column="total_map" jdbcType="VARCHAR" property="totalMap" />
+    <result column="deduct_map" jdbcType="VARCHAR" property="deductMap" />
+    <result column="total_amount" jdbcType="VARCHAR" property="totalAmount" />
+    <result column="deduct_amount" jdbcType="VARCHAR" property="deductAmount" />
+    <result column="real_amount" jdbcType="VARCHAR" property="realAmount" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
+    <result column="id_card_front" jdbcType="VARCHAR" property="idCardFront" />
+    <result column="id_card_back" jdbcType="VARCHAR" property="idCardBack" />
+    <result column="id_card_auth" jdbcType="VARCHAR" property="idCardAuth" />
+    <result column="p_id" jdbcType="VARCHAR" property="pId" />
+    <result column="broker_id" jdbcType="VARCHAR" property="brokerId" />
+    <result column="my_broker_id" jdbcType="VARCHAR" property="myBrokerId" />
+    <result column="agent_id" jdbcType="VARCHAR" property="agentId" />
+    <result column="settle_id" jdbcType="VARCHAR" property="settleId" />
+    <result column="ch_id" jdbcType="VARCHAR" property="chId" />
+    <result column="ce_id" jdbcType="VARCHAR" property="ceId" />
+    <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
+    <result column="agent_code" jdbcType="VARCHAR" property="agentCode" />
+    <result column="open_id" jdbcType="VARCHAR" property="openId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="login_ip" jdbcType="VARCHAR" property="loginIp" />
+    <result column="login_time" jdbcType="TIMESTAMP" property="loginTime" />
+    <result column="login_count" jdbcType="INTEGER" property="loginCount" />
+    <result column="del_tag" jdbcType="CHAR" property="delTag" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, account_type, account_level, name, mobile, id_card, email, password, up_password,
+    nick_icon, nick_name, job, job_day, word_days, leave_days, month_check, month_uncheck,
+    total_map, deduct_map, total_amount, deduct_amount, real_amount, notes, id_card_front,
+    id_card_back, id_card_auth, p_id, broker_id, my_broker_id, agent_id, settle_id, ch_id,
+    ce_id, dept_id, agent_code, open_id, status, create_time, update_time, login_ip,
+    login_time, login_count, del_tag
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_user_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from t_user_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.acl.pojo.UserInfo">
+    insert into t_user_info (id, account_type, account_level,
+    name, mobile, id_card,
+    email, password, up_password,
+    nick_icon, nick_name, job,
+    job_day, word_days, leave_days,
+    month_check, month_uncheck, total_map,
+    deduct_map, total_amount, deduct_amount,
+    real_amount, notes, id_card_front,
+    id_card_back, id_card_auth, p_id,
+    broker_id, my_broker_id, agent_id,
+    settle_id, ch_id, ce_id,
+    dept_id, agent_code, open_id,
+    status, create_time, update_time,
+    login_ip, login_time, login_count,
+    del_tag)
+    values (#{id,jdbcType=VARCHAR}, #{accountType,jdbcType=VARCHAR}, #{accountLevel,jdbcType=INTEGER},
+    #{name,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, #{idCard,jdbcType=VARCHAR},
+    #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{upPassword,jdbcType=VARCHAR},
+    #{nickIcon,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, #{job,jdbcType=VARCHAR},
+    #{jobDay,jdbcType=VARCHAR}, #{wordDays,jdbcType=VARCHAR}, #{leaveDays,jdbcType=VARCHAR},
+    #{monthCheck,jdbcType=VARCHAR}, #{monthUncheck,jdbcType=VARCHAR}, #{totalMap,jdbcType=VARCHAR},
+    #{deductMap,jdbcType=VARCHAR}, #{totalAmount,jdbcType=VARCHAR}, #{deductAmount,jdbcType=VARCHAR},
+    #{realAmount,jdbcType=VARCHAR}, #{notes,jdbcType=VARCHAR}, #{idCardFront,jdbcType=VARCHAR},
+    #{idCardBack,jdbcType=VARCHAR}, #{idCardAuth,jdbcType=VARCHAR}, #{pId,jdbcType=VARCHAR},
+    #{brokerId,jdbcType=VARCHAR}, #{myBrokerId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{settleId,jdbcType=VARCHAR}, #{chId,jdbcType=VARCHAR}, #{ceId,jdbcType=VARCHAR},
+    #{deptId,jdbcType=VARCHAR}, #{agentCode,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR},
+    #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+    #{loginIp,jdbcType=VARCHAR}, #{loginTime,jdbcType=TIMESTAMP}, #{loginCount,jdbcType=INTEGER},
+    #{delTag,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.acl.pojo.UserInfo">
+    insert into t_user_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="accountType != null">
+        account_type,
+      </if>
+      <if test="accountLevel != null">
+        account_level,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="mobile != null">
+        mobile,
+      </if>
+      <if test="idCard != null">
+        id_card,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="upPassword != null">
+        up_password,
+      </if>
+      <if test="nickIcon != null">
+        nick_icon,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="job != null">
+        job,
+      </if>
+      <if test="jobDay != null">
+        job_day,
+      </if>
+      <if test="wordDays != null">
+        word_days,
+      </if>
+      <if test="leaveDays != null">
+        leave_days,
+      </if>
+      <if test="monthCheck != null">
+        month_check,
+      </if>
+      <if test="monthUncheck != null">
+        month_uncheck,
+      </if>
+      <if test="totalMap != null">
+        total_map,
+      </if>
+      <if test="deductMap != null">
+        deduct_map,
+      </if>
+      <if test="totalAmount != null">
+        total_amount,
+      </if>
+      <if test="deductAmount != null">
+        deduct_amount,
+      </if>
+      <if test="realAmount != null">
+        real_amount,
+      </if>
+      <if test="notes != null">
+        notes,
+      </if>
+      <if test="idCardFront != null">
+        id_card_front,
+      </if>
+      <if test="idCardBack != null">
+        id_card_back,
+      </if>
+      <if test="idCardAuth != null">
+        id_card_auth,
+      </if>
+      <if test="pId != null">
+        p_id,
+      </if>
+      <if test="brokerId != null">
+        broker_id,
+      </if>
+      <if test="myBrokerId != null">
+        my_broker_id,
+      </if>
+      <if test="agentId != null">
+        agent_id,
+      </if>
+      <if test="settleId != null">
+        settle_id,
+      </if>
+      <if test="chId != null">
+        ch_id,
+      </if>
+      <if test="ceId != null">
+        ce_id,
+      </if>
+      <if test="deptId != null">
+        dept_id,
+      </if>
+      <if test="agentCode != null">
+        agent_code,
+      </if>
+      <if test="openId != null">
+        open_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="loginIp != null">
+        login_ip,
+      </if>
+      <if test="loginTime != null">
+        login_time,
+      </if>
+      <if test="loginCount != null">
+        login_count,
+      </if>
+      <if test="delTag != null">
+        del_tag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="accountType != null">
+        #{accountType,jdbcType=VARCHAR},
+      </if>
+      <if test="accountLevel != null">
+        #{accountLevel,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null">
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null">
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="upPassword != null">
+        #{upPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="nickIcon != null">
+        #{nickIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="job != null">
+        #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="jobDay != null">
+        #{jobDay,jdbcType=VARCHAR},
+      </if>
+      <if test="wordDays != null">
+        #{wordDays,jdbcType=VARCHAR},
+      </if>
+      <if test="leaveDays != null">
+        #{leaveDays,jdbcType=VARCHAR},
+      </if>
+      <if test="monthCheck != null">
+        #{monthCheck,jdbcType=VARCHAR},
+      </if>
+      <if test="monthUncheck != null">
+        #{monthUncheck,jdbcType=VARCHAR},
+      </if>
+      <if test="totalMap != null">
+        #{totalMap,jdbcType=VARCHAR},
+      </if>
+      <if test="deductMap != null">
+        #{deductMap,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmount != null">
+        #{totalAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="deductAmount != null">
+        #{deductAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="realAmount != null">
+        #{realAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardFront != null">
+        #{idCardFront,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardBack != null">
+        #{idCardBack,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAuth != null">
+        #{idCardAuth,jdbcType=VARCHAR},
+      </if>
+      <if test="pId != null">
+        #{pId,jdbcType=VARCHAR},
+      </if>
+      <if test="brokerId != null">
+        #{brokerId,jdbcType=VARCHAR},
+      </if>
+      <if test="myBrokerId != null">
+        #{myBrokerId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleId != null">
+        #{settleId,jdbcType=VARCHAR},
+      </if>
+      <if test="chId != null">
+        #{chId,jdbcType=VARCHAR},
+      </if>
+      <if test="ceId != null">
+        #{ceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentCode != null">
+        #{agentCode,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null">
+        #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginIp != null">
+        #{loginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="loginTime != null">
+        #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginCount != null">
+        #{loginCount,jdbcType=INTEGER},
+      </if>
+      <if test="delTag != null">
+        #{delTag,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.acl.pojo.UserInfo">
+    update t_user_info
+    <set>
+      <if test="accountType != null">
+        account_type = #{accountType,jdbcType=VARCHAR},
+      </if>
+      <if test="accountLevel != null">
+        account_level = #{accountLevel,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null">
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null">
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="upPassword != null">
+        up_password = #{upPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="nickIcon != null">
+        nick_icon = #{nickIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="job != null">
+        job = #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="jobDay != null">
+        job_day = #{jobDay,jdbcType=VARCHAR},
+      </if>
+      <if test="wordDays != null">
+        word_days = #{wordDays,jdbcType=VARCHAR},
+      </if>
+      <if test="leaveDays != null">
+        leave_days = #{leaveDays,jdbcType=VARCHAR},
+      </if>
+      <if test="monthCheck != null">
+        month_check = #{monthCheck,jdbcType=VARCHAR},
+      </if>
+      <if test="monthUncheck != null">
+        month_uncheck = #{monthUncheck,jdbcType=VARCHAR},
+      </if>
+      <if test="totalMap != null">
+        total_map = #{totalMap,jdbcType=VARCHAR},
+      </if>
+      <if test="deductMap != null">
+        deduct_map = #{deductMap,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmount != null">
+        total_amount = #{totalAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="deductAmount != null">
+        deduct_amount = #{deductAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="realAmount != null">
+        real_amount = #{realAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardFront != null">
+        id_card_front = #{idCardFront,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardBack != null">
+        id_card_back = #{idCardBack,jdbcType=VARCHAR},
+      </if>
+      <if test="idCardAuth != null">
+        id_card_auth = #{idCardAuth,jdbcType=VARCHAR},
+      </if>
+      <if test="pId != null">
+        p_id = #{pId,jdbcType=VARCHAR},
+      </if>
+      <if test="brokerId != null">
+        broker_id = #{brokerId,jdbcType=VARCHAR},
+      </if>
+      <if test="myBrokerId != null">
+        my_broker_id = #{myBrokerId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        agent_id = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleId != null">
+        settle_id = #{settleId,jdbcType=VARCHAR},
+      </if>
+      <if test="chId != null">
+        ch_id = #{chId,jdbcType=VARCHAR},
+      </if>
+      <if test="ceId != null">
+        ce_id = #{ceId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        dept_id = #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentCode != null">
+        agent_code = #{agentCode,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null">
+        open_id = #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginIp != null">
+        login_ip = #{loginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="loginTime != null">
+        login_time = #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginCount != null">
+        login_count = #{loginCount,jdbcType=INTEGER},
+      </if>
+      <if test="delTag != null">
+        del_tag = #{delTag,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.acl.pojo.UserInfo">
+    update t_user_info
+    set account_type = #{accountType,jdbcType=VARCHAR},
+      account_level = #{accountLevel,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      up_password = #{upPassword,jdbcType=VARCHAR},
+      nick_icon = #{nickIcon,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      job = #{job,jdbcType=VARCHAR},
+      job_day = #{jobDay,jdbcType=VARCHAR},
+      word_days = #{wordDays,jdbcType=VARCHAR},
+      leave_days = #{leaveDays,jdbcType=VARCHAR},
+      month_check = #{monthCheck,jdbcType=VARCHAR},
+      month_uncheck = #{monthUncheck,jdbcType=VARCHAR},
+      total_map = #{totalMap,jdbcType=VARCHAR},
+      deduct_map = #{deductMap,jdbcType=VARCHAR},
+      total_amount = #{totalAmount,jdbcType=VARCHAR},
+      deduct_amount = #{deductAmount,jdbcType=VARCHAR},
+      real_amount = #{realAmount,jdbcType=VARCHAR},
+      notes = #{notes,jdbcType=VARCHAR},
+      id_card_front = #{idCardFront,jdbcType=VARCHAR},
+      id_card_back = #{idCardBack,jdbcType=VARCHAR},
+      id_card_auth = #{idCardAuth,jdbcType=VARCHAR},
+      p_id = #{pId,jdbcType=VARCHAR},
+      broker_id = #{brokerId,jdbcType=VARCHAR},
+      my_broker_id = #{myBrokerId,jdbcType=VARCHAR},
+      agent_id = #{agentId,jdbcType=VARCHAR},
+      settle_id = #{settleId,jdbcType=VARCHAR},
+      ch_id = #{chId,jdbcType=VARCHAR},
+      ce_id = #{ceId,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=VARCHAR},
+      agent_code = #{agentCode,jdbcType=VARCHAR},
+      open_id = #{openId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      login_ip = #{loginIp,jdbcType=VARCHAR},
+      login_time = #{loginTime,jdbcType=TIMESTAMP},
+      login_count = #{loginCount,jdbcType=INTEGER},
+      del_tag = #{delTag,jdbcType=CHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getUserInfoList" parameterType="com.acl.pojo.UserInfo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_user_info
+  </select>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMallLevelDao">
+<select id="queryMallLevel" parameterType="hashmap" resultType="map">
+		SELECT              
+			level_id,
+			level_type,
+			level_rule,
+			level_name,
+			DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+			DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+			is_use
+		FROM
+			t_front_mall_level
+		WHERE 1=1
+	<if test="level_name !=null and level_name !=''">
+	AND level_name like CONCAT(CONCAT(#{level_name}), '%')
+	</if>
+</select>
+<insert id="insertMallLevel" parameterType="hashmap">
+	INSERT INTO t_front_mall_level 
+	(
+	<trim suffixOverrides=",">
+	<if test="level_type !=null and level_type !=''">level_type,</if>
+	<if test="level_rule !=null and level_rule !=''">level_rule,</if>
+	<if test="level_name !=null and level_name !=''">level_name,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="level_type !=null and level_type !=''">#{level_type},</if>
+	<if test="level_rule !=null and level_rule !=''">#{level_rule},</if>
+	<if test="level_name !=null and level_name !=''">#{level_name},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateMallLevel" parameterType="hashmap">
+	UPDATE t_front_mall_level SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="level_type  != null and level_type !=''">level_type=#{level_type},</if>
+			<if test="level_rule  != null and level_rule !=''">level_rule=#{level_rule},</if>
+			<if test="level_name  != null and level_name !=''">level_name=#{level_name},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+	</trim>
+	WHERE level_id=#{level_id}
+</update>
+<select id="levelValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		level_id
+	FROM
+		t_front_mall_level
+	WHERE 
+		level_name=#{level_name}
+		<if test="level_id !=null and level_id !=''">
+			AND level_id !=#{level_id}
+		</if>
+</select>
+</mapper>

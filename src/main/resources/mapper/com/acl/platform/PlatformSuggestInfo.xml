@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformSuggestInfoDao">
+ <select id="querySuggestInfo" parameterType="hashmap" resultType="map">
+	 SELECT
+	 t.id_card,
+	 t.id,
+	 t.name,
+	 t1.mobile,
+	 t.`status`,
+	 t.broker_id,
+	 t.settle_id,
+	 t.agent_id,
+	 t1.create_time,
+	 t1.title,
+	 t1.notes,
+	 t.job,
+	 t.job_day,
+	 t.word_days,
+	 t.leave_days,
+	 t.month_check,
+	 t.month_uncheck,
+	 t.total_map,
+	 t.deduct_map,
+	 t.total_amount,
+	 t.deduct_amount,
+	 t.real_amount
+	 FROM
+		 t_user_info t
+	 INNER JOIN t_front_suggest t1 ON t1.user_id = t.id
+	 WHERE
+	 1 = 1
+	  <!--<if test="name!=null and name!=''">-->
+			<!--AND t.user_name like CONCAT(CONCAT(#{user_name}), '%')-->
+	  <!--</if>-->
+	 <if test="id_card!=null and id_card!=''">
+		 AND t.id_card = #{id_card}
+	 </if>
+      <if test="mobile!=null and mobile!=''">
+			AND t.mobile = #{mobile}
+	  </if>
+	  <if test="ch_id!=null and ch_id!=''">
+	        AND t5.dept_parent_id=#{ch_id}
+	  </if>
+	  <if test="settle_id!=null and settle_id!=''">
+	        AND t.settle_id=#{settle_id}
+	  </if>
+	  <if test="agent_id!=null and agent_id!=''">
+	        AND t.agent_id=#{agent_id}
+	  </if>
+	  <if test="DID!=null and DID!=''">
+	        AND t2.dept_id=#{DID}
+	  </if>
+	  <!--<if test="is_useb!=null and is_useb!='' and is_useb=='2' ">	   		-->
+	   		<!--AND t.is_use &gt;='2'	   		-->
+	  <!--</if>	 -->
+	  <!--<if test="is_useb!=null and is_useb!='' and is_useb!='2'">-->
+	          <!--AND t.is_use =#{is_useb}-->
+	   <!--</if>-->
+	  <if test="status!=null and status!=''">
+		  AND t.status =#{status}
+	  </if>
+	  order by  t.update_time,t.create_time desc
+</select>
+
+</mapper>

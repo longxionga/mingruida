@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsItemDao">
+<select id="queryGoodsItem" parameterType="hashmap" resultType="map">
+	SELECT
+		item.goods_id,
+		goods.goods_name,
+		item.unit,
+		item.fare_price,
+		item.item_label,
+		item.description,
+		item.update_time,
+		item.create_time,
+		item.is_use
+	FROM
+		t_front_mall_goods_item item
+	INNER JOIN t_front_mall_goods goods ON goods.goods_id = item.goods_id
+	WHERE 1=1
+	<if test="good_name !=null and good_name !=''">
+	AND goods.goods_name like CONCAT(CONCAT(#{good_name}), '%')
+	</if>
+</select>
+<insert id="insertGoodsItem" parameterType="hashmap">
+	INSERT INTO t_front_mall_goods_item
+	(
+	<trim suffixOverrides=",">
+	<if test="goods_id !=null and goods_id !=''">goods_id,</if>
+	<if test="unit !=null and unit !=''">unit,</if>
+	<if test="fare_price !=null and fare_price !=''">fare_price,</if>
+	<if test="item_label !=null and item_label !=''">item_label,</if>
+	<if test="description !=null and description !=''">description,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="update_time !=null and update_time !=''">update_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="goods_id !=null and goods_id !=''">#{goods_id},</if>
+	<if test="unit !=null and unit !=''">#{unit},</if>
+	<if test="fare_price !=null and fare_price !=''">#{fare_price},</if>
+	<if test="item_label !=null and item_label !=''">#{item_label},</if>
+	<if test="description !=null and description !=''">#{description},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="update_time !=null and update_time !=''">#{update_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateGoodsItem" parameterType="hashmap">
+	UPDATE t_front_mall_goods_item SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="unit  != null and unit !=''">unit=#{unit},</if>
+			<if test="fare_price  != null and fare_price !=''">fare_price=#{fare_price},</if>
+			<if test="item_label  != null and item_label !=''">item_label=#{item_label},</if>
+			<if test="description  != null and description !=''">description=#{description},</if>
+			<if test="create_time  != null and create_time !=''">create_time=#{create_time},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+	</trim>
+	WHERE goods_id=#{goods_id}
+</update>
+<select id="itemValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		goods_id
+	FROM
+		t_front_mall_goods_item
+	WHERE
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods_id=#{goods_id}
+		</if>
+		
+</select>
+
+<select id="queryItemGoodsName" parameterType="hashmap" resultType="map">
+	SELECT goods_id,goods_name FROM t_front_mall_goods		
+</select>
+</mapper>

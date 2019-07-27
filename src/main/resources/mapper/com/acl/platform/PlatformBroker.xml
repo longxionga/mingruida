@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.PlatformBrokerDao">
+	<select id="queryBrokerInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t.broker_id,
+		t.broker_name,
+		t.broker_mobile,
+	    t.create_date,
+		t.broker_money,
+		t.broker_level,
+		<!--  t.broker_incode, -->
+		t.dept_id,
+		t1.dept_name,
+		t2.dept_id as agent_id,
+		t2.dept_name as agent_name,
+		t3.dept_id as settle_id,
+		t3.dept_name as settle_name,
+		t4.dept_id as ch_id,
+		t4.dept_name as	ch_name,
+		t5.dept_id as ce_id,
+		t5.dept_name as ce_name,
+		t6.broker_name as parent_broker_name,
+		t6.broker_mobile as parent_broker_mobile,
+		t.is_use,
+        case
+        when t.is_use='0' then '未开通'
+        else t.broker_incode 
+        end broker_incodes      
+		FROM t_front_broker t
+		LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t.dept_id
+		LEFT JOIN t_back_dept_info t2 ON t2.dept_id=t1.dept_parent_id
+		LEFT JOIN t_back_dept_info t3 ON t3.dept_id=t2.dept_parent_id
+		LEFT JOIN t_back_dept_info t4 ON t4.dept_id=t3.dept_parent_id
+		LEFT JOIN t_back_dept_info t5 ON t5.dept_id=t4.dept_parent_id
+		LEFT JOIN t_front_broker t6 ON t.broker_parent_id=t6.broker_id
+		where
+		t.broker_parent_id not in('-1') and t.is_use!=4
+		<if test="broker_name!=null and broker_name!=''">
+			AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="broker_mobile!=null and broker_mobile!=''">
+			AND t.broker_mobile = #{broker_mobile}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND t5.dept_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND t4.dept_id=#{ch_id}
+		</if>
+		<if test="settle_id!=null and settle_id!=''">
+			AND t3.dept_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			AND t2.dept_id=#{agent_id}
+		</if>
+		<if test="DID!=null and DID!=''">
+			AND t.dept_id=#{DID}
+		</if>
+		<if test="broker_level!=null and broker_level!=''">
+			AND t.broker_level=#{broker_level}
+		</if>
+		 order by t.create_date desc
+	</select>
+
+	<update id="updateBrokerPwd" parameterType="hashmap">
+		UPDATE
+		t_front_broker set
+		broker_password=#{broker_password}
+		WHERE
+		broker_id=#{broker_id}
+	</update>
+
+	<update id="updateBrokerState" parameterType="hashmap">
+		UPDATE
+		t_front_broker
+		set
+		is_use=#{is_use}
+		WHERE broker_id=#{broker_id}
+	</update>
+
+	<select id="queryBrokerUser" parameterType="hashmap" resultType="map">
+		select
+		t.broker_id,
+		t.broker_name,
+		t.broker_mobile,
+		t.create_date,
+		<!-- t.broker_incode, -->
+		<!-- t.is_use,  -->
+		t1.broker_id as pbroker_id,
+		t1.broker_name as pbroker_name,
+		t1.broker_incode as pbroker_incode,
+		t2.dept_name,
+		t3.dept_id as agent_id,
+		t3.dept_name as agent_name,
+		t.is_use,
+        case
+        when t.is_use='0' then '未开通'
+        else t.broker_incode 
+        end as broker_incodes    
+		from t_front_broker t
+		LEFT JOIN t_front_broker t1 ON t1.broker_id=t.broker_parent_id
+		LEFT JOIN t_back_dept_info t2 ON t.dept_id = t2.dept_id
+		LEFT JOIN t_back_dept_info t3 ON t2.dept_parent_id = t3.dept_id
+		WHERE t.broker_id!=#{broker_id} 
+		AND t3.dept_id=
+		(select  distinct t3.dept_id as agent_id
+		from t_front_broker t
+		LEFT JOIN t_front_broker t1 ON t1.broker_id=t.broker_parent_id
+		LEFT JOIN t_back_dept_info t2 ON t.dept_id = t2.dept_id
+		LEFT JOIN t_back_dept_info t3 ON t2.dept_parent_id = t3.dept_id
+		WHERE t.broker_id=#{broker_id}
+		)
+		AND t.broker_parent_id!='-1'
+		<if test="broker_name!=null and broker_name!=''">
+			AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="broker_mobile!=null and broker_mobile!=''">
+			AND t.broker_mobile = #{broker_mobile}
+		</if>		    
+	 	order by t.create_date desc 
+	</select>
+
+	<update id="updateBrokerUser" parameterType="hashmap">
+	UPDATE
+	t_front_broker
+	SET
+	broker_parent_id = #{current_broker_id}
+	where broker_id = #{broker_id}
+	</update>
+
+    
+    <select id="queryBrokers" parameterType="hashmap" resultType="map">
+		select
+		t.broker_id,
+		t.broker_name,
+		t.broker_mobile,
+		t.create_date,
+		<!-- t.broker_incode, -->
+		t.dept_id,
+		<!-- t.is_use,  -->
+		t1.broker_id as pbroker_id,
+		t1.broker_name as pbroker_name,
+		t1.broker_incode as pbroker_incode,
+		t2.dept_name,
+		t3.dept_id as agent_id,
+		t3.dept_name as agent_name,
+		t.is_use,
+        case
+        when t.is_use='0' then '未开通'
+        else t.broker_incode 
+        end as broker_incode
+		from t_front_broker t
+		LEFT JOIN t_front_broker t1 ON t1.broker_id=t.broker_parent_id
+		LEFT JOIN t_back_dept_info t2 ON t.dept_id = t2.dept_id
+		LEFT JOIN t_back_dept_info t3 ON t2.dept_parent_id = t3.dept_id
+		WHERE  t3.dept_id= #{agent_id} AND t.broker_parent_id!='-1'
+		<if test="broker_name!=null and broker_name!=''">
+			AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="broker_mobile!=null and broker_mobile!=''">
+			AND t.broker_mobile = #{broker_mobile}
+		</if>
+		    
+		order by t.broker_name asc
+	</select>  
+	
+	 <select id="queryBrokerForMon" parameterType="hashmap" resultType="map">
+		SELECT
+	b.dept_code,
+	d.dept_name,
+	b.is_use,
+	d.dept_ratio,
+	d.dept_money,
+	d.dept_mobile,
+	d.is_tj_man,
+	d.tj_ratio,
+	d.dept_url,
+	d.broker_url,
+	b.dept_id,
+	d.dept_parent_id,
+	d.dept_type,
+	b.create_date,
+	b.broker_id,
+	b.broker_name,
+	b.broker_password,
+	b.broker_parent_id,
+	b.broker_incode,
+	d.dept_app_id,
+	d.dept_app_secret,
+	b.broker_mobile,
+	p.broker_incode AS broker_parent_incode,
+	b.broker_wx_id,
+	b.broker_money,
+	b.broker_login_id,
+	b.broker_zf_wx_id
+FROM
+	t_front_broker b
+LEFT JOIN t_front_broker p ON p.broker_id = b.broker_parent_id
+LEFT JOIN t_back_dept_info d ON b.dept_id = d.dept_id
+	</select>  
+	 <select id="queryBrokerUserForMon" parameterType="hashmap" resultType="map">
+	 select user_id from t_front_user_info where broker_id=#{broker_id}
+	 </select>
+	 <update id="upBroker" parameterType="hashmap">
+		UPDATE
+		t_front_broker set
+		broker_level=#{broker_level}
+		WHERE
+		broker_id=#{b_id}
+	</update>
+	<select id="queryBrokerAllot" parameterType="hashmap" resultType="map">
+		SELECT sys_id,p_id,ce_id,ch_id,s_id,a_id,b_id,p_allot,ce_allot,ch_allot,s_allot,a_allot,b_allot,is_use,create_date FROM t_back_dept_prorate WHERE b_id=#{b_id}
+	 </select>
+	<insert id="insertBrokerProrateTemp" parameterType="hashmap">
+	INSERT INTO t_back_dept_prorate_temp (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id != null and sys_id !=''">sys_id,</if>
+	        <if test="p_id != null and p_id !=''">p_id,</if>
+	        <if test="ce_id != null and ce_id !=''">ce_id,</if>
+	        <if test="ch_id != null and ch_id !=''">ch_id,</if>
+	        <if test="s_id != null and s_id !=''">s_id,</if>
+	        <if test="a_id != null and a_id !=''">a_id,</if>
+	        <if test="b_id != null and b_id !=''">b_id,</if>
+	        <if test="p_allot != null and p_allot !=''">p_allot,</if>
+	        <if test="ce_allot != null and ce_allot !=''">ce_allot,</if>
+	        <if test="ch_allot != null and ch_allot !=''">ch_allot,</if>
+	        <if test="s_allot != null and s_allot !=''">s_allot,</if>
+	        <if test="a_allot != null and a_allot !=''">a_allot,</if>
+	        <if test="b_allot != null and b_allot !=''">b_allot,</if>
+	        <if test="is_use != null and is_use !=''">is_use,</if>
+	        <if test="create_date != null and create_date !=''">create_date,</if>
+	    </trim>
+    )VALUES(
+		<trim suffix="" suffixOverrides=",">
+
+			<if test="sys_id != null and sys_id !=''">#{sys_id},</if>
+	        <if test="p_id != null and p_id !=''">#{p_id},</if>
+	        <if test="ce_id != null and ce_id !=''">#{ce_id},</if>
+	        <if test="ch_id != null and ch_id !=''">#{ch_id},</if>
+	        <if test="s_id != null and s_id !=''">#{s_id},</if>
+	        <if test="a_id != null and a_id !=''">#{a_id},</if>
+	        <if test="b_id != null and b_id !=''">#{b_id},</if>
+	        <if test="p_allot != null and p_allot !=''">#{p_allot},</if>
+	        <if test="ce_allot != null and ce_allot !=''">#{ce_allot},</if>
+	        <if test="ch_allot != null and ch_allot !=''">#{ch_allot},</if>
+	        <if test="s_allot != null and s_allot !=''">#{s_allot},</if>
+	        <if test="a_allot != null and a_allot !=''">#{a_allot},</if>
+	        <if test="b_allot != null and b_allot !=''">#{b_allot},</if>
+	        <if test="is_use != null and is_use !=''">#{is_use},</if>
+	        <if test="create_date != null and create_date !=''">#{create_date},</if>
+        </trim>
+    )
+	</insert>
+	
+	<update id="updateBrokerProrateTemp" parameterType="hashmap">
+		UPDATE
+		    t_back_dept_prorate_temp
+		SET
+		    is_use = 0
+		WHERE  b_id =  #{b_id}
+	</update>
+	
+	<update id="updateBrokerProrate" parameterType="hashmap">
+		UPDATE
+		    t_back_dept_prorate
+		SET
+		    is_use = 0
+		WHERE  b_id =  #{b_id}
+	</update>
+	
+	<select id="queryAgentAllot" parameterType="hashmap" resultType="map">
+	select p.dept_id as p_id,p.dept_ratio as p_allot,a.dept_id as
+	a_id,a.dept_ratio as a_allot,s.dept_id as s_id ,ch.dept_id as
+	ch_id,ce.dept_id as ce_id,a.ce_allot as ce_allot
+	,a.ch_allot as ch_allot,a.s_allot as s_allot
+	from (Select dept_id,dept_ratio,dept_parent_id,ce_allot,ch_allot,s_allot
+	from t_back_dept_info where dept_type=4) a
+	left JOIN t_back_dept_info s on a.dept_parent_id=s.dept_id
+	LEFT JOIN t_back_dept_info ch on s.dept_parent_id=ch.dept_id
+	LEFT JOIN t_back_dept_info ce on ch.dept_parent_id=ce.dept_id
+	left JOIN t_back_dept_info p on ce.dept_parent_id=p.dept_id
+	where a.dept_id=#{agent_id}
+	 </select>
+	 
+	 <select id="queryBrokerForProrate" parameterType="hashmap" resultType="map">
+		SELECT b_id FROM t_back_dept_prorate where b_id=#{b_id}
+	 </select>
+	 
+	 <insert id="insertBrokerProrate" parameterType="hashmap">
+	INSERT INTO t_back_dept_prorate (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id != null and sys_id !=''">sys_id,</if>
+	        <if test="p_id != null and p_id !=''">p_id,</if>
+	        <if test="ce_id != null and ce_id !=''">ce_id,</if>
+	        <if test="ch_id != null and ch_id !=''">ch_id,</if>
+	        <if test="s_id != null and s_id !=''">s_id,</if>
+	        <if test="a_id != null and a_id !=''">a_id,</if>
+	        <if test="b_id != null and b_id !=''">b_id,</if>
+	        <if test="p_allot != null and p_allot !=''">p_allot,</if>
+	        <if test="ce_allot != null and ce_allot !=''">ce_allot,</if>
+	        <if test="ch_allot != null and ch_allot !=''">ch_allot,</if>
+	        <if test="s_allot != null and s_allot !=''">s_allot,</if>
+	        <if test="a_allot != null and a_allot !=''">a_allot,</if>
+	        <if test="b_allot != null and b_allot !=''">b_allot,</if>
+	        <if test="is_use != null and is_use !=''">is_use,</if>
+	        <if test="create_date != null and create_date !=''">create_date,</if>
+	    </trim>
+    )VALUES(
+		<trim suffix="" suffixOverrides=",">
+
+			<if test="sys_id != null and sys_id !=''">#{sys_id},</if>
+	        <if test="p_id != null and p_id !=''">#{p_id},</if>
+	        <if test="ce_id != null and ce_id !=''">#{ce_id},</if>
+	        <if test="ch_id != null and ch_id !=''">#{ch_id},</if>
+	        <if test="s_id != null and s_id !=''">#{s_id},</if>
+	        <if test="a_id != null and a_id !=''">#{a_id},</if>
+	        <if test="b_id != null and b_id !=''">#{b_id},</if>
+	        <if test="p_allot != null and p_allot !=''">#{p_allot},</if>
+	        <if test="ce_allot != null and ce_allot !=''">#{ce_allot},</if>
+	        <if test="ch_allot != null and ch_allot !=''">#{ch_allot},</if>
+	        <if test="s_allot != null and s_allot !=''">#{s_allot},</if>
+	        <if test="a_allot != null and a_allot !=''">#{a_allot},</if>
+	        <if test="b_allot != null and b_allot !=''">#{b_allot},</if>
+	        <if test="is_use != null and is_use !=''">#{is_use},</if>
+	        <if test="create_date != null and create_date !=''">#{create_date},</if>
+        </trim>
+    )
+	</insert>
+	
+	 <select id="queryUserByMobile" parameterType="hashmap" resultType="map">
+			select mobile from t_user_info where mobile=#{mobile}
+	 </select>
+
+
+
+	<select id="queryUserById" parameterType="hashmap" resultType="map">
+		select broker_mobile,broker_level from t_front_broker where broker_id=#{broker_id}
+	</select>
+
+
+
+	<select id="queryUserInfoDept" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.name,
+		t.mobile,
+		t.id_card,
+		t.create_time,
+		t.update_time,
+		t.account_type,
+		t.account_level,
+		t.dept_id,
+		t1.dept_name,
+		t2.dept_id as agent_id,
+		t2.dept_name as agent_name,
+		t3.dept_id as settle_id,
+		t3.dept_name as settle_name,
+		t4.dept_id as ch_id,
+		t4.dept_name as	ch_name,
+		t5.dept_id as ce_id,
+		t5.dept_name as ce_name
+		FROM t_user_info t
+		LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t.dept_id
+		LEFT JOIN t_back_dept_info t2 ON t2.dept_id=t1.dept_parent_id
+		LEFT JOIN t_back_dept_info t3 ON t3.dept_id=t2.dept_parent_id
+		LEFT JOIN t_back_dept_info t4 ON t4.dept_id=t3.dept_parent_id
+		LEFT JOIN t_back_dept_info t5 ON t5.dept_id=t4.dept_parent_id
+		where
+		t.account_type ='02'
+		<if test="name!=null and name!=''">
+			AND t.name like CONCAT(CONCAT(#{name}), '%')
+		</if>
+		<if test="mobile!=null and mobile!=''">
+			AND t.mobile = #{mobile}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND t5.dept_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND t4.dept_id=#{ch_id}
+		</if>
+		<if test="settle_id!=null and settle_id!=''">
+			AND t3.dept_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			AND t2.dept_id=#{agent_id}
+		</if>
+		<if test="DID!=null and DID!=''">
+			AND t.dept_id=#{DID}
+		</if>
+		order by t.create_time asc
+	</select>
+
+
+
+
+	<select id="queryUserInfoDeptList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.name,
+		t.mobile,
+		t.id_card,
+		t.create_time,
+		t.update_time,
+		t.account_type,
+		t.account_level,
+		t.dept_id,
+		t1.dept_name,
+		t2.dept_id as agent_id,
+		t2.dept_name as agent_name,
+		t3.dept_id as settle_id,
+		t3.dept_name as settle_name,
+		t4.dept_id as ch_id,
+		t4.dept_name as	ch_name,
+		t5.dept_id as ce_id,
+		t5.dept_name as ce_name
+		FROM t_user_info t
+		LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t.dept_id
+		LEFT JOIN t_back_dept_info t2 ON t2.dept_id=t1.dept_parent_id
+		LEFT JOIN t_back_dept_info t3 ON t3.dept_id=t2.dept_parent_id
+		LEFT JOIN t_back_dept_info t4 ON t4.dept_id=t3.dept_parent_id
+		LEFT JOIN t_back_dept_info t5 ON t5.dept_id=t4.dept_parent_id
+		where
+		t.account_type ='02'
+		<if test="name!=null and name!=''">
+			AND t.name like CONCAT(CONCAT(#{name}), '%')
+		</if>
+		<if test="mobile!=null and mobile!=''">
+			AND t.mobile = #{mobile}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND t5.dept_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND t4.dept_id=#{ch_id}
+		</if>
+		<if test="settle_id!=null and settle_id!=''">
+			AND t3.dept_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			AND t2.dept_id=#{agent_id}
+		</if>
+		<if test="DID!=null and DID!=''">
+			AND t.dept_id=#{DID}
+		</if>
+		order by t.create_time asc
+	</select>
+</mapper>
+

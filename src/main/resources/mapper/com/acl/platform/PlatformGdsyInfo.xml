@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformGdsyInfoDao">
+	<select id="queryGdsyInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			t.gdsy_id,
+			t.gdsy_name,
+			t.gdsy_alias,
+			t.gdsy_type,
+			t.gdsy_ratio,
+			t.gdsy_code,
+			t.gdsy_number,
+			t.gdsy_time,
+			t.gdsy_unit,
+			t.gdsy_poundage,
+			t.gdsy_money,
+			t.is_use,
+			DATE_FORMAT(t.create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+			t.gdsy_order,
+			t.gdsy_lot,
+			t.gdsy_rule,
+			t.gdsy_buy_no_time,
+			t.gdsy_buy_no_date      
+		FROM
+			t_gdsy_info t
+		<!--/*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/  -->  
+		WHERE
+		1 = 1
+		<if test="gdsy_name  != null and gdsy_name !=''">
+		AND gdsy_name like CONCAT(CONCAT(#{gdsy_name}), '%')
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if> -->
+	</select>
+
+
+	<insert id="insertGdsyInfo" parameterType="hashmap">
+		insert into t_gdsy_info (
+		<trim suffix="" suffixOverrides=",">
+			<if test="gdsy_id  != null and gdsy_id !=''">gdsy_id,</if>
+			<if test="gdsy_name  != null and gdsy_name !=''">gdsy_name,</if>
+			<if test="gdsy_type  != null and gdsy_type !=''">gdsy_type,</if>
+			<if test="gdsy_code  != null and gdsy_code !=''">gdsy_code,</if>
+			<if test="gdsy_number  != null and gdsy_number !=''">gdsy_number,</if>
+			<if test="gdsy_ratio  != null and gdsy_ratio !=''">gdsy_ratio,</if>
+			<if test="gdsy_time  != null and gdsy_time !=''">gdsy_time,</if>
+			<if test="gdsy_unit  != null and gdsy_unit !=''">gdsy_unit,</if>
+			<if test="gdsy_poundage  != null and gdsy_poundage !=''">gdsy_poundage,</if>
+			<if test="gdsy_money  != null and gdsy_money !=''">gdsy_money,</if>
+			<if test="is_use  != null and is_use !=''">is_use,</if>
+			<if test="create_date  != null and create_date !=''">create_date,</if>
+			<if test="gdsy_order  != null and gdsy_order !=''">gdsy_order,</if>
+			<if test="gdsy_rule != null and gdsy_rule !=''">gdsy_rule,</if>
+			<if test="gdsy_alias != null and gdsy_alias !=''">gdsy_alias,</if>
+			<if test="gdsy_lot  != null and gdsy_lot !=''">gdsy_lot,</if>
+			<if test="gdsy_buy_no_date  != null and gdsy_buy_no_date !=''">gdsy_buy_no_date,</if>
+			<if test="gdsy_buy_no_time  != null and gdsy_buy_no_time !=''">gdsy_buy_no_time,</if>
+			
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="gdsy_id  != null and gdsy_id !=''">#{gdsy_id},</if>
+			<if test="gdsy_name  != null and gdsy_name !=''">#{gdsy_name},</if>
+			<if test="gdsy_type  != null and gdsy_type !=''">#{gdsy_type},</if>
+			<if test="gdsy_code  != null and gdsy_code !=''">#{gdsy_code},</if>
+			<if test="gdsy_number  != null and gdsy_number !=''">#{gdsy_number},</if>
+			<if test="gdsy_ratio  != null and gdsy_ratio !=''">#{gdsy_ratio},</if>
+			<if test="gdsy_time  != null and gdsy_time !=''">#{gdsy_time},</if>
+			<if test="gdsy_unit  != null and gdsy_unit !=''">#{gdsy_unit},</if>
+			<if test="gdsy_poundage  != null and gdsy_poundage !=''">#{gdsy_poundage},</if>
+			<if test="gdsy_money  != null and gdsy_money !=''">#{gdsy_money},</if>
+			<if test="is_use  != null and is_use !=''">#{is_use},</if>
+			<if test="create_date  != null and create_date !=''">#{create_date},</if>
+			<if test="gdsy_order  != null and gdsy_order !=''">#{gdsy_order},</if>
+			<if test="gdsy_rule  != null and gdsy_rule !=''">#{gdsy_rule},</if>
+			<if test="gdsy_alias  != null and gdsy_alias !=''">#{gdsy_alias},</if>
+			<if test="gdsy_lot  != null and gdsy_lot !=''">#{gdsy_lot},</if>		
+			<if test="gdsy_buy_no_date  != null and gdsy_buy_no_date !=''">#{gdsy_buy_no_date},</if>
+			<if test="gdsy_buy_no_time  != null and gdsy_buy_no_time !=''">#{gdsy_buy_no_time},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateGdsyInfo" parameterType="hashmap">
+		UPDATE t_gdsy_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="gdsy_name  != null and gdsy_name !=''">gdsy_name=#{gdsy_name},</if>
+			<if test="gdsy_type  != null and gdsy_type !=''">gdsy_type=#{gdsy_type},</if>
+			<if test="gdsy_code  != null and gdsy_code !=''">gdsy_code=#{gdsy_code},</if>
+			<if test="gdsy_number  != null and gdsy_number !=''">gdsy_number=#{gdsy_number},</if>
+			<if test="gdsy_ratio  != null and gdsy_ratio !=''">gdsy_ratio=#{gdsy_ratio},</if>
+			<if test="gdsy_time  != null and gdsy_time !=''">gdsy_time=#{gdsy_time},</if>
+			<if test="gdsy_unit  != null and gdsy_unit !=''">gdsy_unit=#{gdsy_unit},</if>				
+			<if test="gdsy_poundage  != null and gdsy_poundage !=''">gdsy_poundage=#{gdsy_poundage},</if>
+			<if test="gdsy_money  != null and gdsy_money !=''">gdsy_money=#{gdsy_money},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+			<if test="create_date  != null and create_date !=''">create_date=#{create_date},</if>
+			<if test="gdsy_order  != null and gdsy_order !=''">gdsy_order=#{gdsy_order},</if>
+			<if test="gdsy_lot  != null and gdsy_lot !=''">gdsy_lot=#{gdsy_lot},</if>
+			<if test="gdsy_rule  != null and gdsy_rule !=''">gdsy_rule=#{gdsy_rule},</if>
+			<if test="gdsy_alias  != null and gdsy_alias !=''">gdsy_alias=#{gdsy_alias},</if>
+			<if test="gdsy_buy_no_date  != null and gdsy_buy_no_date !=''">gdsy_buy_no_date=#{gdsy_buy_no_date},</if>
+			<if test="gdsy_buy_no_time  != null and gdsy_buy_no_time !=''">gdsy_buy_no_time=#{gdsy_buy_no_time}</if>
+		</trim>
+		WHERE gdsy_id=#{gdsy_id}
+	</update>
+	
+    <select id="gdsyGoodsValidate" parameterType="hashmap" resultType="map">
+	    SELECT gdsy_name FROM  t_gdsy_info WHERE gdsy_name = #{gdsy_name}
+	</select>
+	<insert id="insertDeptGdsyInfo" parameterType="hashmap">
+		insert into t_dept_gdsy (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id  != null and sys_id !=''">sys_id,</if>
+			<if test="dept_id  != null and dept_id !=''">dept_id,</if>
+			<if test="gdsy_id  != null and gdsy_id !=''">gdsy_id,</if>			
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id  != null and sys_id !=''">#{sys_id},</if>
+			<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+			<if test="gdsy_id  != null and gdsy_id !=''">#{gdsy_id},</if>			
+		</trim>
+		)
+	</insert>
+	<select id="queryGdsyRelationDeptInfo" parameterType="hashmap" resultType="map">
+			select 
+			 t.gdsy_name,
+			 t.gdsy_alias,
+			 t.gdsy_type,
+			 t.gdsy_code,
+			 t.gdsy_number,
+			 t.gdsy_ratio,
+			 t.gdsy_time,
+			 t.gdsy_poundage,
+			 t.gdsy_money,
+			 t.is_use,
+			 t.create_date,
+			 t.gdsy_order,
+			 t.gdsy_lot,
+			 t.gdsy_unit,
+			 t.gdsy_rule,
+			 t.gdsy_buy_no_time,
+			 t.gdsy_buy_no_date,
+			 t1.dept_id,
+			 t1.gdsy_id
+			from t_gdsy_info t INNER JOIN t_dept_gdsy t1 on t.gdsy_id =t1.gdsy_id
+			where 
+			1=1
+			and  t.is_use =1 AND t.gdsy_rule=#{gdsy_rule}
+	</select>
+	<select id="queryGdsyGoodsInfo" parameterType="hashmap" resultType="map">
+			select t.gdsy_id,
+			 t.gdsy_name,
+			 t.gdsy_alias,
+			 t.gdsy_type,
+			 t.gdsy_code,
+			 t.gdsy_number,
+			 t.gdsy_ratio,
+			 t.gdsy_time,
+			 t.gdsy_poundage,
+			 t.gdsy_money,
+			 t.is_use,
+			 t.create_date,
+			 t.gdsy_order,
+			 t.gdsy_lot,
+			 t.gdsy_unit,
+			 t.gdsy_rule,
+			 t.gdsy_buy_no_time,
+			 t.gdsy_buy_no_date			
+			from t_gdsy_info t
+			where 1=1
+			and t.gdsy_rule=#{gdsy_rule}
+			order by gdsy_order desc
+	</select>
+	<select id="queryGdsyDeptInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			t.sys_id,
+			t.dept_id,
+			t.gdsy_id    
+		FROM
+			t_dept_gdsy t
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1		
+		AND gdsy_id= #{gdsy_id}	
+	</select>
+	<select id="deleteGdsyDept" parameterType="hashmap" resultType="map">
+	   DELETE from t_dept_gdsy where gdsy_id=#{gdsy_id}
+	</select>
+	
+	<select id="selectGdsyGroup" parameterType="hashmap" resultType="map">	  
+   		<!-- 
+   			select gdsy_type,gdsy_name, GROUP_CONCAT(DISTINCT gdsy_code)gdsy_code,gdsy_number from t_gdsy_info  t GROUP BY gdsy_type
+   		 -->
+   		select gdsy_type,gdsy_name, gdsy_alias,GROUP_CONCAT(DISTINCT gdsy_code order by gdsy_code asc)gdsy_code,gdsy_number,
+   		GROUP_CONCAT(
+		DISTINCT CONCAT_WS(
+			'$',
+			g.goods_name,
+			g.goods_desc
+		)
+		ORDER BY
+			g.is_order ASC SEPARATOR '#'
+	) goods_detail,
+	GROUP_CONCAT(
+		DISTINCT CONCAT_WS('#', img.goods_url, img.type)
+		ORDER BY
+			type ASC,
+			img.is_order ASC SEPARATOR ','
+	) goods_img
+   		 from t_gdsy_info  t
+   		LEFT JOIN t_goods_info g ON t.gdsy_number = g.goods_code
+		LEFT JOIN t_goods_image img ON t.gdsy_number = img.goods_code
+		where t.is_use=1 and t.gdsy_rule=#{gdsy_rule} and gdsy_id in (select gdsy_id from t_dept_gdsy where dept_id =#{dept_id}) GROUP BY gdsy_type
+		order by gdsy_order asc
+	</select>
+	
+	<select id="selectGdsyRelation" parameterType="hashmap" resultType="map">	   
+	   <!-- select dept_id from t_dept_gdsy  t GROUP BY dept_id-->
+	   select t.dept_id from t_dept_gdsy t
+	   INNER JOIN t_gdsy_info t1
+	   on t.gdsy_id = t1.gdsy_id    
+	   where  t1.is_use=1 and t1.gdsy_rule=#{gdsy_rule} GROUP BY dept_id
+	</select>
+	
+	<select id="selectGdsyGoodsInfo" parameterType="hashmap" resultType="map">			
+			select tb1.gdsy_name,tb1.gdsy_alias,tb1.gdsy_type, tb1.gdsy_code,tb1.gdsy_number, tb1.gdsy_ratio,
+tb1.gdsy_poundage,tb1.gdsy_money,tb1.gdsy_lot,tb1.gdsy_unit,tb1.gdsy_rule,tb1.gdsy_buy_no_time,	tb1.gdsy_buy_no_date,
+cast(GROUP_CONCAT(tb1.gdsy_id,"_",tb1.gdsy_time,"_",tb1.gdsy_ratio,"_",gdsy_rule,"_",tb1.gdsy_poundage ORDER BY gdsy_order) as char) as condata from 
+(
+			select t.gdsy_id,
+			t.gdsy_name,
+			t.gdsy_alias,
+			t.gdsy_type,
+			t.gdsy_code,
+			t.gdsy_number,
+ 		   	t.gdsy_ratio,
+			t.gdsy_time,
+			t.gdsy_poundage,
+			t.gdsy_money,
+			t.is_use,
+			t.create_date,
+			t.gdsy_order,
+			t.gdsy_lot,
+			t.gdsy_unit,
+			t.gdsy_rule,
+			t.gdsy_buy_no_time,
+			t.gdsy_buy_no_date,
+			t1.dept_id
+			from t_gdsy_info t INNER JOIN  t_dept_gdsy t1 ON t.gdsy_id = t1.gdsy_id
+			where 
+			1=1 and t.is_use=1	
+			AND t1.dept_id=#{dept_id}		
+			AND t.gdsy_code=#{gdsy_code}
+			AND t.gdsy_rule=#{gdsy_rule}
+    ORDER BY t.gdsy_order asc
+) tb1
+	</select>
+	<select id="queryGdsyDeptNoexist" parameterType="hashmap" resultType="map">
+	   select dept_id from t_back_dept_info where dept_type=4
+	   and dept_id not in (select dept_id from t_dept_gdsy)
+	</select>		
+</mapper>

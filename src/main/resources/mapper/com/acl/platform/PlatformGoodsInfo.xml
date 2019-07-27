@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.platform.dao.IPlatformGoodsInfoDao">
+<select id="queryGoodsInfo" parameterType="hashMap" resultType="map">
+    SELECT
+	goods_id,	
+	goods_name,
+	goods_ename,
+	goods_code,
+	goods_pro,
+	goods_type,
+	goods_desc,
+	is_order,
+	is_use
+FROM
+	t_goods_info
+WHERE 1=1
+<if test="goods_name!=null and goods_name!=''">AND goods_name like CONCAT(CONCAT(#{goods_name}), '%')</if>
+</select>
+<insert id="insertGoodsInfo" parameterType="hashMap">
+    INSERT INTO t_goods_info
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="goods_id  != null and goods_id!=''">goods_id,</if>
+		<if test="goods_name  != null and goods_name!=''">goods_name,</if>
+		<if test="goods_ename  != null and goods_ename!=''">goods_ename,</if>
+		<if test="goods_code  != null and goods_code!=''">goods_code,</if>
+		<if test="goods_pro  != null and goods_pro!=''">goods_pro,</if>
+		<if test="goods_type  != null and goods_type!=''">goods_type,</if>
+		<if test="goods_desc  != null and goods_desc!=''">goods_desc,</if>
+		<if test="is_order  != null and is_order!=''">is_order,</if>
+		<if test="is_use  != null and is_use!=''">is_use,</if>		
+	</trim>
+	)values(
+	<trim suffix="" suffixOverrides=",">
+		<if test="goods_id  != null and goods_id!=''">#{goods_id},</if>
+		<if test="goods_name  != null and goods_name!=''">#{goods_name},</if>
+		<if test="goods_ename  != null and goods_ename!=''">#{goods_ename},</if>
+		<if test="goods_code  != null and goods_code!=''">#{goods_code},</if>
+		<if test="goods_pro  != null and goods_pro!=''">#{goods_pro},</if>
+		<if test="goods_type  != null and goods_type!=''">#{goods_type},</if>
+		<if test="goods_desc  != null and goods_desc!=''">#{goods_desc},</if>
+		<if test="is_order  != null and is_order!=''">#{is_order},</if>
+		<if test="is_use  != null and is_use!=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+
+<!-- 更新图片信息 -->
+    <update id="updateGoodsInfo" parameterType="hashmap">
+		UPDATE t_goods_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id!=''">goods_id=#{goods_id},</if>
+			<if test="goods_name  != null and goods_name!=''">goods_name=#{goods_name},</if>
+			<if test="goods_ename  != null and goods_ename!=''">goods_ename=#{goods_ename},</if>
+			<if test="goods_code  != null and goods_code!=''">goods_code=#{goods_code},</if>
+			<if test="goods_pro  != null and goods_pro!=''">goods_pro=#{goods_pro},</if>
+			<if test="goods_type  != null and goods_type!=''">goods_type=#{goods_type},</if>
+			<if test="goods_desc  != null and goods_desc!=''">goods_desc=#{goods_desc},</if>
+			<if test="is_order  != null and is_order!=''">is_order=#{is_order},</if>
+			<if test="is_use  != null and is_use!=''">is_use=#{is_use},</if>
+		</trim>
+		WHERE goods_id=#{goods_id}
+	</update>
+	<!-- 删除商品图片-->
+	 <delete id="deleteGoodsInfo" parameterType="hashmap">
+		DELETE FROM t_goods_info
+		  WHERE goods_id =#{goods_id}
+	</delete>
+	
+	<select id="queryGoodsName" parameterType="hashMap" resultType="map">
+	SELECT dict_name,dict_id FROM T_BACK_DICT_INFO WHERE
+		dict_id!=1
+		<if test="dict_code!=null and dict_code!=''">AND DICT_CODE =#{dict_code}</if>
+		order by is_order
+	</select>
+
+</mapper>

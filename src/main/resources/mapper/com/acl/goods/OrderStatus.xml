@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.goods.dao.OrderStatusDao">
+
+    <resultMap id="BaseResultMap" type="com.acl.pojo.OrderStatus">
+        <id column="status_id" property="statusId" jdbcType="BIGINT"/>
+        <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="orderStatus" property="orderStatus" jdbcType="TINYINT"/>
+        <result column="process_time" property="processTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="is_use" property="isUse" jdbcType="CHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        status_id,order_id,order_status,process_time,create_time,update_time,is_use
+    </sql>
+
+    <sql id="where_sql_keys">
+        <where>
+            AND status_id = #{statusId,jdbcType=BIGINT}
+        </where>
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="statusId != null">
+                AND status_id = #{statusId,jdbcType=BIGINT}
+            </if>
+            <if test="orderId != null and orderId != ''">
+                AND order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderStatus != null">
+                AND order_status = #{orderStatus,jdbcType=TINYINT}
+            </if>
+            <if test="processTime != null">
+                AND process_time = #{processTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createTime != null">
+                AND create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="updateTime != null">
+                AND update_time = #{updateTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="isUse != null and isUse != ''">
+                AND is_use = #{isUse,jdbcType=CHAR}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="Long">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_front_mall_order_status
+        <include refid="where_sql_keys"/>
+    </select>
+
+    <select id="select" resultMap="BaseResultMap" parameterType="com.acl.pojo.OrderStatus">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_front_mall_order_status
+        <include refid="where_sql"/>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        DELETE FROM t_front_mall_order_status
+        <include refid="where_sql_keys"/>
+    </delete>
+
+    <delete id="delete" parameterType="com.acl.pojo.OrderStatus">
+        DELETE FROM t_front_mall_order_status
+        <include refid="where_sql"/>
+    </delete>
+
+    <insert id="insert" parameterType="com.acl.pojo.OrderStatus">
+        INSERT INTO t_front_mall_order_status
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null and orderId != ''">
+                order_id,
+            </if>
+            <if test="orderStatus != null">
+                order_status,
+            </if>
+            <if test="processTime != null">
+                process_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="isUse != null and isUse != ''">
+                is_use,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null and orderId != ''">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null">
+                #{orderStatus,jdbcType=TINYINT},
+            </if>
+            <if test="processTime != null">
+                #{processTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isUse != null and isUse != ''">
+                #{isUse,jdbcType=CHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.acl.pojo.OrderStatus">
+        UPDATE t_front_mall_order_status
+        <set>
+            <if test="orderId != null and orderId != ''">
+                order_id = #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus,jdbcType=TINYINT},
+            </if>
+            <if test="processTime != null">
+                process_time = #{processTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isUse != null and isUse != ''">
+                is_use = #{isUse,jdbcType=CHAR},
+            </if>
+        </set>
+        <include refid="where_sql_keys"/>
+    </update>
+</mapper>

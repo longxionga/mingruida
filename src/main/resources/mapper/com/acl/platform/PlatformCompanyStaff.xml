@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformCompanyStaffDao">
+	<select id="queryCompanyStaffInfoPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.parentid,
+		t.brandid,
+		bd.dept_name,
+		t1.name as brandname,
+		t.staffcode,
+		t.staffname,
+		t.phoneNO,
+		t.staffstate,
+		DATE_FORMAT(t.startdate,'%Y-%m-%d') as startdate,
+		DATE_FORMAT(t.enddate,'%Y-%m-%d') as enddate ,
+		t.position,
+		t.branch,
+		t.remarks,
+		t.channel,
+		t.agentcode,
+		t.agentname,
+		t.isstate,
+		t.bystages,
+		t.logincode,
+		t.detailedaddress,
+		t.create_time,
+		t.update_time,
+		t.shengzhistate,
+		case when   #{orgid} = t.id then  '1' else '2' end  as istart
+		FROM
+		t_data_company_staff t LEFT JOIN t_front_brand_rule t1 on t.brandid = t1.id
+		LEFT JOIN t_back_dept_info bd on t.branch = bd.dept_id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		WHERE
+		1 = 1
+		<if test="ibrand_id  != null and ibrand_id !=''">
+			AND t.brandid =#{ibrand_id}
+		</if>
+		<if test="isdept_id  != null and isdept_id !=''">
+		AND t.branch like CONCAT(CONCAT(#{isdept_id}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+        <if test="position!=null and position!='' ">
+            AND t.position =#{position}
+        </if>
+        <if test="orgid!=null and orgid!='' ">
+            and (t.id = #{orgid}
+            OR tt2.id = #{orgid}
+            OR tt3.id = #{orgid}
+            OR tt4.id = #{orgid})
+
+        </if>
+
+
+	</select>
+
+
+	<insert id="insertCompanyStaff" parameterType="hashmap">
+		insert into t_data_company_staff
+		(id,
+		parentid,
+		staffname,
+		staffcode,
+		agentcode,
+		agentname,
+		phoneNO,
+		staffstate,
+		startdate,
+		enddate,
+		position,
+		branch,
+		remarks,
+		channel,
+		brandid,
+		bystages,
+		isstate,
+		logincode,
+		loginuserid
+		)VALUES
+		<foreach collection="itemMap" separator="," item="item">
+		(#{item.id},#{item.parentid},#{item.staffname},#{item.staffcode},#{item.agentcode},#{item.agentname},
+		#{item.phoneNO},#{item.staffstate},#{item.startdate},#{item.enddate},#{item.position},#{item.branch},
+		#{item.remarks},#{item.channel},#{item.brandid},#{item.bystages},#{item.isstate},#{item.logincode},
+		#{item.loginuserid}
+
+		)
+		</foreach>
+	</insert>
+
+	<delete id="deleteCompanyStaffAll" parameterType="hashmap">
+		DELETE FROM t_data_company_staff
+
+	</delete>
+
+	<select id="findConpanyStaffByName" parameterType="hashmap" resultType="map">
+		SELECT
+		tt.id
+		FROM
+		(
+		SELECT
+		t.id,
+		CONCAT_WS(
+		'-',
+		bd.dept_name,
+		t.staffname
+		) AS agentname
+		FROM
+		t_data_company_staff t
+		LEFT JOIN t_back_dept_info bd ON t.branch = bd.dept_id
+		WHERE
+		1 = 1
+		<if test="name  != null and name !=''">
+			AND t.staffname=#{name}
+		</if>
+		<if test="agentcode  != null and agentcode !=''">
+			AND t.agentcode=#{agentcode}
+		</if>
+		<if test="branch  != null and branch !=''">
+			AND t.branch=#{branch}
+		</if>
+		<if test="brandid  != null and brandid !=''">
+			AND t.brandid=#{brandid}
+		</if>
+		) tt
+		WHERE
+		1 = 1
+		<if test="agentname  != null and agentname !=''">
+			AND locate( tt.agentname,#{agentname})>0
+		</if>
+    </select>
+
+	<!--<sql id="where_sql">
+		<where>
+			<if test="branch  != null and branch !=''">
+				AND t.branch like CONCAT(CONCAT(#{branch}), '%')
+			</if>
+			<if test="staffname  != null and staffname !=''">
+				AND t.staffname like CONCAT(CONCAT(#{staffname}), '%')
+			</if>
+			<if test="position!=null and position!='' and position!='0' ">
+				AND t.position =#{position}
+			</if>
+		</where>
+	</sql>-->
+	<select id="querystaffInfoByType" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.parentid,
+		t.brandid,
+		t.staffcode,
+		t.staffname,
+		t.phoneNO,
+		t.staffstate,
+		t.startdate,
+		t.enddate,
+		t.position,
+		t.branch,
+		t.remarks,
+		t.channel,
+		t.agentcode,
+		t.agentname,
+		tf.`name` as brandname,
+		tb.dept_name,
+		t.loginuserid
+		FROM
+		t_data_company_staff t LEFT JOIN t_front_brand_rule tf on t.brandid = tf.id
+		LEFT JOIN t_back_dept_info tb on t.branch = tb.dept_id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		LEFT JOIN t_back_user bu on t.loginuserid = bu.user_id
+		WHERE
+		t.branch IS NOT NULL
+		<if test="branch  != null and branch !=''">
+			AND t.branch like CONCAT(CONCAT(#{branch}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+		<if test="position!=null and position!='' and position!=0 ">
+			AND t.position =#{position}
+		</if>
+		<if test="broker_name!=null and broker_name!='' ">
+			AND t.staffname =#{broker_name}
+		</if>
+		<if test="broker_code!=null and broker_code!=''">
+			AND t.staffcode =#{broker_code}
+		</if>
+		<if test="staff_id!=null and staff_id!=''">
+			AND t.id =#{staff_id}
+		</if>
+		<if test="loginname!=null and loginname!=''">
+			AND bu.user_name =#{loginname}
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+
+             and (t.id = #{orgid} OR tt2.id = #{orgid}
+            OR tt3.id = #{orgid}
+            OR tt4.id = #{orgid})
+		</if>
+		<if test="brandid!=null and brandid!=''">
+			AND t.brandid =#{brandid}
+		</if>
+
+		ORDER BY
+		t.id
+	</select>
+
+	<select id="querystaffCompanyInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			tt.branch AS id,
+			tt.branch AS branchname
+		FROM
+			(
+				SELECT DISTINCT
+					t.branch
+				FROM
+					t_data_company_staff t where t.branch is not null
+					<if test="brand_id!=null and brand_id!=''">
+						AND t.brandid =#{brand_id}
+					</if>
+			) tt ORDER BY tt.branch
+
+	</select>
+
+
+	<select id="querystaffInfoForCombox" parameterType="hashmap" resultType="map">
+		SELECT
+		a.id as id,
+		a.name as text
+		FROM
+		t_front_brand_rule a
+		WHERE 1=1
+		<if test="status!=null and status!=''">
+			AND a.status =#{status}
+		</if>
+		<if test="id!=null and id!=''">
+			AND a.id =#{id}
+		</if>
+		order by create_time asc
+	</select>
+
+	<select id="querystaffCompanyInfoForCombox" parameterType="hashmap" resultType="map">
+		SELECT
+		tt.branch AS id,
+		tt.branch AS text
+		FROM
+		(
+		SELECT DISTINCT
+		t.branch
+		FROM
+		t_data_company_staff t where t.branch is not null
+		<if test="brand_id!=null and brand_id!=''">
+			AND t.brandid =#{brand_id}
+		</if>
+		) tt ORDER BY tt.branch
+	</select>
+
+	<select id="queryCompanyManagerForCombox" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id AS id,
+		t.agentname AS text
+		FROM
+		t_data_company_staff t
+		WHERE
+		t.branch IS NOT NULL
+		AND t.position = '1'
+		<if test="company_name!=null and company_name!=''">
+			AND t.branch =#{company_name}
+		</if>
+	</select>
+
+	<select id="queryStaffDeptInfoForCombox" parameterType="hashmap" resultType="map">
+		SELECT
+			dept_id as  id,
+			dept_name as text
+		FROM
+			t_back_dept_info v
+		WHERE
+			v.dept_type = '5'
+			 AND v.dept_mobile !='-1'
+	  </select>
+
+	<insert id="insCompanyStaff" parameterType="hashmap">
+		INSERT INTO t_data_company_staff(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">id,</if>
+			<if test="brandid!=null and brandid!=''">brandid,</if>
+			<if test="branch!=null and branch!=''">branch,</if>
+			<if test="staffcode!=null and staffcode!=''">staffcode,</if>
+			<if test="staffname!=null and staffname!=''">staffname,</if>
+			<if test="bystages!=null and bystages!=''">bystages,</if>
+			<if test="logincode!=null and logincode!=''">logincode,</if>
+			<if test="position!=null and position!=''">position,</if>
+			<if test="staffstate!=null and staffstate!=''">staffstate,</if>
+			<if test="phoneNO!=null and phoneNO!=''">phoneNO,</if>
+			<if test="isstate!=null and isstate!=''">isstate,</if>
+			<if test="detailedaddress!=null and detailedaddress!=''">detailedaddress,</if>
+			<if test="create_time!=null and create_time!=''">create_time,</if>
+			<if test="startdate!=null and startdate!=''">startdate,</if>
+			<if test="enddate!=null and enddate!=''">enddate,</if>
+			<if test="enddate!=null and enddate!=''">parentid,</if>
+			<if test="parentid!=null and parentid!=''">parentid,</if>
+			<if test="loginuserid!=null and loginuserid!=''">loginuserid,</if>
+			<if test="shengzhistate!=null and shengzhistate!=''">shengzhistate,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">#{id},</if>
+			<if test="brandid!=null and brandid!=''">#{brandid},</if>
+			<if test="branch!=null and branch!=''">#{branch},</if>
+			<if test="staffcode!=null and staffcode!=''">#{staffcode},</if>
+			<if test="staffname!=null and staffname!=''">#{staffname},</if>
+			<if test="bystages!=null and bystages!=''">#{bystages},</if>
+			<if test="logincode!=null and logincode!=''">#{logincode},</if>
+			<if test="position!=null and position!=''">#{position},</if>
+			<if test="staffstate!=null and staffstate!=''">#{staffstate},</if>
+			<if test="phoneNO!=null and phoneNO!=''">#{phoneNO},</if>
+			<if test="isstate!=null and isstate!=''">#{isstate},</if>
+			<if test="detailedaddress!=null and detailedaddress!=''">#{detailedaddress},</if>
+			<if test="create_time!=null and create_time!=''">#{create_time},</if>
+			<if test="startdate!=null and startdate!=''">#{startdate},</if>
+			<if test="enddate!=null and enddate!=''">#{enddate},</if>
+			<if test="parentid!=null and parentid!=''">#{parentid},</if>
+			<if test="loginuserid!=null and loginuserid!=''">#{loginuserid},</if>
+			<if test="shengzhistate!=null and shengzhistate!=''">#{shengzhistate},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updCompanyStaff" parameterType="hashmap">
+		UPDATE t_data_company_staff
+		<set>
+			<trim suffixOverrides=",">
+				<if test="brandid!=null and brandid!=''">brandid=#{brandid},</if>
+				<if test="branch!=null and branch!=''">branch=#{branch},</if>
+				<if test="staffcode!=null and staffcode!=''">staffcode=#{staffcode},</if>
+				<if test="staffname!=null and staffname!=''">staffname=#{staffname},</if>
+				<if test="bystages!=null and bystages!=''">bystages=#{bystages},</if>
+				<if test="logincode!=null and logincode!=''">logincode=#{logincode},</if>
+				<if test="position!=null and position!=''">position=#{position},</if>
+				<if test="staffstate!=null and staffstate!=''">staffstate=#{staffstate},</if>
+				<if test="phoneNO!=null and phoneNO!=''">phoneNO=#{phoneNO},</if>
+				<if test="isstate!=null and isstate!=''">isstate=#{isstate},</if>
+				<if test="detailedaddress!=null and detailedaddress!=''">detailedaddress=#{detailedaddress},</if>
+				<if test="update_time!=null and update_time!=''">update_time=now(),</if>
+				<if test="startdate!=null and startdate!=''">startdate=#{startdate},</if>
+				<if test="enddate!=null and enddate!=''">enddate=#{enddate},</if>
+				<if test="parentid!=null and parentid!=''">parentid=#{parentid},</if>
+			</trim>
+		</set>
+		WHERE id=#{id}
+	</update>
+
+	<select id="staffValidate" parameterType="map" resultType="map">
+	    SELECT staffcode FROM  t_data_company_staff WHERE staffcode = #{staffcode}
+	  </select>
+	<select id="staffNameValidate" parameterType="map" resultType="map">
+	    SELECT staffname FROM  t_data_company_staff WHERE staffname = #{staffname}
+	  </select>
+
+	<delete id="deleteCompanyStaff" parameterType="hashmap">
+		DELETE FROM t_data_company_staff WHERE id= #{staffid}
+
+	</delete>
+
+	<select id="getCompanyStaffBox" parameterType="hashmap" resultType="map">
+		SELECT
+		tt.id,
+		getstaffname(tt.id) AS text
+		FROM
+		(
+		SELECT
+		t.id AS id,
+		t.staffname,
+		bd.dept_name as branch,
+		CASE
+		WHEN t.position = '1' THEN
+		'经理'
+		WHEN t.position = '2' THEN
+		'主管'
+		WHEN t.position = '3' THEN
+		'组员'
+		WHEN t.position = '4' THEN
+		'人事'
+		ELSE
+		'其他'
+		END AS ptsition,
+		a. NAME
+		FROM
+		t_data_company_staff t
+		LEFT JOIN t_front_brand_rule a ON t.brandid = a.id
+		LEFT JOIN t_back_dept_info bd on t.branch = bd.dept_id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		WHERE
+		t.branch IS NOT NULL
+
+		<if test="staffname!=null and staffname!=''">
+			AND t.staffname =#{staffname}
+		</if>
+		<if test="brandid!=null and brandid!=''">
+			AND t.brandid =#{brandid}
+		</if>
+		<if test="branch!=null and branch!=''">
+			AND t.branch like CONCAT(CONCAT(#{branch}), '%')
+		</if>
+		<if test="position!=null and position!=''">
+			AND t.position =#{position}
+		</if>
+		<if test="q!=null and q!=''">
+			AND t.staffname like CONCAT(CONCAT(#{q}), '%')
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+            and (tt2.id = #{orgid}
+            OR tt3.id = #{orgid}
+            OR tt4.id = #{orgid})
+
+		</if>
+		) tt
+</select>
+
+<select id="findDeptInfoById" parameterType="hashmap" resultType="map">
+	SELECT
+		dept_id,
+		dept_name
+	FROM
+		t_back_dept_info v
+	WHERE
+	 v.dept_mobile !='-1'
+	<if test="sdept_id!=null and sdept_id!=''">
+		AND v.dept_id= #{sdept_id}
+	</if>
+  </select>
+
+
+	<select id="findStaffInfoById" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.parentid,
+		t.brandid,
+		t.staffcode,
+		t.staffname,
+		t.phoneNO,
+		t.staffstate,
+		t.startdate,
+		t.enddate,
+		t.position,
+		t.branch,
+		t.remarks,
+		t.channel,
+		t.agentcode,
+		t.agentname,
+		tf.`name` as brandname,
+		tb.dept_name,
+		t.loginuserid,
+		t.isstate,
+		t.shengzhistate
+
+		FROM
+		t_data_company_staff t LEFT JOIN t_front_brand_rule tf on t.brandid = tf.id
+		LEFT JOIN t_back_dept_info tb on t.branch = tb.dept_id
+		LEFT JOIN t_back_user bu on t.loginuserid = bu.user_id
+		WHERE
+		1 = 1
+		<if test="branch  != null and branch !=''">
+			AND t.branch like CONCAT(CONCAT(#{branch}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t.staffname = #{staffname}
+		</if>
+		<if test="position!=null and position!='' and position!=0 ">
+			AND t.position =#{position}
+		</if>
+		<if test="broker_name!=null and broker_name!='' ">
+			AND t.staffname =#{broker_name}
+		</if>
+		<if test="broker_code!=null and broker_code!=''">
+			AND t.staffcode =#{broker_code}
+		</if>
+		<if test="staff_id!=null and staff_id!=''">
+			AND t.id =#{staff_id}
+		</if>
+		<if test="loginname!=null and loginname!=''">
+			AND bu.user_name =#{loginname}
+		</if>
+
+		<if test="brandid!=null and brandid!=''">
+			AND t.brandid =#{brandid}
+		</if>
+		<if test="staffid!=null and staffid!=''">
+			AND t.id =#{staffid}
+		</if>
+		<if test="parentid!=null and parentid!=''">
+			AND t.parentid =#{parentid}
+		</if>
+		<if test="loginid!=null and loginid!=''">
+			AND t.loginuserid =#{loginid}
+		</if>
+		ORDER BY
+		t.id
+	</select>
+
+	<select id="querystaffInfoInfoList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.parentid,
+		t.brandid,
+		t.staffcode,
+		t.staffname,
+		t.phoneNO,
+		t.staffstate,
+		t.startdate,
+		t.enddate,
+		t.position,
+		t.branch,
+		t.remarks,
+		t.channel,
+		t.agentcode,
+		t.agentname,
+		tf.`name` as brandname,
+		tb.dept_name,
+		t.loginuserid
+		FROM
+		t_data_company_staff t LEFT JOIN t_front_brand_rule tf on t.brandid = tf.id
+		LEFT JOIN t_back_dept_info tb on t.branch = tb.dept_id
+		LEFT JOIN t_back_user bu on t.loginuserid = bu.user_id
+		WHERE
+		1 = 1
+		<if test="branch  != null and branch !=''">
+			AND t.branch like CONCAT(CONCAT(#{branch}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t.staffname = #{staffname}
+		</if>
+		<if test="position!=null and position!='' and position!=0 ">
+			AND t.position =#{position}
+		</if>
+		<if test="broker_name!=null and broker_name!='' ">
+			AND t.staffname like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="broker_code!=null and broker_code!=''">
+			AND t.staffcode =#{broker_code}
+		</if>
+		<if test="staff_id!=null and staff_id!=''">
+			AND t.id =#{staff_id}
+		</if>
+		<if test="loginname!=null and loginname!=''">
+			AND bu.user_name =#{loginname}
+		</if>
+
+		<if test="brandid!=null and brandid!=''">
+			AND t.brandid =#{brandid}
+		</if>
+
+		ORDER BY
+		t.id
+	</select>
+
+	<select id="queryStaffzhuguanForCombox" parameterType="hashmap" resultType="map">
+		SELECT
+			t.id AS id,
+			t.staffname AS text
+		FROM
+			t_data_company_staff t
+		WHERE
+			t.position = '2'
+		AND t.branch = #{sdept_id}
+	  </select>
+
+	<select id="queryStaffjingli" parameterType="hashmap" resultType="map">
+		SELECT
+			t.*
+		FROM
+			t_data_company_staff t
+		WHERE
+			t.position = '1'
+		<if test="branch!=null and branch!=''">
+			AND t.branch =#{branch}
+		</if>
+		<if test="brandid!=null and brandid!=''">
+			AND t.brandid =#{brandid}
+		</if>
+
+	  </select>
+
+
+
+</mapper>

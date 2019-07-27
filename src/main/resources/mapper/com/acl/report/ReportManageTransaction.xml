@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportManageTransactionDao">
+	<select id="queryManageTransactionPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t1.id,
+		m.`name` AS brandname,
+		bd.dept_name,
+		t1.staffcode,
+		getstaffname(t1.id) AS staffname
+
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="countManageTradeInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		COUNT(t1.id) as mcount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="exportManageTradeReportInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t1.id,
+		m.`name` AS '机具品牌',
+		bd.dept_name AS '所属部门',
+		getstaffname(t1.id) AS '员工名称'
+
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="queryManagetradeSum" parameterType="hashmap" resultType="map">
+		SELECT
+		SUM(tr.order_amount) AS totalsum,
+		SUM(
+
+		IF (
+		tr.pay_type = '支付宝',
+		tr.order_amount,
+		0
+		)
+		) as zhifubaosum,
+		SUM(
+
+		IF (
+		tr.pay_type = '微信支付',
+		tr.order_amount,
+		0
+		)
+		) as weixinsum,
+		SUM(
+
+		IF (
+		tr.pay_type = '银联二维码',
+		tr.order_amount,
+		0
+		)
+		) yinliansum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '贷记卡' <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) daijikasum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '准贷记卡'  <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) as  zhundaijikasum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '借记卡' <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS jijikasum
+
+		FROM
+		(SELECT inf.* FROM t_data_machine_info inf GROUP BY inf.merchantcode) mi
+		INNER JOIN t_data_trade_order tr ON mi.merchantcode = tr.merchant_code
+		WHERE
+		tr.order_state = '1'
+		AND tr.order_type = '消费'
+		<if test="staffid  != null and staffid !=''">
+			AND mi.staffid  = #{staffid}
+		</if>
+		<if test="brindid  != null and brindid !=''">
+			AND mi.brindid = #{brindid}
+		</if>
+		<if test="startdate!=null and startdate!='' ">
+			AND tr.trade_day  >= #{startdate}
+		</if>
+		<if test="enddate!=null and enddate!='' ">
+			AND tr.trade_day <![CDATA[ <= ]]> #{enddate}
+		</if>
+		GROUP BY
+		mi.staffid
+	</select>
+
+
+
+</mapper>

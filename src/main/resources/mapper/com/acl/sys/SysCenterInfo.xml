@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysCenterInfoDao">
+	<select id="queryCenterInfo" parameterType="hashmap" resultType="map">
+			SELECT
+		center_id,
+		center_title,
+		center_text,
+		DATE_FORMAT(c.create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+		center_user,
+		c.is_use,
+		center_type,
+		center_number,
+		center_abstract,
+		DATE_FORMAT(use_date,'%Y-%m-%d %H:%i:%s') as use_date,
+		is_important,
+		c.dept_id,
+		d.dept_name,
+		c.dept_type
+		FROM
+		t_center_info c
+		left join t_back_dept_info d on d.dept_id =c.dept_id
+		WHERE 1=1
+		<if test="center_title!=null and center_title!=''">
+		AND center_title like CONCAT(CONCAT('%', #{center_title}), '%')
+		</if>
+		<if test="center_abstract!=null and center_abstract!=''">
+		AND center_abstract like CONCAT(CONCAT('%', #{center_abstract}), '%')
+		</if>
+		<if test="center_type!=null and center_type!=''">
+		AND center_type=#{center_type}
+		</if>
+		<if test="center_user!=null and center_user!=''">
+		AND center_user=#{center_user}
+		</if>		
+	</select>
+	
+	<select id="queryMessage" parameterType="hashmap" resultType="map">
+		SELECT
+		center_id,
+		center_title,
+		center_text,
+		DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+		center_user,
+		is_use,
+		center_type,
+		center_number,
+		center_abstract,
+		DATE_FORMAT(use_date,'%Y-%m-%d %H:%i:%s') as use_date,
+		is_important
+		FROM
+		t_center_info
+		WHERE is_use='1' and center_type='3'	
+		order by create_date desc limit 10	
+	</select>
+	
+	<select id="queryMsg" parameterType="hashmap" resultType="map">
+		SELECT
+		center_id,
+		center_title,
+		center_text,
+		DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+		center_user,
+		is_use,
+		center_type,
+		center_number,
+		center_abstract,
+		is_important,
+		use_date
+		FROM
+		t_center_info
+		WHERE is_important='1' and is_use='1' and center_type='3' and use_date &gt;=#{newDate}
+		order by create_date desc
+	</select>
+	
+	<select id="queryMsgInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		center_id,
+		center_title,
+		IFNULL(center_text,"") as center_text,
+		DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+		center_user,
+		is_use,
+		center_type,
+		center_number,
+		center_abstract,
+		DATE_FORMAT(use_date,'%Y-%m-%d %H:%i:%s') as use_date,
+		is_important
+		FROM
+		t_center_info
+		WHERE center_id=#{center_id}
+		<!-- WHERE is_use='1' AND center_type='2'
+		order by create_date desc		 -->
+	</select>
+	<insert id="insertCenterInfo" parameterType="hashmap">
+		INSERT INTO t_center_info(
+		<trim suffixOverrides=",">
+			<if test="center_id!=null and center_id!=''">center_id,</if>
+			<if test="center_title!=null and center_title!=''">center_title,</if>
+			<if test="center_text!=null and center_text!=''">center_text,</if>
+			<if test="create_date!=null and create_date!=''">create_date,</if>
+			<if test="center_user!=null and center_user!=''">center_user,</if>
+			<if test="is_use!=null and is_use!=''">is_use,</if>
+			<if test="center_type!=null and center_type!=''">center_type,</if>
+			<if test="center_number!=null and center_number!=''">center_number,</if>
+			<if test="center_abstract!=null and center_abstract!=''">center_abstract,</if>
+			<if test="is_important!=null and is_important!=''">is_important,</if>
+			<if test="use_date!=null and use_date!=''">use_date,</if>
+			<if test="dept_id!=null and dept_id!=''">dept_id,</if>
+			<if test="dept_type!=null and dept_type!=''">dept_type,</if>
+		</trim>
+		)VALUES
+		(
+		<trim suffixOverrides=",">
+			<if test="center_id!=null and center_id!=''">#{center_id},</if>
+			<if test="center_title!=null and center_title!=''">#{center_title},</if>
+			<if test="center_text!=null and center_text!=''">#{center_text},</if>
+			<if test="create_date!=null and create_date!=''">#{create_date},</if>
+			<if test="center_user!=null and center_user!=''">#{center_user},</if>
+			<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			<if test="center_type!=null and center_type!=''">#{center_type},</if>
+			<if test="center_number!=null and center_number!=''">#{center_number},</if>
+			<if test="center_abstract!=null and center_abstract!=''">#{center_abstract},</if>
+			<if test="is_important!=null and is_important!=''">#{is_important},</if>
+			<if test="use_date!=null and use_date!=''">#{use_date},</if>
+			<if test="dept_id!=null and dept_id!=''">#{dept_id},</if>
+			<if test="dept_type!=null and dept_type!=''">#{dept_type},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateCenterInfo" parameterType="hashmap">
+		UPDATE t_center_info
+		<set>
+			<trim suffixOverrides=",">
+				<if test="center_title!=null and center_title!=''">center_title=#{center_title},</if>
+				<!--<if test="center_text!=null and center_text!=''">center_text=#{center_text},</if>-->
+				center_text=#{center_text},
+				<if test="create_date!=null and create_date!=''">create_date=#{create_date},</if>
+				<if test="center_user!=null and center_user!=''">center_user=#{center_user},</if>
+				<if test="is_use!=null and is_use!=''">is_use=#{is_use},</if>
+				<if test="center_type!=null and center_type!=''">center_type=#{center_type},</if>
+				<if test="center_number!=null and center_number!=''">center_number=#{center_number},</if>
+				<if test="center_abstract!=null and center_abstract!=''">center_abstract=#{center_abstract},</if>
+				<if test="is_important!=null and is_important!=''">is_important=#{is_important},</if>
+				<if test="use_date!=null and use_date!=''">use_date=#{use_date},</if>
+				<if test="dept_id!=null and dept_id!=''">dept_id=#{dept_id},</if>
+				<if test="dept_type!=null and dept_type!=''">dept_type=#{dept_type},</if>
+			</trim>
+		</set>
+		WHERE center_id=#{center_id}
+	</update>
+	<delete id="deleteCenterInfo" parameterType="hashmap">
+		DELETE FROM t_center_info WHERE center_id=#{center_id}
+	</delete>
+	<select id="CenterValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		center_title FROM t_center_info WHERE center_title = #{name}
+	</select>
+	
+</mapper>

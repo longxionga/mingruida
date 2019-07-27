@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.platform.dao.IPlatformRefundInfoDao">
+<select id="queryRefundInfo" parameterType="hashMap" resultType="map">
+	SELECT
+	t.id,
+	t.user_id,
+	t.order_id,
+	t.money,
+	t.duty_money,
+	t.transaction_money,
+	t.refund_channel_rule_id,
+	t.out_trade_id,
+	t.user_mobile,
+	t.user_name,
+	t.user_bank_type,
+	t.user_bank_no,
+	t.`status`,
+	t.refund_time,
+	t.create_time,
+	t.update_time,
+	t.del_tag,
+	u.id as use_id,
+	u.agent_id,
+	u.settle_id,
+	d.dept_name as agent_name,
+	s.dept_name as settle_name,
+	z.dict_name as tx_type,
+	st.dict_name
+	FROM
+	t_pay_refund_order t LEFT JOIN t_user_info u ON t.user_id=u.id
+	LEFT JOIN t_back_dept_info d ON d.dept_id =u.agent_id
+	LEFT JOIN t_back_dept_info s ON s.dept_id=u.settle_id
+	LEFT JOIN  t_back_dict_info z ON z.dict_code='1008' and  z.dict_value=t.refund_channel_rule_id
+	LEFT  JOIN  t_back_dict_info st ON st.dict_code='1027' and st.dict_id=t.status
+	WHERE 1=1 and t.status='2'
+	<if test="settle_id!=null and settle_id!=''">
+	AND u.settle_id=#{settle_id}
+	</if>
+	<if test="agent_id!=null and agent_id!=''">
+	AND u.agent_id=#{agent_id}
+	</if>
+	<if test="start_date!=null and start_date!=''">
+	AND t.create_time &gt;=#{start_date}
+	</if>
+	<if test="end_date!=null and end_date!=''">
+	AND t.create_time &lt;=#{end_date}
+	</if>
+	<if test="user_name!=null and user_name!=''">
+	AND t.user_name=#{user_name}
+	</if>
+	<if test="out_trade_id!=null and out_trade_id!=''">
+	AND t.out_trade_id=#{out_trade_id}
+	</if>
+	<if test="id!=null and id!=''">
+	AND t.id=#{id}
+	</if>	
+	<if test="user_mobile!=null and user_mobile!=''">
+	AND t.user_mobile=#{user_mobile}
+	</if>
+	order by t.create_time asc
+</select>
+<select id="queryRefundInfoById" parameterType="hashMap" resultType="map">
+	SELECT
+	t.id,
+	t.user_id,
+	t.order_id,
+	t.money,
+	t.duty_money,
+	t.transaction_money,
+	t.refund_channel_rule_id,
+	t.out_trade_id,
+	t.user_mobile,
+	t.user_name,
+	t.user_bank_type,
+	t.user_bank_no,
+	t.`status`,
+	t.refund_time,
+	t.create_time,
+	t.update_time,
+	t.del_tag
+	FROM
+	t_pay_refund_order t
+	WHERE 1=1
+	<if test="id!=null and id!=''">
+		And id=#{id}
+	</if>
+</select>
+
+</mapper>

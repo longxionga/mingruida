@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "file:///E:/Utils/mybatis/mybatis-3-mapper.dtd"> -->
+<mapper namespace="com.acl.sys.dao.DBLogDao">
+	<insert id="insert" parameterType="com.acl.pojo.DBLog">
+		INSERT INTO SYS_LOG(
+			LOG_ID,
+			LOG_TIME,
+			METHOD_NAME,
+			CQ_PARAMS,
+			IS_OK,
+			ACTION_MESSAGE
+		) VALUES(
+			#{log_id},
+			now(),
+			#{method_name},
+			#{cq_params},
+			#{is_ok},
+			#{action_message}
+			)
+	</insert>
+	<select id="searchLogBean" parameterType="map" resultType="com.acl.pojo.DBLog">
+		SELECT
+			LOG_ID,
+			LOG_TIME,
+			METHOD_NAME,
+			CQ_PARAMS,
+			IS_OK,
+			ACTION_MESSAGE
+		FROM
+			SYS_LOG
+		WHERE
+			1 = 1
+		<if test="log_id !=null and log_id !=''">
+			AND LOG_ID = #{log_id }
+		</if>
+		<if test="begin_date !=null and begin_date !=''">
+			AND LOG_TIME BETWEEN #{begin_date } AND #{end_date }
+		</if>
+		<if test="method_name !=null and method_name !=''">
+			AND METHOD_NAME like  CONCAT(CONCAT('%', #{method_name}), '%')
+		</if>
+		<if test="cq_params !=null and cq_params !=''">
+			AND CQ_PARAMS like  CONCAT(CONCAT('%', #{cq_params}), '%')
+		</if>
+		<if test="is_ok !=null and is_ok !=''">
+			AND IS_OK = #{is_ok}
+		</if>
+		<if test="action_message !=null and action_message !=''">
+			AND ACTION_MESSAGE like  CONCAT(CONCAT('%', #{action_message}), '%')
+		</if>
+	</select>
+
+</mapper>

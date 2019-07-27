@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+    <bean id="ShiroRealm" class="com.acl.component.ShiroRealm">
+        <property name="authorizationCacheName" value="shiro.authorizationCache"/>
+    </bean>
+
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="ShiroRealm"/>
+        <property name="cacheManager" ref="memoryConstrainedCacheManager"/>
+    </bean>
+
+    <bean id="memoryConstrainedCacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager"/>
+
+    <bean id="ajaxUserFilter" class="com.acl.component.AjaxUserFilter"/>
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login"/>
+        <property name="successUrl" value="/main"/>
+        <property name="unauthorizedUrl" value="/403"/>
+        <!-- 下面value值的第一个'/'代表的路径是相对于HttpServletRequest.getContextPath()的值来的 -->
+        <!-- anon：它对应的过滤器里面是空的,什么都没做 -->
+        <!-- authc：该过滤器下的页面必须验证后才能访问,它是Shiro内置的一个拦截器org.apache.shiro.web.filter.authc.FormAuthenticationFilter -->
+        <property name="filterChainDefinitions">
+            <value>
+                /static/** = anon
+                /login = anon
+                /slide = anon
+                /401 = anon
+                /403 = anon
+                /404 = anon
+                /505 = anon
+                /getVerifyCodeImage = anon
+                /getVerifyCodeText= anon
+                /loginAuth = anon
+                /home= user
+                /main= user
+                /loginOut= user
+                /sys/**= user
+                /platform/**= user
+                /report/**= user
+                /upload/**= user
+                /** = user
+            </value>
+        </property>
+        <property name="filters">
+            <map>
+                <entry key="user" value-ref="ajaxUserFilter"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean
+            class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.apache.shiro.authz.UnauthenticatedException">/403</prop>
+                <prop key="org.apache.shiro.authz.UnauthorizedException">/401</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 使用静态变量缓存 applicationContext -->
+    <bean id="springContextHolder" class="com.anchol.common.framework.spring.SpringContextHolder" lazy-init="false"/>
+
+    <bean id="sessionFactory" class="com.anchol.common.component.session.SessionFactory">
+        <property name="sessionManager" ref="redisSessionManager"></property>
+    </bean>
+
+    <bean id="sessionManager" class="com.anchol.common.component.session.SessionManager" abstract="true"/>
+
+    <bean id="httpSessionManager" class="com.anchol.common.component.session.proxy.HttpSessionManager"
+          parent="sessionManager"/>
+
+    <bean id="redisSessionManager" class="com.anchol.common.component.session.redis.RedisSessionManager"
+          parent="sessionManager">
+        <property name="redisTemplate" ref="redisTemplate"/>
+        <property name="sessionCacheName" value="sessionCache"/>
+    </bean>
+
+    <bean id="initializer" class="com.acl.component.Initializer" init-method="init" depends-on="springContextHolder">
+        <property name="temporaryFolderPath" value="/temp"></property>
+    </bean>
+
+    <bean id="systemConfigBean" class="com.acl.component.SystemConfigBean" depends-on="springContextHolder"></bean>
+
+    <bean id="systemConfig" class="com.acl.component.SystemConfig" depends-on="springContextHolder"></bean>
+
+    <!-- 存储 -->
+    <bean id="storage" factory-bean="storageFactory" factory-method="getStorage" init-method="init"
+          destroy-method="destroy" depends-on="springContextHolder"></bean>
+
+    <!-- 存储工厂 -->
+    <bean id="storageFactory" class="com.anchol.common.component.storage.StorageFactory">
+        <property name="type" value="${storage.type}"/>
+        <property name="baseUrl" value="${storage.baseUrl}"/>
+        <property name="host" value="${storage.host}"/>
+        <property name="port" value="${storage.port}"/>
+        <property name="username" value="${storage.username}"/>
+        <property name="password" value="${storage.password}"/>
+        <!-- 1D97DE9A458C165AEE60795C0B8B414A -->
+        <property name="fileRoot" value="${storage.fileRoot}"/>
+        <!-- www用户  uid gid-->
+        <property name="uid" value="${storage.uid}"/>
+        <property name="gid" value="${storage.gid}"/>
+        <property name="poolMaxTotal" value="${storage.poolMaxTotal}"/>
+        <property name="poolMaxIdle" value="${storage.poolMaxIdle}"/>
+        <property name="poolMinIdle" value="${storage.poolMinIdle}"/>
+    </bean>
+
+</beans>

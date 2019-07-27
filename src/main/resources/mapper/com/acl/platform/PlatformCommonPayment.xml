@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.acl.platform.dao.IPlatformCommonPaymentDao">
+	<insert id="insertCzOrder" parameterType="com.acl.pojo.CzOrder">
+		insert into t_front_cz_order (
+		<trim suffix="" suffixOverrides=",">
+			<if test="order_id     != null">order_id,</if>
+			<if test="order_money  != null">order_money,</if>
+			<if test="user_id      != null">user_id,</if>
+			<if test="create_date  != null">create_date,</if>
+			<if test="role_type    != null">role_type,</if>
+			<if test="agent_id     != null">agent_id,</if>
+			<if test="agent_name   != null">agent_name,</if>
+			<if test="settle_id    != null">settle_id,</if>
+			<if test="settle_name  != null">settle_name,</if>
+			<if test="ch_id        != null">ch_id,</if>
+			<if test="ch_name      != null">ch_name,</if>
+			<if test="ce_id        != null">ce_id,</if>
+			<if test="ce_name      != null">ce_name,</if>
+			<if test="cz_type      != null">cz_type,</if>
+			<if test="cz_pc_mobile != null">cz_pc_mobile,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="order_id     != null">#{order_id},</if>
+			<if test="order_money  != null">#{order_money},</if>
+			<if test="user_id      != null">#{user_id},</if>
+			<if test="create_date  != null">#{create_date},</if>
+			<if test="role_type    != null">#{role_type},</if>
+			<if test="agent_id     != null">#{agent_id},</if>
+			<if test="agent_name   != null">#{agent_name},</if>
+			<if test="settle_id    != null">#{settle_id},</if>
+			<if test="settle_name  != null">#{settle_name},</if>
+			<if test="ch_id        != null">#{ch_id},</if>
+			<if test="ch_name      != null">#{ch_name},</if>
+			<if test="ce_id        != null">#{ce_id},</if>
+			<if test="ce_name      != null">#{ce_name},</if>
+			<if test="cz_type      != null">#{cz_type},</if>
+			<if test="cz_pc_mobile != null">#{cz_pc_mobile},</if>
+		</trim>
+		)
+	</insert>
+	
+	<insert id="insertCzOrderRs" parameterType="com.acl.pojo.CzOrderRs">
+		insert into t_front_cz_order_rs (
+		<trim suffix="" suffixOverrides=",">
+			<if test="order_rs_id       != null">order_rs_id,</if>
+			<if test="order_id          != null">order_id,</if>
+			<if test="order_rs_no       != null">order_rs_no,</if>
+			<if test="user_id           != null">user_id,</if>
+			<if test="order_rs_fee      != null">order_rs_fee,</if>
+			<if test="order_rs_brokeage != null">order_rs_brokeage,</if>
+			<if test="order_rs_type     != null">order_rs_type,</if>
+			<if test="order_rs_status   != null">order_rs_status,</if>
+			<if test="create_date       != null">create_date,</if>
+			<if test="is_use            != null">is_use,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="order_rs_id       != null">#{order_rs_id},</if>
+			<if test="order_id          != null">#{order_id},</if>
+			<if test="order_rs_no       != null">#{order_rs_no},</if>
+			<if test="user_id           != null">#{user_id},</if>
+			<if test="order_rs_fee      != null">#{order_rs_fee},</if>
+			<if test="order_rs_brokeage != null">#{order_rs_brokeage},</if>
+			<if test="order_rs_type     != null">#{order_rs_type},</if>
+			<if test="order_rs_status   != null">#{order_rs_status},</if>
+			<if test="create_date       != null">#{create_date},</if>
+			<if test="is_use            != null">#{is_use},</if>
+		</trim>
+		)
+	</insert>
+		
+	<update id="updateCzOrder" parameterType="hashmap">
+		update t_front_cz_order set
+		<trim suffix="" suffixOverrides=",">
+			<if test="new_create_date != null">create_date = #{new_create_date}</if>
+		</trim>
+		where order_id = #{order_id} and create_date = #{old_create_date}
+	</update>
+	
+	<insert id="insertTxOrder" parameterType="com.acl.pojo.TxOrder">
+		insert into t_front_tx_order (
+		<trim suffix="" suffixOverrides=",">
+			<if test="tx_order_id       != null">tx_order_id,</if>
+			<if test="tx_money          != null">tx_money,</if>
+			<if test="user_id           != null">user_id,</if>
+			<if test="create_date       != null">create_date,</if>
+			<if test="user_name         != null">user_name,</if>
+			<if test="user_bank         != null">user_bank,</if>
+			<if test="user_bank_address != null">user_bank_address,</if>
+			<if test="user_prov         != null">user_prov,</if>
+			<if test="user_city         != null">user_city,</if>
+			<if test="bank_type         != null">bank_type,</if>
+			<if test="tx_type           != null">tx_type,</if>
+			<if test="tx_pc_mobile      != null">tx_pc_mobile,</if>
+			<if test="is_use            != null">is_use,</if>
+			<if test="agent_id          != null">agent_id,</if>
+			<if test="agent_name        != null">agent_name,</if>
+			<if test="settle_id         != null">settle_id,</if>
+			<if test="settle_name       != null">settle_name,</if>
+			<if test="ce_id             != null">ce_id,</if>
+			<if test="ch_name           != null">ch_name,</if>
+			<if test="role_type         != null">role_type,</if>
+			<if test="ce_name           != null">ce_name,</if>
+			<if test="ch_id             != null">ch_id,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="tx_order_id       != null">#{tx_order_id},</if>
+			<if test="tx_money          != null">#{tx_money},</if>
+			<if test="user_id           != null">#{user_id},</if>
+			<if test="create_date       != null">#{create_date},</if>
+			<if test="user_name         != null">#{user_name},</if>
+			<if test="user_bank         != null">#{user_bank},</if>
+			<if test="user_bank_address != null">#{user_bank_address},</if>
+			<if test="user_prov         != null">#{user_prov},</if>
+			<if test="user_city         != null">#{user_city},</if>
+			<if test="bank_type         != null">#{bank_type},</if>
+			<if test="tx_type           != null">#{tx_type},</if>
+			<if test="tx_pc_mobile      != null">#{tx_pc_mobile},</if>
+			<if test="is_use            != null">#{is_use},</if>
+			<if test="agent_id          != null">#{agent_id},</if>
+			<if test="agent_name        != null">#{agent_name},</if>
+			<if test="settle_id         != null">#{settle_id},</if>
+			<if test="settle_name       != null">#{settle_name},</if>
+			<if test="ce_id             != null">#{ce_id},</if>
+			<if test="ch_name           != null">#{ch_name},</if>
+			<if test="role_type         != null">#{role_type},</if>
+			<if test="ce_name           != null">#{ce_name},</if>
+			<if test="ch_id             != null">#{ch_id},</if>
+		</trim>
+		)
+	</insert>
+
+	<insert id="insertTxOrderRs" parameterType="com.acl.pojo.TxOrderRs">
+		insert into t_front_tx_order_rs (
+		<trim suffix="" suffixOverrides=",">
+			<if test="tx_rs_id        != null">tx_rs_id,</if>
+			<if test="user_id         != null">user_id,</if>
+			<if test="tx_order_id     != null">tx_order_id,</if>
+			<if test="tx_rs_status    != null">tx_rs_status,</if>
+			<if test="tx_number       != null">tx_number,</if>
+			<if test="tx_rs_money     != null">tx_rs_money,</if>
+			<if test="tx_rs_brokerage != null">tx_rs_brokerage,</if>
+			<if test="create_date     != null">create_date,</if>
+			<if test="is_use          != null">is_use,</if>
+			<if test="tx_type         != null">tx_type,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="tx_rs_id        != null">#{tx_rs_id},</if>
+			<if test="user_id         != null">#{user_id},</if>
+			<if test="tx_order_id     != null">#{tx_order_id},</if>
+			<if test="tx_rs_status    != null">#{tx_rs_status},</if>
+			<if test="tx_number       != null">#{tx_number},</if>
+			<if test="tx_rs_money     != null">#{tx_rs_money},</if>
+			<if test="tx_rs_brokerage != null">#{tx_rs_brokerage},</if>
+			<if test="create_date     != null">#{create_date},</if>
+			<if test="is_use          != null">#{is_use},</if>
+			<if test="tx_type         != null">#{tx_type},</if>
+		</trim>
+		)
+	</insert>
+	
+	<update id="updateTxOrder" parameterType="hashmap">
+		update t_front_tx_order set 		
+		is_use = #{is_use}	
+		where tx_order_id = #{tx_order_id}
+		and is_use =1
+	</update>
+	
+	<select id="queryCzOrderByOrderId" parameterType="hashmap" resultType="com.acl.pojo.CzOrder">
+		select a.order_id,
+		       a.order_money,
+		       a.user_id,
+		       a.create_date,
+		       a.role_type,
+		       b.order_rs_fee
+		from t_front_cz_order a left join t_front_cz_order_rs b on a.order_id = b.order_id
+		where a.order_id = #{order_id}
+	</select>
+	
+	<select id="queryTxOrderByOrderId" parameterType="hashmap" resultType="com.acl.pojo.TxOrder">
+		select tx_order_id,
+					 tx_money,
+					 user_id,
+					 create_date,
+					 user_name,
+					 user_bank,
+					 user_bank_address,
+					 user_prov,
+					 user_city,
+					 bank_type,
+					 tx_type,
+					 tx_pc_mobile,
+					 is_use,
+					 agent_id,
+					 agent_name,
+					 settle_id,
+					 settle_name,
+					 ce_id,
+					 ch_name,
+					 role_type
+		from t_front_tx_order
+		where tx_order_id = #{tx_order_id}
+	</select>
+	
+	<select id="queryBrokerParentInfo" parameterType="hashmap" resultType="map">
+	select t1.broker_id        AS 'broker_id',
+				 t1.broker_incode    AS 'broker_incode',
+				 t1.broker_money     AS 'broker_money'
+	  from t_front_broker t1 
+	 where t1.broker_id = (select t2.broker_parent_id from t_front_broker t2 where t2.broker_id = #{user_id})
+	</select>
+	
+	<select id="queryUserWalletByUserId" parameterType="string" resultType="com.acl.pojo.Wallet">
+		select * from t_front_user_wallet
+		where user_id = #{user_id}
+	</select>
+</mapper>	

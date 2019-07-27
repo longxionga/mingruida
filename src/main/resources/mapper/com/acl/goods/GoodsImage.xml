@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsImageDao">
+<select id="queryGoodsImage" parameterType="hashMap" resultType="map">
+	SELECT
+		a.img_id,
+		a.goods_id,
+		a.img_type,
+		a.img_seq,
+		a.img_uri,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+		a.is_use,
+		b.goods_name
+	FROM
+		t_front_mall_goods_image a LEFT JOIN t_front_mall_goods b ON a.goods_id=b.goods_id
+	WHERE 1=1
+	<if test="goods_name!=null and goods_name!=''">
+	AND b.goods_name like CONCAT(CONCAT(#{goods_name}), '%')
+	</if>
+	ORDER BY goods_id asc
+</select>
+<insert id="insertGoodsImage" parameterType="hashMap">
+    INSERT INTO t_front_mall_goods_image
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="goods_id  != null and goods_id !=''">goods_id,</if>
+		<if test="img_type  != null and img_type !=''">img_type,</if>
+		<if test="img_seq  != null and img_seq !=''">img_seq,</if>
+		<if test="img_uri  != null and img_uri !=''">img_uri,</if>
+		<if test="create_time  != null and create_time !=''">create_time,</if>
+		<if test="is_use  != null and is_use !=''">is_use,</if>
+	</trim>
+	)values(
+	<trim suffix="" suffixOverrides=",">
+		<if test="goods_id  != null and goods_id !=''">#{goods_id},</if>
+		<if test="img_type  != null and img_type !=''">#{img_type},</if>
+		<if test="img_seq  != null and img_seq !=''">#{img_seq},</if>
+		<if test="img_uri  != null and img_uri !=''">#{img_uri},</if>
+		<if test="create_time  != null and create_time !=''">#{create_time},</if>
+		<if test="is_use  != null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+
+<!-- 更新图片信息 -->
+    <update id="updateGoodsImage" parameterType="hashmap">
+		UPDATE t_front_mall_goods_image SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id !=''">goods_id=#{goods_id},</if>
+			<if test="img_type  != null and img_type !=''">img_type=#{img_type},</if>
+			<if test="img_seq  != null and img_seq !=''">img_seq=#{img_seq},</if>
+			<if test="img_uri  != null and img_uri !=''">img_uri=#{img_uri},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+		</trim>
+		WHERE img_id=#{img_id}
+	</update>	
+</mapper>

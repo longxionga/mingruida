@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformSettleStockDao">
+    <select id="querySettleStock" resultType="map" parameterType="hashmap">
+        SELECT
+        t.sku_id,
+        t.goods_id,
+        t.spec_id,
+        t.settle_id,
+        t.total_amount,
+        t.sale_amount,
+        DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+        DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+        g.goods_name,
+        g.goods_alias,
+        s.spec_name,
+        d.dept_name
+        FROM
+        t_front_settle_goods_stock t LEFT JOIN t_front_mall_goods g ON t.goods_id=g.goods_id
+        LEFT JOIN t_front_mall_goods_spec s on s.goods_id=t.goods_id and  s.spec_id=t.spec_id
+        LEFT JOIN t_back_dept_info d ON d.dept_id =t.settle_id
+        WHERE 1=1
+        <if test="settle_id!=null and settle_id!=''">
+          AND  t.settle_id=#{settle_id}
+        </if>
+        <if test="goods_name!=null and goods_name!=''">
+            AND g.goods_name like CONCAT(CONCAT(#{goods_name}), '%')
+        </if>
+        <if test="spec_name!=null and spec_name!=''">
+            AND s.spec_name like CONCAT(CONCAT(#{spec_name}), '%')
+        </if>
+        ORDER BY  t.create_time DESC
+    </select>
+
+</mapper>

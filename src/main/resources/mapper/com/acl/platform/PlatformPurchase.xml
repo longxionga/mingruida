@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.PlatformPurchaseDao">
+    <select id="queryGoodsInfoForSettle" resultType="map" parameterType="hashmap">
+      SELECT
+	t.spec_id,
+	t.goods_id,
+	t.spec_name,
+	g.goods_name,
+	g.goods_alias,
+	i.img_uri,
+	st.booked_amount
+FROM
+	(
+		SELECT
+			spec_id,
+			goods_id,
+			spec_name
+		FROM
+			t_front_mall_goods_spec
+		WHERE
+			is_use = 1
+	) t
+LEFT JOIN (
+	SELECT
+		goods_id,
+		goods_name,
+		goods_alias
+	FROM
+		t_front_mall_goods
+	WHERE
+		is_use = 1
+) g ON g.goods_id = t.goods_id
+LEFT JOIN t_front_mall_goods_stock st ON g.goods_id = st.goods_id
+AND st.spec_id = t.spec_id
+AND st.is_use = 1
+LEFT JOIN t_front_mall_goods_image i ON t.goods_id = i.goods_id
+AND i.img_type = 1
+        WHERE 1=1
+        <if test="check_goods_name!=null and check_goods_name!=''">
+            AND  g.goods_name LIKE CONCAT(CONCAT(#{check_goods_name}), '%')
+        </if>
+        <if test="check_spec_name!=null and check_spec_name!=''">
+            AND  t.spec_name LIKE CONCAT(CONCAT(#{check_spec_name}), '%')
+        </if>
+</select>
+<select id="queryPurchase" resultType="map" parameterType="hashmap">
+        SELECT
+            t.id,
+            t.goods_id,
+            t.spec_id,
+            t.settle_id,
+            t.num,
+            DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+            DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+            t.status,
+            t.reviewer,
+            g.goods_name,
+            s.spec_name,
+            d.dept_name
+        FROM
+            t_back_purchase t LEFT JOIN t_front_mall_goods g ON t.goods_id=g.goods_id
+          LEFT JOIN t_front_mall_goods_spec s ON s.goods_id=t.goods_id and s.spec_id=t.spec_id
+          LEFT JOIN t_back_dept_info d ON d.dept_id=t.settle_id
+          WHERE t.settle_id=#{settle_id}
+            <if test="start_date!=null and start_date!=''">
+                AND t.create_time &gt;=#{start_date}
+            </if>
+            <if test="end_date!=null and end_date!=''">
+                AND t.create_time &lt;=#{end_date}
+            </if>
+            <if test="status!=null and status!=''">
+                AND t.status =#{status}
+            </if>
+            <if test="order_goods_id!=null and order_goods_id!=''">
+                AND t.goods_id =#{order_goods_id}
+            </if>
+            <if test="order_spec_id!=null and order_spec_id!=''">
+                AND t.spec_id =#{order_spec_id}
+            </if>
+          ORDER BY create_time DESC
+</select>
+    <insert id="insertPurchase" parameterType="hashmap">
+        INSERT INTO t_back_purchase
+        (
+        <trim suffix="" suffixOverrides=",">
+            <if test="goods_id  != null and goods_id !=''">goods_id,</if>
+            <if test="spec_id  != null and spec_id!=''">spec_id,</if>
+            <if test="settle_id  != null and settle_id!=''">settle_id,</if>
+            <if test="settle_code  != null and settle_code!=''">settle_code,</if>
+            <if test="number  != null and number!=''">num,</if>
+            <if test="create_time  != null and create_time!=''">create_time,</if>
+            <if test="status  != null and status!=''">status,</if>
+        </trim>
+        )values(
+        <trim suffix="" suffixOverrides=",">
+            <if test="goods_id  != null and goods_id !=''">#{goods_id},</if>
+            <if test="spec_id  != null and spec_id!=''">#{spec_id},</if>
+            <if test="settle_id  != null and settle_id!=''">#{settle_id},</if>
+            <if test="settle_code  != null and settle_code!=''">#{settle_code},</if>
+            <if test="number  != null and number!=''">#{number},</if>
+            <if test="create_time  != null and create_time!=''">#{create_time},</if>
+            <if test="status  != null and status!=''">#{status},</if>
+        </trim>
+        )
+    </insert>
+    <select id="queryGoodsList" parameterType="hashmap" resultType="map">
+        SELECT goods_id as id,goods_name as text FROM t_front_mall_goods where is_use=1
+    </select>
+    <select id="queryGoodsSpec" parameterType="hashmap" resultType="map">
+      select spec_id as id ,spec_name as text from t_front_mall_goods_spec where is_use=1 and goods_id=#{goods_id}
+    </select>
+
+    <select id="queryGoodsStock" parameterType="hashmap" resultType="map">
+       SELECT
+	sku_id,
+	goods_id,
+	spec_id,
+	settle_id,
+	original_price,
+	discounted_price,
+	total_amount,
+	buy_amount,
+	booked_amount,
+	is_activity,
+	rebate,
+	fare_price,
+	create_time,
+	update_time,
+	is_use
+FROM
+	t_front_mall_goods_stock
+where is_use=1 and goods_id=#{goods_id} and spec_id=#{spec_id}
+    </select>
+
+    <insert id="substractStock" parameterType="hashmap">
+        UPDATE t_front_mall_goods_stock SET booked_amount=booked_amount-#{number} WHERE goods_id=#{goods_id} and spec_id=#{spec_id}
+    </insert>
+</mapper>

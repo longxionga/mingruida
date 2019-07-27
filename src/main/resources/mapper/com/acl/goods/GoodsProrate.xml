@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsProrateDao">
+<select id="queryGoodsProrate" parameterType="hashmap" resultType="map">
+		SELECT
+			a.goods_prorate_id,
+			a.goods_id,
+			a.level_id,
+			a.g_allot,
+			DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+			DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+			a.is_use as prorate_is_use,
+			b.goods_name,
+			c.level_name
+		FROM
+			t_front_mall_goods_prorate a
+		LEFT JOIN t_front_mall_goods b ON a.goods_id = b.goods_id
+		LEFT JOIN t_front_mall_level c ON a.level_id = c.level_id	
+		WHERE 1=1
+		<if test="good_name !=null and good_name !=''">
+		AND goods_name like CONCAT(CONCAT(#{good_name}), '%')
+		</if>
+		<if test="goods_id !=null and goods_id !=''">
+		AND a.goods_id =#{goods_id}
+		</if>
+</select>
+<insert id="insertGoodsProrate" parameterType="hashmap">
+	INSERT INTO t_front_mall_goods_prorate 
+	(
+	<trim suffixOverrides=",">
+	<if test="prorate_goods_id !=null and prorate_goods_id !=''">goods_id,</if>
+	<if test="level_id !=null and level_id !=''">level_id,</if>
+	<if test="g_allot !=null and g_allot !=''">g_allot,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="prorate_is_use !=null and prorate_is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="prorate_goods_id !=null and prorate_goods_id !=''">#{prorate_goods_id},</if>
+	<if test="level_id !=null and level_id !=''">#{level_id},</if>
+	<if test="g_allot !=null and g_allot !=''">#{g_allot},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="prorate_is_use !=null and prorate_is_use !=''">#{prorate_is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateGoodsProrate" parameterType="hashmap">
+	UPDATE t_front_mall_goods_prorate SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="g_allot  != null and g_allot !=''">g_allot=#{g_allot},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="prorate_is_use  != null and prorate_is_use !=''">is_use=#{prorate_is_use},</if>
+	</trim>
+	WHERE goods_prorate_id=#{goods_prorate_id}
+</update>
+<select id="prorateValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		goods_prorate_id
+	FROM
+		t_front_mall_goods_prorate
+	WHERE 
+		goods_id=#{goods_id}  AND level_id=#{level_id}
+		
+</select>
+<select id="getMallLevel" parameterType="hashmap" resultType="map">
+	SELECT level_id,level_name FROM t_front_mall_level		
+</select>
+</mapper>

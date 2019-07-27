@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsSettleAllotDao">
+<select id="querySettleAllot" parameterType="hashmap" resultType="map">
+	SELECT
+		dept.dept_name,
+		allot.settle_id,
+		allot.s_allot,
+		allot.create_time,
+		allot.update_time,
+		allot.is_use
+		FROM
+		t_front_mall_settler_prorate allot
+	INNER JOIN t_back_dept_info dept ON allot.settle_id = dept.dept_id
+	WHERE 1=1
+	<if test="settle_name !=null and settle_name !=''">
+	AND dept.settle_name like CONCAT(CONCAT(#{settle_name}), '%')
+	</if>
+</select>
+	<select id="querySettleAllotList" parameterType="hashmap" resultType="map">
+		SELECT
+		allot.settle_id,
+		allot.s_allot
+		FROM
+		t_front_mall_settler_prorate allot
+
+		WHERE 1=1 AND is_use='1'
+
+	</select>
+<insert id="insertSettleAllot" parameterType="hashmap">
+	INSERT INTO t_front_mall_settler_prorate
+	(
+	<trim suffixOverrides=",">
+	<if test="settle_id !=null and settle_id !=''">settle_id,</if>
+	<if test="s_allot !=null and s_allot !=''">s_allot,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="update_time !=null and update_time !=''">update_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="settle_id !=null and settle_id !=''">#{settle_id},</if>
+	<if test="s_allot !=null and s_allot !=''">#{s_allot},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="update_time !=null and update_time !=''">#{update_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateSettleAllot" parameterType="hashmap">
+	UPDATE t_front_mall_settler_prorate SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="s_allot  != null and s_allot !=''">s_allot=#{s_allot},</if>
+			<if test="create_time  != null and create_time !=''">create_time=#{create_time},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+	</trim>
+	WHERE settle_id=#{settle_id}
+</update>
+<select id="settleValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		settle_id
+	FROM
+		t_front_mall_settler_prorate
+	WHERE
+		<if test="settle_id !=null and settle_id !=''">
+			AND settle_id=#{settle_id}
+		</if>
+		
+</select>
+
+<select id="querySettleName" parameterType="hashmap" resultType="map">
+	SELECT dept_id,dept_name FROM t_back_dept_info WHERE dept_type=3
+</select>
+</mapper>

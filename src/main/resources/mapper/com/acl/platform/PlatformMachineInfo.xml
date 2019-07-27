@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMachineInfoDao">
+	<select id="queryMachineInfoPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.machineSN,
+		t.machinecode,
+		t.merchantcode,
+		t.attagentcode,
+		t.isbound,
+		t.machinetype,
+		t.machinemodel,
+		t.warehousingtype,
+		t.vipstatus,
+		t.attagentname,
+		t.merchantname,
+		t.machineryT1rate,
+		t.machineryT0rate,
+		t.machineryamount,
+		m.`name` AS brindname,
+		t.create_time,
+		t.create_day,
+		t.update_time,
+		t.del_tag,
+		t.batchcode,
+		t.dotcode,
+		t.dotname,
+		t.isencryption,
+		t.machineident,
+		t.policyident,
+		t.allocationnum,
+		t.ifdeposit,
+		t.staffid,
+		t.brindid,
+		t1.staffcode,
+		getstaffname(t1.id) AS bystages
+		FROM
+		t_data_machine_info t
+		LEFT JOIN t_front_brand_rule m ON t.brindid = m.id
+		LEFT JOIN t_data_company_staff t1 on t.staffid = t1.id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t1.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		LEFT JOIN t_back_dept_info bd on t1.branch = bd.dept_id
+		WHERE
+		 t1.isstate= '1'
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="attagentcode  != null and attagentcode !=''">
+			AND t.attagentcode like CONCAT(CONCAT(#{attagentcode}), '%')
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''" >
+			<if test="brindnameid !=0" >
+				AND t.brindid = #{brindnameid}
+			</if>
+		</if>
+		<if test="ibrand_id  != null and ibrand_id !=''">
+			AND t1.brandid =#{ibrand_id}
+		</if>
+		<if test="isdept_id  != null and isdept_id !=''">
+			AND t1.branch = #{isdept_id}
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+			and (t1.id = #{orgid}
+			OR tt2.id = #{orgid}
+			OR tt3.id = #{orgid}
+			OR tt4.id = #{orgid})
+
+		</if>
+		<if test="batchcode  != null and batchcode !=''">
+			AND t.batchcode =#{batchcode}
+		</if>
+		<if test="machineSN  != null and machineSN !=''">
+			AND t.machineSN like CONCAT(CONCAT(#{machineSN}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machinecode = #{machinecode}
+		</if>
+
+		<if test="isbound  != null and isbound !=''">
+			AND t.isbound = #{isbound}
+		</if>
+	</select>
+
+	<delete id="deleteMachineInfoAll" parameterType="hashmap">
+		DELETE FROM t_data_machine_info
+
+	</delete>
+
+	<update id="savaMachaneToStaff" parameterType="hashmap">
+        UPDATE
+        t_data_machine_info
+        set
+        staffid=#{staffid},update_time = now(), attagentcode=#{agentcode}, attagentname=#{agentname}
+        WHERE id=#{machine_id}
+    </update>
+
+	<select id="findMachineInfoList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.machineSN,
+		t.machinecode,
+		t.merchantcode,
+		t.attagentcode,
+		t.isbound,
+		t.machinetype,
+		t.machinemodel,
+		t.warehousingtype,
+		t.vipstatus,
+		t.attagentname,
+		t.merchantname,
+		t.machineryT1rate,
+		t.machineryT0rate,
+		t.machineryamount,
+		m.`name` AS brindname,
+		t.create_time,
+		t.create_day,
+		t.update_time,
+		t.del_tag,
+		t.batchcode,
+		t.dotcode,
+		t.dotname,
+		t.isencryption,
+		t.machineident,
+		t.policyident,
+		t.allocationnum,
+		t.ifdeposit,
+		t.staffid,
+		t.brindid,
+		t1.staffcode,
+		getstaffname(t1.id) as staffname
+		FROM
+		t_data_machine_info t
+		LEFT JOIN t_front_brand_rule m ON t.brindid = m.id
+		LEFT JOIN t_data_company_staff t1 on t.staffid = t1.id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t1.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+
+		WHERE
+		t1.isstate= '1'
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="attagentcode  != null and attagentcode !=''">
+			AND t.attagentcode like CONCAT(CONCAT(#{attagentcode}), '%')
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''" >
+			<if test="brindnameid !=0" >
+				AND t.brindid = #{brindnameid}
+			</if>
+		</if>
+		<if test="ibrand_id  != null and ibrand_id !=''">
+			AND t1.brandid =#{ibrand_id}
+		</if>
+		<if test="isdept_id  != null and isdept_id !=''">
+			AND t1.branch = #{isdept_id}
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+			and (t1.id = #{orgid}
+			OR tt2.id = #{orgid}
+			OR tt3.id = #{orgid}
+			OR tt4.id = #{orgid})
+		</if>
+		<if test="batchcode  != null and batchcode !=''">
+			AND t.batchcode =#{batchcode}
+		</if>
+		<if test="machineSN  != null and machineSN !=''">
+			AND t.machineSN like CONCAT(CONCAT(#{machineSN}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machinecode =#{machinecode}
+		</if>
+		<if test="login_id  != null and login_id !=''">
+			AND t.staffid =#{login_id}
+		</if>
+
+	</select>
+
+	<update id="machineAllocations" parameterType="hashmap">
+        UPDATE
+        t_data_machine_info
+        set
+     	 staffid=#{substaff_id},update_time = now(), attagentcode=#{agentcode}, attagentname=#{agentname}
+      WHERE batchcode=#{batchcode}
+    </update>
+
+	<update id="machineAllocation" parameterType="hashmap">
+        UPDATE
+        t_data_machine_info
+        set
+         staffid=#{substaff_id},update_time = now(), attagentcode=#{agentcode}, attagentname=#{agentname}
+      WHERE  machinecode=#{machinecode}
+    </update>
+
+	<update id="machineCallback" parameterType="hashmap">
+        UPDATE
+        t_data_machine_info
+        set
+         staffid=#{substaff_id},update_time = now(), attagentcode=#{agentcode}, attagentname=#{agentname}
+      WHERE id=#{machineid}
+    </update>
+
+	<update id="updateMachineinfo" parameterType="hashmap">
+		UPDATE t_data_machine_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id !=''">id=#{id},</if>
+			<if test="isbound  != null and isbound !=''">isbound=#{isbound},</if>
+			<if test="merchantcode  != null and merchantcode !=''">merchantcode=#{merchantcode},</if>
+			<if test="merchantname  != null and merchantname !=''">merchantname=#{merchantname},</if>
+			<if test="allocationnum  != null and allocationnum !=''">allocationnum=#{allocationnum},</if>
+			<if test="ifdeposit  != null and ifdeposit !=''">ifdeposit=#{ifdeposit},</if>
+			<if test="policyident  != null and policyident !=''">policyident=#{policyident},</if>
+			<if test="machineident  != null and machineident !=''">machineident=#{machineident},</if>
+
+			<if test="dotcode  != null and dotcode !=''">dotcode=#{dotcode},</if>
+			<if test="dotname  != null and dotname !=''">dotname=#{dotname},</if>
+			<if test="isencryption  != null and isencryption !=''">isencryption=#{isencryption},</if>
+
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+	<update id="updateMachineinfo_2" parameterType="hashmap">
+		UPDATE t_data_machine_info SET
+		<trim suffix="" suffixOverrides=",">
+			isbound=#{isbound},
+			merchantcode=#{merchantcode},
+			merchantname=#{merchantname},
+			allocationnum=#{allocationnum},
+			ifdeposit=#{ifdeposit},
+			policyident=#{policyident},
+			machineident=#{machineident},
+			dotcode=#{dotcode},
+			dotname=#{dotname},
+			isencryption=#{isencryption},
+			update_time=#{update_time},
+
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+	<select id="findMachineById" parameterType="hashmap" resultType="map">
+    SELECT
+       t.id
+    FROM
+       t_data_machine_info t
+    WHERE
+    1=1
+		<if test="machineSN  != null and machineSN !=''">
+			and t.machineSN=#{machineSN}
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			and t.machinecode=#{machinecode}
+		</if>
+
+		<if test="staffid  != null and staffid !=''">
+			and t.staffid =#{staffid}
+		</if>
+    </select>
+
+	<delete id="deleteMachineInfo" parameterType="hashmap">
+		DELETE FROM t_data_machine_info WHERE id = #{machineid}
+
+	</delete>
+
+	<select id="exportMachineReportInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id AS '主键',
+		m.`name` AS '所属品牌',
+		t.batchcode AS '批次号',
+		t.machineSN AS '机具编号',
+		t.machinecode AS '机具序列号',
+		t1.staffcode AS '归属员工编号',
+		getstaffname(t1.id) AS '归属员工名称',
+		t.merchantcode AS '商户编号',
+		t.merchantname AS '商户名称',
+		CASE
+		WHEN t.isbound = '1' THEN
+		'已绑定'
+		WHEN t.isbound = '3' THEN
+		'已分配服务商'
+		ELSE
+		''
+		END AS '是否绑定',
+		t.machinetype AS '机具类型',
+		t.ifdeposit AS '是否已缴纳押金'
+		FROM
+		t_data_machine_info t
+		LEFT JOIN t_front_brand_rule m ON t.brindid = m.id
+		LEFT JOIN t_data_company_staff t1 ON t.staffid = t1.id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t1.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		LEFT JOIN t_data_company_staff tt5 ON tt5.id = tt4.parentid
+		WHERE
+		t1.isstate = '1'
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="attagentcode  != null and attagentcode !=''">
+			AND t.attagentcode like CONCAT(CONCAT(#{attagentcode}), '%')
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''" >
+			<if test="brindnameid !=0" >
+				AND t.brindid = #{brindnameid}
+			</if>
+		</if>
+		<if test="ibrand_id  != null and ibrand_id !=''">
+			AND t1.brandid =#{ibrand_id}
+		</if>
+		<if test="isdept_id  != null and isdept_id !=''">
+			AND t1.branch = #{isdept_id}
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+			and (t1.id = #{orgid}
+			OR tt2.id = #{orgid}
+			OR tt3.id = #{orgid}
+			OR tt4.id = #{orgid}
+			OR tt5.id = #{orgid})
+		</if>
+		<if test="batchcode  != null and batchcode !=''">
+			AND t.batchcode =#{batchcode}
+		</if>
+		<if test="machineSN  != null and machineSN !=''">
+			AND t.machineSN like CONCAT(CONCAT(#{machineSN}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machinecode = #{machinecode}
+		</if>
+
+		<if test="isbound  != null and isbound !=''">
+			AND t.isbound = #{isbound}
+		</if>
+	</select>
+
+	<select id="countMachineInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		count(1) as num
+		FROM
+		t_data_machine_info t
+		LEFT JOIN t_front_brand_rule m ON t.brindid = m.id
+		LEFT JOIN t_data_company_staff t1 ON t.staffid = t1.id
+		LEFT JOIN t_data_company_staff tt2 ON tt2.id = t1.parentid
+		LEFT JOIN t_data_company_staff tt3 ON tt3.id = tt2.parentid
+		LEFT JOIN t_data_company_staff tt4 ON tt4.id = tt3.parentid
+		LEFT JOIN t_data_company_staff tt5 ON tt5.id = tt4.parentid
+		WHERE
+		t1.isstate = '1'
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="attagentcode  != null and attagentcode !=''">
+			AND t.attagentcode like CONCAT(CONCAT(#{attagentcode}), '%')
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''" >
+			<if test="brindnameid !=0" >
+				AND t.brindid = #{brindnameid}
+			</if>
+		</if>
+		<if test="ibrand_id  != null and ibrand_id !=''">
+			AND t1.brandid =#{ibrand_id}
+		</if>
+		<if test="isdept_id  != null and isdept_id !=''">
+			AND t1.branch = #{isdept_id}
+		</if>
+		<if test="orgid!=null and orgid!='' ">
+			and (t1.id = #{orgid}
+			OR tt2.id = #{orgid}
+			OR tt3.id = #{orgid}
+			OR tt4.id = #{orgid}
+			OR tt5.id = #{orgid})
+		</if>
+		<if test="batchcode  != null and batchcode !=''">
+			AND t.batchcode =#{batchcode}
+		</if>
+		<if test="machineSN  != null and machineSN !=''">
+			AND t.machineSN like CONCAT(CONCAT(#{machineSN}), '%')
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machinecode = #{machinecode}
+		</if>
+
+		<if test="isbound  != null and isbound !=''">
+			AND t.isbound = #{isbound}
+		</if>
+	</select>
+
+	<update id="updateMachineForStaffid" parameterType="hashmap">
+		UPDATE t_data_machine_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id !=''">id=#{id},</if>
+			<if test="zhystaffid  != null and zhystaffid !=''">staffid=#{zhystaffid},</if>
+
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+
+		</trim>
+		WHERE isbound = '1' AND  staffid=#{zhgstaffid}
+	</update>
+
+</mapper>

@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.ReportMemberInfoDao">
+	<select id="queryDayReportMemberInfo" parameterType="hashmap" resultType="map">
+			SELECT 
+			us.USER_ID,
+			STATISTICS_DAY,
+			ui.mobile,
+			us.USER_NAME AS USER_NAME ,
+			us.BROKER_ID,
+			us.BROKER_NAME,
+			us.AGENT_ID,
+			AGENT_NAME,
+			us.SETTLE_ID,
+			SETTLE_NAME,
+			us.DEPT_ID,
+			us.DEPT_NAME,
+			us.RECHARGE_OFFLINE,
+			RECHARGE_DAY,
+			WITHDRAWALS_DAY,
+			COUNTER_FEE_DAY,
+			PROFIT_LOSS_DAY,
+			BALANCE_DAY,
+			REFUND_DAY,		
+			BAD_DAY,
+			FOR_YEAR,
+			FOR_MONTH,
+			FOR_DAY,
+			FOR_WEEK				
+			from t_report_day_user_statistics us
+			inner JOIN t_user_info ui on ui.id = us.USER_ID
+			left join t_back_dept_info d on us.dept_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=us.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="dept_id !=null and dept_id !=''">
+		 AND us.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+				AND us.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND us.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND us.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND us.USER_NAME like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND us.BROKER_NAME like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="AGENT_NAME !=null and AGENT_NAME !=''">
+			AND us.AGENT_NAME like CONCAT(CONCAT(#{AGENT_NAME}), '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc,us.USER_NAME asc,AGENT_NAME asc,SETTLE_NAME desc
+		
+	</select>
+	
+	<select id="queryMonthReportMemberInfo" parameterType="hashmap" resultType="map">
+			SELECT 
+			mu.USER_ID,
+			ui.mobile,
+			STATISTICS_DAY,
+			mu.USER_NAME,
+			mu.BROKER_ID,
+			mu.BROKER_NAME,
+			mu.AGENT_ID,
+			mu.AGENT_NAME,
+			mu.SETTLE_ID,
+			mu.SETTLE_NAME,
+			mu.DEPT_ID,
+			mu.DEPT_NAME,
+			RECHARGE_MONTH,
+			WITHDRAWALS_MONTH,
+			COUNTER_FEE_MONTH,
+			PROFIT_LOSS_MONTH,
+			BALANCE_MONTH,
+			BAD_MONTH,
+			FOR_YEAR,
+			FOR_MONTH	
+			from t_report_month_user_statistics mu
+			inner JOIN t_user_info ui on ui.id = mu.USER_ID
+			left join t_back_dept_info d on mu.dept_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=mu.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="dept_id !=null and dept_id !=''">
+		 AND mu.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+				AND mu.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND mu.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND mu.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND mu.USER_NAME like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND mu.BROKER_NAME like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc
+
+	</select>
+	
+	<select id="queryDayResultExport" parameterType="map" resultType="java.util.LinkedHashMap">
+		SELECT
+			STATISTICS_DAY,
+			ui.mobile,
+			us.USER_NAME,
+			us.BROKER_NAME,
+			AGENT_NAME,
+			SETTLE_NAME,
+			us.DEPT_NAME,
+			RECHARGE_DAY,
+			WITHDRAWALS_DAY,
+			COUNTER_FEE_DAY,
+			PROFIT_LOSS_DAY,
+			BALANCE_DAY,
+			BAD_DAY,
+			REFUND_DAY,
+			FOR_YEAR,
+			FOR_MONTH,
+			FOR_DAY,
+			FOR_WEEK
+		from t_report_day_user_statistics us
+		inner JOIN t_user_info ui on ui.id = us.USER_ID
+		left join t_back_dept_info d on us.dept_id=d.dept_id
+		left join t_back_dept_info ch on ch.dept_id=us.settle_id
+		left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->
+		WHERE
+		1 = 1
+		<if test="dept_id !=null and dept_id !=''">
+		 	AND us.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND us.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND us.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND us.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND us.USER_NAME like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND us.BROKER_NAME like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>		
+		<if test="AGENT_NAME !=null and AGENT_NAME !=''">
+			AND us.AGENT_NAME like CONCAT(CONCAT(#{AGENT_NAME}), '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc
+	</select>
+	
+	<select id="queryMonthResultExport" parameterType="map" resultType="java.util.LinkedHashMap">
+			SELECT			
+			STATISTICS_DAY,
+			ui.mobile as,
+			mu.USER_NAME,			
+			mu.BROKER_NAME,			
+			mu.AGENT_NAME,			
+			mu.SETTLE_NAME,			
+			mu.DEPT_NAME,
+			RECHARGE_MONTH,
+			WITHDRAWALS_MONTH,
+			COUNTER_FEE_MONTH,
+			PROFIT_LOSS_MONTH,
+			BALANCE_MONTH,
+			BAD_MONTH,
+			FOR_YEAR,
+			FOR_MONTH	
+			from t_report_month_user_statistics mu
+			inner JOIN t_user_info ui on ui.id = mu.USER_ID
+			left join t_back_dept_info d on mu.dept_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=mu.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="dept_id !=null and dept_id !=''">
+		 AND mu.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND mu.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND mu.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND mu.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND mu.USER_NAME like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND mu.BROKER_NAME like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>		
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc		
+	</select>
+	
+	
+	<select id="queryMemberDayCount" parameterType="hashmap" resultType="map">
+		SELECT
+			IFNULL(SUM(RECHARGE_DAY),0) as RECHARGE_DAYCOUNT,
+			IFNULL(SUM(WITHDRAWALS_DAY),0) as WITHDRAWALS_DAYCOUNT,
+			IFNULL(SUM(COUNTER_FEE_DAY),0) as COUNTER_FEE_DAYCOUNT,
+			IFNULL(SUM(PROFIT_LOSS_DAY),0) as PROFIT_LOSS_DAYCOUNT,
+			IFNULL(SUM(BALANCE_DAY),0) as BALANCE_DAYCOUNT,
+			IFNULL(SUM(BAD_DAY),0) as BAD_DAYCOUNT,
+			IFNULL(SUM(us.RECHARGE_OFFLINE),0) as RECHARGE_OFFLINE
+			from t_report_day_user_statistics us
+			inner JOIN t_user_info ui on ui.id = us.USER_ID
+			left join t_back_dept_info d on us.dept_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=us.settle_id
+			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+			1 = 1
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->
+		<if test="dept_id !=null and dept_id !=''">
+		 AND us.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND us.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND us.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND us.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND us.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND us.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="AGENT_NAME !=null and AGENT_NAME !=''">
+			AND us.AGENT_NAME like CONCAT(CONCAT(#{AGENT_NAME}), '%')
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc
+	</select>
+	
+	<select id="queryMemberMonthCount" parameterType="hashmap" resultType="map">
+			SELECT 
+			IFNULL(SUM(RECHARGE_MONTH),0) as RECHARGE_MONTHCOUNT,
+			IFNULL(SUM(WITHDRAWALS_MONTH),0) as WITHDRAWALS_MONTHCOUNT,
+			IFNULL(SUM(COUNTER_FEE_MONTH),0) as COUNTER_FEE_MONTHCOUNT,
+			IFNULL(SUM(PROFIT_LOSS_MONTH),0) as PROFIT_LOSS_MONTHCOUNT,
+			IFNULL(SUM(BALANCE_MONTH),0) as BALANCE_MONTHCOUNT,
+			IFNULL(SUM(BAD_MONTH),0) as BAD_MONTHCOUNT		
+			from t_report_month_user_statistics mu
+			inner JOIN t_user_info ui on ui.id = mu.USER_ID
+			left join t_back_dept_info d on mu.dept_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=mu.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="dept_id !=null and dept_id !=''">
+		 AND mu.dept_id =#{dept_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND mu.dept_id = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND mu.AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND mu.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="mobile !=null and mobile !=''">
+			AND ui.mobile =#{mobile}
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND mu.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND mu.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc		
+	</select>
+	
+	<select id="querySettleFeeCount" parameterType="hashmap" resultType="map">
+		SELECT 
+			IFNULL(SUM(USER_TX_BROKERAGE),0) as USER_TXCOUNT,
+			IFNULL(SUM(SETTLE_CZ_BROKERAGE),0) as SETTLE_CZCOUNT			
+			from t_report_day_user_statistics mu			
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+			1 = 1		
+		<if test="settle_id !=null and settle_id !=''">
+			AND mu.SETTLE_ID = #{settle_id} 
+		</if>		
+		<if test="begindate!=null and begindate !=''">
+		 	AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 	AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+	</select>
+	
+	<select id="querySettleFeeInfo" parameterType="hashmap" resultType="map">
+			SELECT
+				SETTLE_ID,
+				STATISTICS_DAY,
+				SETTLE_NAME,
+				D.DEPT_MONEY,
+				D.dept_mobile,
+				IFNULL(SUM(USER_TX_BROKERAGE), 0) AS USER_TXCOUNT,
+				IFNULL(SUM(SETTLE_CZ_BROKERAGE), 0) AS SETTLE_CZCOUNT
+			FROM
+				t_report_day_user_statistics mu
+			INNER JOIN t_back_dept_info D ON D.DEPT_ID= mu.SETTLE_ID
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+			WHERE
+				1 = 1		
+		<if test="settle_id !=null and settle_id !=''">
+				AND mu.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>		
+			GROUP BY SETTLE_NAME
+			order by STATISTICS_DAY desc		
+	</select>
+	
+	<select id="querySettleFeeExport" parameterType="hashmap" resultType="map">
+			SELECT
+				SETTLE_ID '服务商ID',
+				STATISTICS_DAY '日期',
+				SETTLE_NAME	'服务商名称',
+				D.DEPT_MONEY '服务商余额',
+				D.dept_mobile '电话号码',
+				IFNULL(SUM(USER_TX_BROKERAGE), 0)  '用户提现手续费',
+				IFNULL(SUM(SETTLE_CZ_BROKERAGE), 0) '服务商充值手续费'
+			FROM
+				t_report_day_user_statistics mu
+			INNER JOIN t_back_dept_info D ON D.DEPT_ID= mu.SETTLE_ID
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+			WHERE
+				1 = 1		
+		<if test="settle_id !=null and settle_id !=''">
+				AND mu.SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+			GROUP BY SETTLE_NAME
+			order by STATISTICS_DAY desc
+	</select>
+</mapper>

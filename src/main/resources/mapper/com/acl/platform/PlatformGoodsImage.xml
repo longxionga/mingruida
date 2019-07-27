@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.platform.dao.IPlatformGoodsImageDao">
+<select id="queryGoodsImage" parameterType="hashMap" resultType="map">
+    SELECT
+	id,
+	category_name,
+	category_code,
+	category_url,
+	type,
+	is_order,
+	category_desc
+FROM
+	t_category_image
+WHERE 1=1
+<if test="category_name!=null and category_name!=''">AND category_name like CONCAT(CONCAT(#{category_name}), '%')</if>
+</select>
+<insert id="insertGoodsImage" parameterType="hashMap">
+    INSERT INTO t_category_image
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="id  != null and id!=''">id,</if>
+		<if test="category_name  != null and category_name!=''">category_name,</if>
+		<if test="category_code  != null and category_code!=''">category_code,</if>
+		<if test="category_url  != null and category_url!=''">category_url,</if>
+		<if test="is_order  != null and is_order!=''">is_order,</if>
+		<if test="type  != null and type!=''">type,</if>
+		<if test="category_desc  != null and category_desc!=''">category_desc,</if>
+	</trim>
+	)values(
+	<trim suffix="" suffixOverrides=",">
+		<if test="id  != null and id!=''">#{id},</if>
+		<if test="category_name  != null and category_name!=''">#{category_name},</if>
+		<if test="category_code  != null and category_code!=''">#{category_code},</if>
+		<if test="category_url  != null and category_url!=''">#{category_url},</if>
+		<if test="is_order  != null and is_order!=''">#{is_order},</if>
+		<if test="type  != null and type!=''">#{type},</if>
+		<if test="category_desc  != null and category_desc!=''">#{category_desc},</if>
+	</trim>
+	)
+</insert>
+
+<!-- 更新图片信息 -->
+    <update id="updateGoodsImage" parameterType="hashmap">
+		UPDATE t_category_image SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id!=''">id=#{id},</if>
+			<if test="category_name  != null and category_name!=''">category_name=#{category_name},</if>
+			<if test="category_code  != null and category_code!=''">category_code=#{category_code},</if>
+			<if test="category_url  != null and category_url!=''">category_url=#{category_url},</if>
+			<if test="is_order  != null and is_order!=''">is_order=#{is_order},</if>
+			<if test="type  != null and type!=''">type=#{type},</if>
+			<if test="category_desc  != null and category_desc!=''">category_desc=#{category_desc},</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+	<!-- 删除商品图片-->
+	 <delete id="deleteGoodsImage" parameterType="hashmap">
+		DELETE FROM t_category_image
+		  WHERE id =#{id}
+	</delete>
+	
+	<select id="queryGoodsName" parameterType="hashMap" resultType="map">
+	select DISTINCT(gzp_number)as goods_code,gzp_name as goods_name from  t_gzp_info
+	</select>
+			
+	<select id="queryGoodsUrl" parameterType="hashMap" resultType="map">
+		select category_url from t_category_image where type='0'
+	</select>
+</mapper>

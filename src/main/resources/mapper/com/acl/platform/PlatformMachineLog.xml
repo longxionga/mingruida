@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMachineLogDao">
+	<select id="queryMachineLogPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.create_time,
+		t.operate_userid,
+		bu.user_name,
+		CASE WHEN t.operate_mode='1' THEN '调拨' WHEN t.operate_mode = '2' THEN '回调' ELSE '' END AS operate_name,
+		t.operate_mode,
+		t.before_staffid,
+		sta1.staffcode as before_code,
+		CONCAT_WS(
+		'-',
+		bd1.dept_name,
+		sta1.staffname
+
+		) as before_name,
+		t.after_staffid,
+		sta2.staffcode as after_code,
+		CONCAT_WS(
+		'-',
+		bd2.dept_name,
+		sta2.staffname
+
+		) as  after_name,
+		t.allocation_mode,
+		t.machine_code,
+		t.brand_id,
+		fb.name as brand_name
+		FROM
+		t_data_machine_log t LEFT JOIN t_back_user bu on t.operate_userid =bu.user_id
+		LEFT JOIN t_data_company_staff sta1 on t.before_staffid  = sta1.id
+		LEFT JOIN t_back_dept_info bd1 on sta1.branch = bd1.dept_id
+		LEFT JOIN t_data_company_staff sta2 on t.after_staffid  = sta2.id
+		LEFT JOIN t_back_dept_info bd2 on sta2.branch = bd2.dept_id
+		LEFT JOIN t_front_brand_rule fb on t.brand_id = fb.id
+
+		WHERE
+		1 = 1
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="brindid  != null and brindid !=''">
+			AND t.brand_id = #{brindid}
+		</if>
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machine_code = #{machinecode}
+		</if>
+		<if test="staffcode  != null and staffcode !=''">
+			AND sta2.staffcode = #{staffcode}
+		</if>
+
+		<if test="staffcode  != null and staffcode !=''">
+			AND sta2.staffcode = #{staffcode}
+		</if>
+		<if test="begindate  != null and begindate !=''">
+			AND t.create_time <![CDATA[>= ]]> #{begindate}
+		</if>
+		<if test="enddate  != null and enddate !=''">
+			AND t.create_time <![CDATA[<= ]]> #{enddate}
+		</if>
+        ORDER BY t.create_time DESC
+
+	</select>
+
+	<insert id="savaMachaneLog" parameterType="hashmap">
+		INSERT INTO t_data_machine_log (
+		<trim suffix="" suffixOverrides=",">
+			<if test="id != null and id !=''">id,</if>
+			<if test="operate_userid != null and operate_userid !=''">operate_userid,</if>
+			<if test="operate_mode != null and operate_mode !=''">operate_mode,</if>
+			<if test="before_staffid != null and before_staffid !=''">before_staffid,</if>
+			<if test="after_staffid != null and after_staffid !=''">after_staffid,</if>
+			<if test="allocation_mode != null and allocation_mode !=''">allocation_mode,</if>
+			<if test="machine_code != null and machine_code !=''">machine_code,</if>
+			<if test="create_time != null and create_time !=''">create_time,</if>
+			<if test="brand_id != null and brand_id !=''">brand_id,</if>
+
+		</trim>
+		)VALUES(
+		<trim suffix="" suffixOverrides=",">
+			<if test="id != null and id !=''">#{id},</if>
+			<if test="operate_userid != null and operate_userid !=''">#{operate_userid},</if>
+			<if test="operate_mode != null and operate_mode !=''">#{operate_mode},</if>
+			<if test="before_staffid != null and before_staffid !=''">#{before_staffid},</if>
+			<if test="after_staffid != null and after_staffid !=''">#{after_staffid},</if>
+			<if test="allocation_mode != null and allocation_mode !=''">#{allocation_mode},</if>
+			<if test="machine_code != null and machine_code !=''">#{machine_code},</if>
+			<if test="create_time != null and create_time !=''">#{create_time},</if>
+			<if test="brand_id != null and brand_id !=''">#{brand_id},</if>
+
+		</trim>
+		)
+	</insert>
+
+</mapper>

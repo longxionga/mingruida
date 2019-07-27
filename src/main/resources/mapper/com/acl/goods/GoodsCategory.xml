@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsCategoryDao">
+<select id="queryGoodsCategory" parameterType="hashmap" resultType="map">
+	SELECT
+		category_id,
+		category_name,
+		superior_id ,
+		category_level,
+		DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		DATE_FORMAT(update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+		is_use
+	FROM
+		t_front_mall_goods_category
+	WHERE
+		superior_id=#{category_id}
+</select>
+<insert id="insertGoodsCategory" parameterType="hashmap">
+	INSERT INTO t_front_mall_goods_category 
+	(
+	<trim suffixOverrides=",">
+	<if test="category_name !=null and category_name !=''">category_name,</if>
+	<if test="superior_id !=null and superior_id !=''">superior_id,</if>
+	<if test="category_level !=null and category_level !=''">category_level,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="category_name !=null and category_name !=''">#{category_name},</if>
+	<if test="superior_id !=null and superior_id !=''">#{superior_id},</if>
+	<if test="category_level !=null and category_level !=''">#{category_level},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateGoodsCategory" parameterType="hashmap">
+	UPDATE t_front_mall_goods_category SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="category_name  != null and category_name !=''">category_name=#{category_name},</if>
+			<if test="superior_id  != null and superior_id !=''">superior_id=#{superior_id},</if>
+			<if test="category_level  != null and category_level !=''">category_level=#{category_level},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+	</trim>
+	WHERE category_id=#{category_id}
+</update>
+<select id="categoryValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		category_id
+	FROM
+		t_front_mall_goods_category
+	WHERE 
+		category_name=#{category_name}
+		<if test="category_id !=null and category_id !=''">
+			AND category_id !=#{category_id}
+		</if>
+</select>
+
+<select id="getGoodsCategory" parameterType="hashmap" resultType="map">
+	SELECT category_id,category_name FROM t_front_mall_goods_category WHERE is_use='1'	AND category_level='1'
+</select>
+</mapper>

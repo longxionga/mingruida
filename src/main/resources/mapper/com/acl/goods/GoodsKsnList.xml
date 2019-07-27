@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.goods.dao.GoodsKsnListDao">
+		<select id="queryKsnListInfo" parameterType="hashmap" resultType="map">
+			SELECT
+				t.id,
+				t.batch_code,
+				t.batch_name,
+				t.machine_code,
+				t.machine_name,
+				t.brand_id,
+				r.name as brand_name,
+				t.user_id,
+				t2.broker_name as user_name,
+				t.agent_id,
+				t1.dept_name as agent_name,
+				t.create_time,
+				t.update_time,
+				t.activation_status,
+				t.usage_status,
+				t.handout_status
+			FROM
+				t_machine_info t
+			LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t.dept_id
+			LEFT JOIN t_front_broker t2 ON t2.dept_id=t.dept_id
+			LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+			WHERE
+				1 = 1
+			<if test="machine_name !=null and machine_name !=''">
+				AND machine_name like CONCAT(CONCAT(#{machine_name}), '%')
+			</if>
+			<if test="brand_id!=null and brand_id!=''">
+				AND r.id = #{brand_id}
+			</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		GROUP BY t.id
+		ORDER BY id asc,update_time desc,create_time desc
+	</select>
+	<select id="selectGoodsList" parameterType="hashmap" resultType="map">
+		SELECT
+		goods.goods_id,
+		goods.category_id,
+		goods.goods_type,
+		goods.goods_code,
+		goods.goods_name,
+		goods.goods_alias,
+		goods.goods_label,
+		goods.description,
+		goods.STATUS,
+		goods.create_time,
+		goods.update_time,
+		goods.is_use,
+		spec.spec_id,
+		spec_name,
+		spec.spec_type,
+		category.category_name
+		FROM
+		t_front_mall_goods goods
+		LEFT JOIN t_front_mall_goods_spec spec ON goods.goods_id = spec.goods_id
+		LEFT JOIN t_front_mall_goods_category category ON category.category_id = goods.category_id
+		WHERE
+		1 = 1
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods.goods_id =#{goods_id}
+		</if>
+		<if test="spec_id !=null and spec_id !=''">
+			AND spec.spec_id =#{spec_id}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+            order by ${sort} ${order}
+        </if>-->
+		ORDER BY goods_id asc, update_time desc,create_time desc
+	</select>
+
+	<insert id="insertKsnInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		insert into t_machine_info (
+		<trim suffix="" suffixOverrides=",">
+			<if test="brand  != null and brand !=''">brand,</if>
+			<if test="type  != null and type !=''">type,</if>
+			<if test="machine_name  != null and machine_name !=''">machine_name,</if>
+			<if test="machine_code  != null and machine_code !=''">machine_code,</if>
+			<if test="agent_id  != null and agent_id !=''">agent_id,</if>
+			<if test="user_id  != null and user_id !=''">user_id,</if>
+			<if test="create_time  != null and create_time !=''">create_time,</if>
+			<if test="activation_status  != null and activation_status !=''">activation_status,</if>
+			<if test="usage_status  != null and usage_status !=''">usage_status,</if>
+			<if test="handout_status  != null and handout_status !=''">handout_status,</if>
+			<if test="update_time  != null and update_time !=''">update_time,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="brand  != null and brand !=''">#{brand},</if>
+			<if test="type  != null and type !=''">#{type},</if>
+			<if test="machine_name  != null and machine_name !=''">#{machine_name},</if>
+			<if test="machine_code  != null and machine_code !=''">#{machine_code},</if>
+			<if test="agent_id  != null and agent_id !=''">#{agent_id},</if>
+			<if test="user_id  != null and user_id !=''">#{user_id},</if>
+			<if test="create_time  != null and create_time !=''">#{create_time},</if>
+			<if test="activation_status  != null and activation_status !=''">#{activation_status},</if>
+			<if test="usage_status  != null and usage_status !=''">usage_status,</if>
+			<if test="handout_status  != null and handout_status !=''">#{handout_status},</if>
+			<if test="update_time  != null and update_time !=''">#{update_time},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateKsnInfo" parameterType="hashmap">
+		UPDATE t_machine_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="brand  != null and brand !=''">brand=#{brand},</if>
+			<if test="type  != null and type !=''">type=#{type},</if>
+			<if test="machine_name  != null and machine_name !=''">machine_name=#{machine_name},</if>
+			<if test="machine_code  != null and machine_code !=''">machine_code=#{machine_code},</if>
+			<if test="agent_id  != null and agent_id !=''">agent_id=#{agent_id},</if>
+			<if test="user_id  != null and user_id !=''">user_id=#{user_id},</if>
+			<if test="create_time  != null and create_time !=''">create_time=#{create_time},</if>
+			<if test="activation_status  != null and activation_status !=''">activation_status=#{activation_status},</if>
+			<if test="usage_status  != null and usage_status !=''">usage_status=#{usage_status},</if>
+			<if test="handout_status  != null and handout_status !=''">handout_status=#{handout_status},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time}</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+
+    <select id="gzpGoodsValidate" parameterType="hashmap" resultType="map">
+	    SELECT gzp_name FROM  t_gzp_info WHERE gzp_name = #{gzp_name}
+	</select>
+	<select id="queryGoodsDeptInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.sku_id,
+			t.settle_id as dept_id,
+			t.goods_id,
+			t.spec_id
+		FROM
+			t_front_mall_goods_stock t
+		WHERE
+		goods_id= #{goods_id}
+		AND spec_id= #{spec_id}
+		<if test="is_use !=null and is_use !=''">
+			AND is_use =#{is_use}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+			AND settle_id =#{dept_id}
+		</if>
+	</select>
+
+	<insert id="insertGoodsDeptInfo" parameterType="hashmap">
+		insert into t_front_mall_goods_stock (
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id !=''">goods_id,</if>
+			<if test="dept_id  != null and dept_id !=''">settle_id,</if>
+			<if test="spec_id  != null and spec_id !=''">spec_id,</if>
+			<if test="create_time  != null and create_time !=''">create_time,</if>
+			<if test="update_time  != null and update_time !=''">update_time,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id !=''">#{goods_id},</if>
+			<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+			<if test="spec_id  != null and gzp_id !=''">#{spec_id},</if>
+			<if test="create_time  != null and create_time !=''">#{create_time},</if>
+			<if test="update_time  != null and update_time !=''">#{update_time},</if>
+		</trim>
+		)
+	</insert>
+
+	<select id="deleteGoodsDept" parameterType="hashmap" resultType="map">
+		DELETE from t_front_mall_goods_stock where goods_id=#{goods_id} and spec_id=#{spec_id}
+	</select>
+
+	<select id="queryIsValidationInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.is_validation
+		FROM
+		t_front_mall_goods t
+		WHERE
+		1 = 1
+		<if test="is_use !=null and is_use !=''">
+			AND is_use =#{is_use}
+		</if>
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods_id =#{goods_id}
+		</if>
+	</select>
+
+	<select id="queryGoodsValidationInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			img.goods_id AS img_goods_id,
+			param.goods_id AS param_goods_id,
+			spec.goods_id AS spec_goods_id,
+			pror.goods_id AS pror_goods_id,
+			img_type
+		FROM
+			t_front_mall_goods goods
+		INNER JOIN t_front_mall_goods_image img ON img.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_param param ON param.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_spec spec ON spec.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_prorate pror ON pror.goods_id = goods.goods_id
+		WHERE
+			img.goods_id = #{goods_id}
+		or spec.goods_id = #{goods_id}
+		or pror.goods_id = #{goods_id}
+		or param.goods_id= #{goods_id}
+		GROUP BY
+		img_type
+	</select>
+
+	<select id="queryCenterKsnListInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.batch_code,
+		t.batch_name,
+		t.machine_code,
+		t.machine_name,
+		t.brand_id,
+		r.name as brand_name,
+		t.user_id,
+		t2.broker_name as user_name,
+		t.agent_id,
+		t1.dept_name as agent_name,
+		t.create_time,
+		t.update_time,
+		t.activation_status,
+		t.usage_status,
+		t.handout_status
+		FROM
+		t_machine_info t
+		LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t.dept_id
+		LEFT JOIN t_front_broker t2 ON t2.dept_id=t.dept_id
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_name !=null and machine_name !=''">
+			AND machine_name like CONCAT(CONCAT(#{machine_name}), '%')
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		GROUP BY t.id
+		ORDER BY id asc,update_time desc,create_time desc
+	</select>
+
+
+
+
+	<select id="queryMerchantInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t.broker_code,t.broker_name,r.name as brand_name
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="broker_code !=null and broker_code !=''">
+			AND t.broker_code =#{broker_code}
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		GROUP BY broker_code ORDER BY broker_name
+	</select>
+
+
+
+
+
+    <select id="queryTradeOrderInfoPageList" parameterType="hashmap" resultType="map">
+        SELECT
+        t.*,r.name as brand_name
+        FROM
+        t_data_trade_order t
+        LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+        WHERE
+        1 = 1
+        <if test="machine_code !=null and machine_code !=''">
+            AND t.machine_code =#{machine_code}
+        </if>
+        <if test="merchant_name !=null and merchant_name !=''">
+            AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+        </if>
+        <if test="merchant_code !=null and merchant_code !=''">
+            AND t.merchant_code =#{merchant_code}
+        </if>
+        <if test="brand_id!=null and brand_id!=''">
+            AND r.id = #{brand_id}
+        </if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.trade_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.trade_day &lt;=#{end_date}
+		</if>
+        <!--<if test="sort  != null and sort !=''">
+            order by ${sort} ${order}
+        </if>-->
+        ORDER BY t.trade_time desc,t.id asc
+    </select>
+
+
+
+	<select id="queryTradeOrderInfoList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*,r.name as brand_name
+		FROM
+		t_data_trade_order t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.trade_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.trade_day &lt;=#{end_date}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+            order by ${sort} ${order}
+        </if>-->
+		ORDER BY t.trade_time desc,t.id asc
+	</select>
+
+
+	<select id="queryMerchantTransfList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*
+		FROM
+		t_data_agent_merchant t
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="user_id !=null and user_id !=''">
+			AND t.user_id =#{user_id}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		ORDER BY t.create_time desc,t.id asc
+	</select>
+
+
+
+
+	<select id="queryMerchantInfoPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*,r.name as brand_name
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		ORDER BY t.bind_time desc,t.id asc
+	</select>
+
+
+
+	<select id="giftMerchantInfoDetail" parameterType="hashmap" resultType="map">
+		SELECT
+		am.broker_code,c.broker_name,
+		c.cmcount ,o.cocount,o.total_amount,o.real_amount,c.activationcount,c.unactivationcount
+        ,b.id,b.name as brand_name
+		FROM
+		t_data_agent_merchant am,
+		(
+		SELECT
+		broker_code,broker_name,
+		COUNT(merchant_code) AS cmcount,
+        SUM(CASE activation WHEN '已激活' THEN '1' ELSE '0' END) activationcount,
+        SUM(CASE activation WHEN '未激活' THEN '1' ELSE '0' END) unactivationcount,
+        brand_id
+		FROM
+		t_data_merchant
+		where 1=1
+		<if test="start_date!=null and start_date!=''">
+			AND bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND bind_day &lt;=#{end_date}
+		</if>
+		GROUP BY
+		broker_code
+		) c,
+		(
+		SELECT
+		broker_code,
+		COUNT(id) AS cocount,
+		SUM(total_amount) as total_amount,
+		SUM(real_amount) as real_amount,
+        brand_id
+		FROM
+		t_data_trade_order
+		where 1=1
+		<if test="start_date!=null and start_date!=''">
+			AND trade_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND trade_day &lt;=#{end_date}
+		</if>
+		GROUP BY
+		broker_code
+		) o ,
+        t_front_brand_rule b
+
+        WHERE
+		c.broker_code = am.broker_code
+		and o.broker_code = am.broker_code
+        and c.brand_id = o.brand_id and c.brand_id = b.id
+        <if test="user_id !=null and user_id !=''">
+			AND am.user_id =#{user_id}
+		</if>
+		 GROUP BY am.broker_code
+
+	</select>
+
+
+
+	<select id="queryMerchantInfoList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*,r.name as brand_name
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		ORDER BY t.bind_time desc,t.id asc
+	</select>
+</mapper>

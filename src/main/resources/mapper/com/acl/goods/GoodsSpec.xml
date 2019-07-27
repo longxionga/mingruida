@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsSpecDao">
+<select id="queryGoodsSpec" parameterType="hashmap" resultType="map">
+	SELECT
+		a.spec_id as spec_ids,
+		a.goods_id as goods_ids,
+		a.spec_type,
+		a.spec_name as spec_names,
+		a.spec_order,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+		a.is_use as is_uses,
+		b.goods_name
+	FROM
+		t_front_mall_goods_spec a
+	INNER JOIN t_front_mall_goods b ON a.goods_id = b.goods_id	
+		WHERE 1=1
+	<if test="good_name !=null and good_name !=''">
+	AND goods_name like CONCAT(CONCAT(#{good_name}), '%')
+	</if>
+	<if test="goods_id !=null and goods_id !=''">
+		AND a.goods_id =#{goods_id}
+	</if>
+</select>
+<insert id="insertGoodsSpec" useGeneratedKeys="true"  keyProperty="spec_id" parameterType="com.acl.pojo.GoodsSpec">
+	INSERT INTO t_front_mall_goods_spec 
+	(
+	<trim suffixOverrides=",">
+	<if test="goods_id !=null and goods_id !=''">goods_id,</if>
+	<if test="spec_type !=null and spec_type !=''">spec_type,</if>
+	<if test="spec_name !=null and spec_name !=''">spec_name,</if>
+	<if test="spec_order !=null and spec_order !=''">spec_order,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="goods_id !=null and goods_id !=''">#{goods_id},</if>
+	<if test="spec_type !=null and spec_type !=''">#{spec_type},</if>
+	<if test="spec_name !=null and spec_name !=''">#{spec_name},</if>
+	<if test="spec_order !=null and spec_order !=''">#{spec_order},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<insert id="insertKsnSpec" useGeneratedKeys="true"  keyProperty="spec_id" parameterType="com.acl.pojo.GoodsSpec">
+	INSERT INTO t_machine_info 
+	(
+	<trim suffixOverrides=",">
+	<if test="usage_status !=null and usage_status !=''">usage_status,</if>
+	<if test="activation_status !=null and activation_status !=''">activation_status,</if>
+	<if test="handout_status !=null and handout_status !=''">handout_status,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="usage_status !=null and usage_status !=''">#{usage_status},</if>
+	<if test="activation_status !=null and activation_status !=''">#{activation_status},</if>
+	<if test="handout_status !=null and handout_status !=''">#{handout_status},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	</trim>
+	)
+</insert>
+<update id="updateGoodsSpec" parameterType="hashmap">
+	UPDATE t_front_mall_goods_spec SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="goods_ids  != null and goods_ids !=''">goods_id=#{goods_ids},</if>
+			<if test="spec_type  != null and spec_type !=''">spec_type=#{spec_type},</if>
+			<if test="spec_names != null and spec_names !=''">spec_name=#{spec_names},</if>
+			<if test="spec_order != null and spec_order !=''">spec_order=#{spec_order},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="is_uses  != null and is_uses !=''">is_use=#{is_uses},</if>
+	</trim>
+	WHERE spec_id=#{spec_ids}
+</update>
+<update id="updateKsnSpec" parameterType="hashmap">
+	UPDATE t_machine_info SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="usage_status  != null and usage_status !=''">usage_status=#{usage_status},</if>
+			<if test="activation_status != null and activation_status !=''">activation_status=#{activation_status},</if>
+			<if test="handout_status != null and handout_status !=''">handout_status=#{handout_status},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+	</trim>
+	WHERE spec_id=#{spec_ids}
+</update>
+<select id="specValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		spec_id
+	FROM
+		t_front_mall_goods_spec
+	WHERE 
+		spec_name=#{spec_name} 
+		<if test="spec_id !=null and spec_id !=''">
+			AND spec_id !=#{spec_id}
+		</if>
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods_id=#{goods_id}
+		</if>		
+</select>
+</mapper>

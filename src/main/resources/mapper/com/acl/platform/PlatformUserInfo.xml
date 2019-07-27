@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformUserInfoDao">
+    <select id="queryUserInfo" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id_card,
+        t.id,
+        t.name,
+        t.mobile,
+        t.`status`,
+        t.broker_id,
+        t.settle_id,
+        t.agent_id,
+        t.create_time,
+        t1.amount,
+        t.job,
+        t.job_day,
+        t.word_days,
+        t.leave_days,
+        t.month_check,
+        t.month_uncheck,
+        t.total_map,
+        t.deduct_map,
+        t.total_amount,
+        t.deduct_amount,
+        t.notes,
+        t.real_amount,
+        t.account_type
+        FROM
+        t_user_info t
+        INNER JOIN t_user_capital t1 ON t1.user_id = t.id
+        WHERE
+        1 = 1
+        <if test="name!=null and name!=''">
+            AND t.name like CONCAT(CONCAT(#{name}), '%')
+        </if>
+        <if test="id_card!=null and id_card!=''">
+            AND t.id_card = #{id_card}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND t.mobile = #{mobile}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND t5.dept_parent_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t2.dept_id=#{DID}
+        </if>
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb=='2' ">	   		-->
+        <!--AND t.is_use &gt;='2'	   		-->
+        <!--</if>	 -->
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb!='2'">-->
+        <!--AND t.is_use =#{is_useb}-->
+        <!--</if>-->
+        <if test="status!=null and status!=''">
+            AND t.status =#{status}
+        </if>
+        <if test="account_type!=null and account_type!=''">
+            AND t.account_type =#{account_type}
+        </if>
+        order by t.update_time,t.create_time desc
+    </select>
+
+    <select id="queryUserBalanceSum" parameterType="hashmap" resultType="map">
+        SELECT
+        IFNULL(sum(t1.amount), 0) AS balance_count
+        FROM
+        t_user_info t
+        INNER JOIN t_user_capital t1 ON t1.user_id = t.id
+        INNER JOIN t_front_broker t2 ON t2.broker_id = t.broker_id
+        INNER JOIN t_back_dept_info t3 ON t3.dept_id = t2.dept_id
+        INNER JOIN t_back_dept_info t4 ON t4.dept_id = t.agent_id
+        INNER JOIN t_back_dept_info t5 ON t5.dept_id = t.settle_id
+        WHERE
+        1 = 1
+        <if test="name!=null and name!=''">
+            AND t.name like CONCAT(CONCAT(#{name}), '%')
+        </if>
+        <if test="broker_name!=null and broker_name!=''">
+            AND t2.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND t.mobile = #{mobile}
+        </if>
+
+        <if test="ch_id!=null and ch_id!=''">
+            AND t5.dept_parent_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t2.dept_id=#{DID}
+        </if>
+        <if test="status!=null and status!='' and status=='2' ">
+            AND t.status &gt;='2'
+        </if>
+        <if test="status!=null and status!='' and status!='2'">
+            AND t.status =#{status}
+        </if>
+        order by t.create_time desc
+    </select>
+
+    <update id="updateUserInfoPwd" parameterType="hashmap">
+        UPDATE
+        t_user_info set
+        password=#{password},update_time=now()
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateUserInfoState" parameterType="hashmap">
+        UPDATE
+        t_user_info
+        set
+        status=#{status},update_time=now(),job =null,job_day=null,word_days=null,leave_days=null,month_check=null,month_uncheck=null,total_map=null,deduct_map=null,
+            total_amount=null,deduct_amount=null,real_amount=null,notes=null
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateUserWeiXinInfo" parameterType="hashmap">
+            UPDATE
+            t_user_info
+            set
+            open_id=''
+            WHERE id=#{id}
+    </update>
+
+
+    <select id="selectUserCz" parameterType="hashmap" resultType="hashmap">
+        SELECT
+	    COUNT(*) AS count,
+			t.mobile,
+			t.open_id
+         FROM
+	     t_user_info t
+		INNER JOIN t_front_cz_order_rs t1 ON t.id = t1.user_id
+		WHERE
+	       t.id=#{id}
+</select>
+
+    <update id="logoutUserInfoState" parameterType="hashmap">
+            UPDATE t_user_info t
+            set
+            t.`status`=#{status},
+            t.mobile = #{mobile},
+            t.update_time = #{update_time},
+            t.open_id=#{open_id}
+            WHERE t.id=#{id}
+        </update>
+
+    <update id="logoutBrokerInfoState" parameterType="hashmap">
+        UPDATE t_front_broker
+        set
+        is_use=#{is_use},
+        broker_mobile = #{broker_mobile},
+        broker_wx_id =#{broker_wx_id},
+        broker_zf_wx_id=#{broker_zf_wx_id},
+        broker_mobile = #{broker_mobile},
+        broker_incode=#{broker_incode}
+        WHERE broker_mobile=#{user_mobile}
+        </update>
+
+    <update id="updateUserBroker" parameterType="hashmap">
+        UPDATE
+        t_user_info
+        set
+        broker_id = #{broker_id}
+        WHERE id in(
+        <foreach collection="id" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+
+        <!-- user_id in(#{user_id})   -->
+    </update>
+
+    <!-- 删除前台用户信息临时表中的历史数据 -->
+    <delete id="deleteUserBroker" parameterType="hashmap">
+        DELETE FROM t_front_user_info_temp
+        WHERE user_id in(
+        <foreach collection="user_id" item="user_id" separator=",">
+            #{user_id}
+        </foreach>
+        )
+    </delete>
+    <!-- 前台用户信息临时表中插入数据 -->
+    <insert id="insertUserBroker" parameterType="hashmap">
+        INSERT INTO t_front_user_info_temp(
+        <trim suffixOverrides=",">
+            <if test="sys_id!=null and sys_id!=''">sys_id,</if>
+            <if test="user_id!=null and user_id!=''">user_id,</if>
+            <if test="broker_id!=null and broker_id!=''">broker_id,</if>
+        </trim>
+        )VALUES(
+        <trim suffixOverrides=",">
+            <if test="sys_id!=null and sys_id!=''">#{sys_id},</if>
+            <if test="user_id!=null and user_id!=''">#{user_id},</if>
+            <if test="broker_id!=null and broker_id!=''">#{broker_id},</if>
+        </trim>
+        )
+    </insert>
+
+    <select id="queryBrokerLevel" parameterType="hashmap" resultType="hashmap">
+        select broker_id,broker_mobile,broker_wx_id,broker_zf_wx_id,broker_level,broker_incode from t_front_broker where broker_mobile=#{user_mobile}
+    </select>
+
+    <!--<update id="updateNumberState" parameterType="hashmap">-->
+    <!--UPDATE-->
+    <!--t_back_number_info-->
+    <!--set is_use=#{is_use}-->
+    <!--WHERE number_code=#{number_code}-->
+    <!--</update>-->
+
+
+    <update id="updateUserInfoidCardAuth" parameterType="hashmap">
+		UPDATE
+		t_user_info
+		set
+		id_card_auth=#{id_card_auth},update_time = now(),job =null,job_day=null,word_days=null,leave_days=null,month_check=null,month_uncheck=null,total_map=null,deduct_map=null,
+		total_amount=null,deduct_amount=null,real_amount=null,notes=null
+		WHERE id=#{id}
+	</update>
+
+
+    <update id="updateCloseAll" parameterType="hashmap">
+		UPDATE
+		t_user_info
+		set
+		status=#{status},update_time = now(),job =null,job_day=null,word_days=null,leave_days=null,month_check=null,month_uncheck=null,total_map=null,deduct_map=null,
+		total_amount=null,deduct_amount=null,real_amount=null,notes=null
+       where  account_type = #{account_type}
+	</update>
+
+
+    <select id="queryUserAgentInfo" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id_card,
+        t1.id,
+        t.name,
+        t.mobile,
+        t.`status`,
+        t.broker_id,
+        t.settle_id,
+        t.agent_id,
+        t.account_type,
+        t1.create_time,
+        t1.job,
+        t1.job_day,
+        t1.word_days,
+        t1.leave_days,
+        t1.month_check,
+        t1.month_uncheck,
+        t1.total_map,
+        t1.deduct_map,
+        t1.total_amount,
+        t1.deduct_amount,
+        t1.notes,
+        t1.real_amount,
+        t1.back_name,
+        t1.agent_name,
+        t1.ch_name,
+        t1.brand,
+        t1.user_id,
+        r.sala_title,
+        r.sala_status
+        FROM
+        t_user_info t
+        INNER JOIN t_front_sala_agent_info t1 ON t1.user_id = t.id
+        INNER JOIN t_sala_rule r on t1.sala_rule_id = r.id and r.sala_type = '02' and r.sala_status ='01'
+        WHERE
+        1 = 1
+        <if test="brand!=null and brand!='' and brand!='全部'">
+            AND t1.brand like CONCAT(CONCAT(#{brand}), '%')
+        </if>
+        <if test="sala_rule_id!=null and sala_rule_id!=''">
+            AND t1.sala_rule_id = #{sala_rule_id}
+        </if>
+        <if test="agent_name!=null and agent_name!=''">
+            AND t1.agent_name = #{agent_name}
+        </if>
+        <!--<if test="name!=null and name!=''">-->
+        <!--AND t.user_name like CONCAT(CONCAT(#{user_name}), '%')-->
+        <!--</if>-->
+        <if test="id_card!=null and id_card!=''">
+            AND t.id_card = #{id_card}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND t.mobile = #{mobile}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND t5.dept_parent_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t2.dept_id=#{DID}
+        </if>
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb=='2' ">	   		-->
+        <!--AND t.is_use &gt;='2'	   		-->
+        <!--</if>	 -->
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb!='2'">-->
+        <!--AND t.is_use =#{is_useb}-->
+        <!--</if>-->
+        <if test="status!=null and status!=''">
+            AND t.status =#{status}
+        </if>
+        <if test="account_type!=null and account_type!=''">
+            AND t.account_type =#{account_type}
+        </if>
+        order by t1.create_time desc
+    </select>
+
+
+    <insert id="insertDataMerchant_s" parameterType="hashmap">
+        INSERT INTO t_data_merchant (
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">id,</if>
+            <if test="merchant_code != null">merchant_code,</if>
+            <if test="merchant_name != null ">merchant_name,</if>
+            <if test="broker_code != null and broker_code !=''">broker_code,</if>
+            <if test="broker_name != null and broker_name !=''">broker_name,</if>
+            <if test="merchant_type != null and merchant_type !=''">merchant_type,</if>
+            <if test="brand_id != null and brand_id !=''">brand_id,</if>
+            <if test="machine_code != null and machine_code !=''">machine_code,</if>
+            <if test="machine_type != null and machine_type !=''">machine_type,</if>
+            <if test="current_month_amount != null and current_month_amount !=''">current_month_amount,</if>
+            <if test="three_month_amount != null and three_month_amount !=''">three_month_amount,</if>
+            <if test="bind_time != null and bind_time !=''">bind_time,</if>
+            <if test="bind_day != null and bind_day !=''">bind_day,</if>
+            <if test="activation != null and activation !=''">activation,</if>
+            <if test="activation_notes != null and activation_notes !=''">activation_notes,</if>
+            <if test="activation_type != null and activation_type !=''">activation_type,</if>
+            <if test="create_time != null and create_time !=''">create_time,</if>
+            <if test="create_day != null and create_day !=''">create_day,</if>
+            <if test="del_tag != null and del_tag !=''">del_tag,</if>
+        </trim>
+        )VALUES(
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">#{id},</if>
+            <if test="merchant_code != null">#{merchant_code},</if>
+            <if test="merchant_name != null ">#{merchant_name},</if>
+            <if test="broker_code != null and broker_code !=''">#{broker_code},</if>
+            <if test="broker_name != null and broker_name !=''">#{broker_name},</if>
+            <if test="merchant_type != null and merchant_type !=''">#{merchant_type},</if>
+            <if test="brand_id != null and brand_id !=''">#{brand_id},</if>
+            <if test="machine_code != null and machine_code !=''">#{machine_code},</if>
+            <if test="machine_type != null and machine_type !=''">#{machine_type},</if>
+            <if test="current_month_amount != null and current_month_amount !=''">#{current_month_amount},</if>
+            <if test="three_month_amount != null and three_month_amount !=''">#{three_month_amount},</if>
+            <if test="bind_time != null and bind_time !=''">#{bind_time},</if>
+            <if test="bind_day != null and bind_day !=''">#{bind_day},</if>
+            <if test="activation != null and activation !=''">#{activation},</if>
+            <if test="activation_notes != null and activation_notes !=''">#{activation_notes},</if>
+            <if test="activation_type != null and activation_type !=''">#{activation_type},</if>
+            <if test="create_time != null and create_time !=''">#{create_time},</if>
+            <if test="create_day != null and create_day !=''">#{create_day},</if>
+            <if test="del_tag != null and del_tag !=''">#{del_tag},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <insert id="insertDataMerchant" parameterType="hashmap">
+        INSERT INTO t_data_merchant
+        (
+        id,
+        merchant_code,
+        merchant_name,
+        broker_code,
+        broker_name,
+        merchant_type,
+        brand_id,
+        machine_code,
+        machine_type,
+        current_month_amount,
+        three_month_amount,
+        bind_time,
+        bind_day,
+        activation,
+        activation_notes,
+        activation_type,
+        create_time,
+        create_day,
+        del_tag
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.merchant_code},#{item.merchant_name},#{item.broker_code},#{item.broker_name},#{item.merchant_type},
+            #{item.brand_id},#{item.machine_code},#{item.machine_type},#{item.current_month_amount},#{item.three_month_amount},#{item.bind_time},
+            #{item.bind_day},#{item.activation},#{item.activation_notes},#{item.activation_type},#{item.create_time},
+            #{item.create_day},#{item.del_tag}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertDataTradeOrder" parameterType="hashmap">
+        INSERT INTO t_data_trade_order (
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">id,</if>
+            <if test="order_id != null and order_id !=''">order_id,</if>
+            <if test="order_type != null and order_type !=''">order_type,</if>
+            <if test="order_state != null and order_state !=''">order_state,</if>
+            <if test="settle_type != null and settle_type !=''">settle_type,</if>
+            <if test="merchant_code != null">merchant_code,</if>
+            <if test="merchant_name != null ">merchant_name,</if>
+            <if test="broker_code != null and broker_code !=''">broker_code,</if>
+            <if test="broker_name != null and broker_name !=''">broker_name,</if>
+            <if test="merchant_type != null and merchant_type !=''">merchant_type,</if>
+            <if test="pay_type != null and pay_type !=''">pay_type,</if>
+            <if test="pay_card_type != null and pay_card_type !=''">pay_card_type,</if>
+            <if test="pay_card_no != null and pay_card_no !=''">pay_card_no,</if>
+            <if test="merchant_rate != null and merchant_rate !=''">merchant_rate,</if>
+            <if test="brand_id != null and brand_id !=''">brand_id,</if>
+            <if test="machine_code != null and machine_code !=''">machine_code,</if>
+            <if test="machine_type != null and machine_type !=''">machine_type,</if>
+            <if test="total_amount != null and total_amount !=''">total_amount,</if>
+            <if test="real_amount != null and real_amount !=''">real_amount,</if>
+            <if test="trade_time != null and trade_time !=''">trade_time,</if>
+            <if test="trade_day != null and trade_day !=''">trade_day,</if>
+            <if test="create_time != null and create_time !=''">create_time,</if>
+            <if test="create_day != null and create_day !=''">create_day,</if>
+            <if test="del_tag != null and del_tag !=''">del_tag,</if>
+        </trim>
+        )VALUES(
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">#{id},</if>
+            <if test="order_id != null and order_id !=''">#{order_id},</if>
+            <if test="order_type != null and order_type !=''">#{order_type},</if>
+            <if test="order_state != null and order_state !=''">#{order_state},</if>
+            <if test="settle_type != null and settle_type !=''">#{settle_type},</if>
+            <if test="merchant_code != null">#{merchant_code},</if>
+            <if test="merchant_name != null ">#{merchant_name},</if>
+            <if test="broker_code != null and broker_code !=''">#{broker_code},</if>
+            <if test="broker_name != null and broker_name !=''">#{broker_name},</if>
+            <if test="merchant_type != null and merchant_type !=''">#{merchant_type},</if>
+            <if test="pay_type != null and pay_type !=''">#{pay_type},</if>
+            <if test="pay_card_type != null and pay_card_type !=''">#{pay_card_type},</if>
+            <if test="pay_card_no != null and pay_card_no !=''">#{pay_card_no},</if>
+            <if test="merchant_rate != null and merchant_rate !=''">#{merchant_rate},</if>
+            <if test="brand_id != null and brand_id !=''">#{brand_id},</if>
+            <if test="machine_code != null and machine_code !=''">#{machine_code},</if>
+            <if test="machine_type != null and machine_type !=''">#{machine_type},</if>
+            <if test="total_amount != null and total_amount !=''">#{total_amount},</if>
+            <if test="real_amount != null and real_amount !=''">#{real_amount},</if>
+            <if test="trade_time != null and trade_time !=''">#{trade_time},</if>
+            <if test="trade_day != null and trade_day !=''">#{trade_day},</if>
+            <if test="create_time != null and create_time !=''">#{create_time},</if>
+            <if test="create_day != null and create_day !=''">#{create_day},</if>
+            <if test="del_tag != null and del_tag !=''">#{del_tag},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <insert id="insertDataTradeOrderAll" parameterType="hashmap">
+        INSERT INTO t_data_trade_order
+        (id,order_id,order_type,order_state,settle_type,merchant_code,merchant_name,broker_code,
+        broker_name,merchant_type,pay_type,pay_card_type,pay_card_no,merchant_rate,
+        brand_id,machine_code,total_amount,real_amount,trade_time,
+        trade_day,create_time,create_day,arrival_state
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.order_id},#{item.order_type},#{item.order_state},#{item.settle_type},#{item.merchant_code},
+            #{item.merchant_name},#{item.broker_code},#{item.broker_name},#{item.merchant_type},#{item.pay_type},#{item.pay_card_type},
+            #{item.pay_card_no},#{item.merchant_rate},#{item.brand_id},#{item.machine_code},#{item.total_amount},
+            #{item.real_amount},#{item.trade_time},#{item.trade_day},#{item.create_time},#{item.create_day},#{item.arrival_state}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="queryUserTransf" parameterType="hashmap" resultType="map">
+        SELECT
+        t.*
+        FROM
+        t_user_info t
+        WHERE
+        1 = 1
+        <!--<if test="name!=null and name!=''">-->
+        <!--AND t.user_name like CONCAT(CONCAT(#{user_name}), '%')-->
+        <!--</if>-->
+        <if test="account_type!=null and account_type!=''">
+            AND t.account_type = #{account_type}
+        </if>
+        <if test="id_card!=null and id_card!=''">
+            AND t.id_card = #{id_card}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND t.mobile = #{mobile}
+        </if>
+
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb=='2' ">	   		-->
+        <!--AND t.is_use &gt;='2'	   		-->
+        <!--</if>	 -->
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb!='2'">-->
+        <!--AND t.is_use =#{is_useb}-->
+        <!--</if>-->
+        <if test="status!=null and status!=''">
+            AND t.status =#{status}
+        </if>
+        order by t.update_time,t.create_time desc
+    </select>
+
+
+    <insert id="insertUserTransf" parameterType="hashmap">
+        INSERT INTO t_data_agent_merchant (
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">id,</if>
+            <if test="user_id != null">user_id,</if>
+            <if test="broker_code != null ">broker_code,</if>
+            <if test="create_time != null and create_time !=''">create_time,</if>
+            <if test="create_day != null and create_day !=''">create_day,</if>
+            <if test="del_tag != null and del_tag !=''">del_tag,</if>
+        </trim>
+        )VALUES(
+        <trim suffix="" suffixOverrides=",">
+            <if test="id != null and id !=''">#{id},</if>
+            <if test="user_id != null">#{user_id},</if>
+            <if test="broker_code != null ">#{broker_code},</if>
+            <if test="create_time != null and create_time !=''">#{create_time},</if>
+            <if test="create_day != null and create_day !=''">#{create_day},</if>
+            <if test="del_tag != null and del_tag !=''">#{del_tag},</if>
+        </trim>
+        )
+    </insert>
+
+
+    <!-- 删除经纪人部门关系临时表中的历史数据 -->
+    <delete id="deleteUserTransf" parameterType="hashmap">
+        DELETE FROM t_data_agent_merchant
+        <where>
+            <if test="user_id!=null and user_id!=''">
+                AND user_id =#{user_id}
+            </if>
+            <if test="merchant_ids!=null and merchant_ids!=''">
+                merchant_id in(
+                <foreach collection="merchant_ids" item="merchant_id" separator=",">
+                    #{merchant_id}
+                </foreach>
+                )
+            </if>
+        </where>
+
+    </delete>
+
+
+
+    <select id="giftMerchantInfo" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id,t.account_type,t.mobile,t.id_card,t.`status`,t.create_time,
+        (select COUNT(DISTINCT(m.broker_code)) from t_data_merchant m where m.broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id GROUP BY am.broker_code) ) as mcount,
+        (select COUNT(m.broker_code) from t_data_merchant m where m.broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id GROUP BY am.broker_code) ) as mmcount,
+        (select SUM(CASE activation WHEN '已激活' THEN '1' ELSE '0' END)  from t_data_merchant where broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id  GROUP BY am.broker_code) ) as activationcount,
+        (select COUNT(o.broker_code) from t_data_trade_order o where o.broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id GROUP BY am.broker_code)) as ocount,
+        (select SUM(o.total_amount) from t_data_trade_order o where o.broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id GROUP BY am.broker_code) ) as total_amount,
+        (select SUM(o.real_amount) from t_data_trade_order o where o.broker_code in(select am.broker_code from t_data_agent_merchant am where am.user_id = t.id GROUP BY am.broker_code) ) as real_amount
+
+        FROM
+        t_user_info t
+        WHERE
+        1 = 1
+        <!--<if test="name!=null and name!=''">-->
+        <!--AND t.user_name like CONCAT(CONCAT(#{user_name}), '%')-->
+        <!--</if>-->
+        <if test="account_type!=null and account_type!=''">
+            AND t.account_type = #{account_type}
+        </if>
+        <if test="id_card!=null and id_card!=''">
+            AND t.id_card = #{id_card}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND t.mobile = #{mobile}
+        </if>
+
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb=='2' ">	   		-->
+        <!--AND t.is_use &gt;='2'	   		-->
+        <!--</if>	 -->
+        <!--<if test="is_useb!=null and is_useb!='' and is_useb!='2'">-->
+        <!--AND t.is_use =#{is_useb}-->
+        <!--</if>-->
+        <if test="status!=null and status!=''">
+            AND t.status =#{status}
+        </if>
+        order by t.update_time,t.create_time desc
+    </select>
+
+
+    <update id="savaAgentToNdept" parameterType="hashmap">
+        UPDATE
+        t_user_info
+        set
+        agent_id=#{agent_id},update_time = now(), settle_id=#{settle_id}, ch_id=#{ch_id}, ce_id=#{ce_id},p_id  =#{p_id},dept_id  =#{dept_id}
+        WHERE id=#{id}
+    </update>
+
+    <insert id="insertDataMachineInfoAll" parameterType="hashmap">
+        INSERT INTO t_data_machine_info
+        (id,machineSN,merchantcode,attagentcode,isbound,machinetype,machinemodel,warehousingtype,
+        vipstatus,attagentname,merchantname,machineryT1rate,machineryT0rate,machineryamount,
+        companyid,brindnameid,create_time,create_day,update_time,del_tag
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.machineSN},#{item.merchantcode},#{item.attagentcode},#{item.isbound},#{item.machinetype},
+            #{item.machinemodel},#{item.warehousingtype},#{item.vipstatus},#{item.attagentname},#{item.merchantname},#{item.machineryT1rate},
+            #{item.machineryT0rate},#{item.machineryamount},#{item.companyid},#{item.brindnameid},#{item.create_time},
+            #{item.create_day}, #{item.update_time},#{item.del_tag}
+            )
+
+        </foreach>
+    </insert>
+
+    <insert id="insertDataHKMachineInfoAll" parameterType="hashmap">
+        INSERT INTO t_data_machine_info
+        (id,machineSN,machinecode,batchcode,isbound,machinetype,attagentcode,attagentname,
+        perattagentname,merchantcode,merchantname,dotcode,dotname,isencryption,
+        machineident,policyident,allocationnum,ifdeposit,staffid,brindid,create_time,create_day
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.machineSN},#{item.machinecode},#{item.batchcode},#{item.isbound},#{item.machinetype},
+            #{item.attagentcode},#{item.attagentname},#{item.perattagentname},#{item.merchantcode},#{item.merchantname},#{item.dotcode},
+            #{item.dotname},#{item.isencryption},#{item.machineident},#{item.policyident},#{item.allocationnum},
+            #{item.ifdeposit}, #{item.staffid},#{item.brindid},#{item.create_time},#{item.create_day}
+            )
+
+        </foreach>
+    </insert>
+
+    <insert id="insertHKDataTradeOrderAll" parameterType="hashmap">
+        INSERT INTO t_data_trade_order
+        (id,order_id,machine_type,machine_code,merchant_code,merchant_name,trade_time,trade_day,
+        network_name,order_type,isshuagmian,total_amount,yhjine,qdyhjine,
+        jyshxf,zshshxf,pay_type,pay_card_type,settle_type,
+        order_state,dingdanleixin,brand_id,create_time,create_day,butagentname,order_amount
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.order_id},#{item.machine_type},#{item.machine_code},#{item.merchant_code},#{item.merchant_name},
+            #{item.trade_time},#{item.trade_day},#{item.network_name},#{item.order_type},#{item.isshuagmian},#{item.total_amount},
+            #{item.yhjine},#{item.qdyhjine},#{item.jyshxf},#{item.zshshxf},#{item.pay_type},
+            #{item.pay_card_type},#{item.settle_type},#{item.order_state},#{item.dingdanleixin},#{item.brand_id},#{item.create_time},
+            #{item.create_day},#{item.butagentname},#{item.order_amount} )
+        </foreach>
+    </insert>
+
+    <insert id="insertHKMerchant" parameterType="hashmap">
+        INSERT INTO t_data_merchant
+        (
+        id,
+        merchant_code,
+        merchant_name,
+        bind_time,
+        bind_day,
+        broker_code,
+        broker_name,
+        merchant_rovince,
+        subbroker_name,
+
+        merchant_type,
+        merchant_state,
+        machine_type,
+        audit_status,
+        rate_type,
+        brand_id,
+        create_time,
+        create_day
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.merchant_code},#{item.merchant_name},#{item.bind_time},#{item.bind_day},#{item.broker_code},#{item.broker_name},
+            #{item.merchant_rovince},#{item.subbroker_name},#{item.merchant_type}, #{item.merchant_state}, #{item.machine_type}, #{item.audit_status},
+            #{item.rate_type}, #{item.brand_id},#{item.create_time}, #{item.create_day}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

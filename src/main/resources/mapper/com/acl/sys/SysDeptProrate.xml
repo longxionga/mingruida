@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.sys.dao.ISysDepProrateDao">
+	<select id="queryDeptProrate" parameterType="hashmap" resultType="map">
+		SELECT sys_id, p_id, ce_id, ch_id, s_id, a_id, b_id, p_allot, ce_allot, ch_allot, s_allot, a_allot, b_allot, is_use, create_date 
+		FROM t_back_dept_prorate
+		WHERE 1=1 
+	    <if test="sys_id !=null and sys_id !=''">
+			AND sys_id = #{sys_id}
+		</if>
+		<if test="p_id !=null and p_id !=''">
+			AND p_id = #{p_id}
+		</if>
+		<if test="ce_id !=null and ce_id !=''">
+			AND ce_id = #{ce_id}
+		</if>
+		<if test="ch_id !=null and ch_id !=''">
+			AND ch_id = #{ch_id}
+		</if>
+		<if test="s_id !=null and s_id !=''">
+			AND s_id = #{s_id}
+		</if>
+		<if test="a_id !=null and a_id !=''">
+			AND a_id = #{a_id}
+		</if>
+		<if test="b_id !=null and b_id !=''">
+			AND b_id = #{b_id}
+		</if>
+		<if test="p_allot !=null and p_allot !=''">
+			AND p_allot = #{p_allot}
+		</if>
+		<if test="ce_allot !=null and ce_allot !=''">
+			AND ce_allot = #{ce_allot}
+		</if>
+		<if test="ch_allot !=null and ch_allot !=''">
+			AND ch_allot = #{ch_allot}
+		</if>
+		<if test="s_allot !=null and s_allot !=''">
+			AND s_allot = #{s_allot}
+		</if>
+		<if test="a_allot !=null and a_allot !=''">
+			AND a_allot = #{a_allot}
+		</if>
+		<if test="b_allot !=null and b_allot !=''">
+			AND b_allot = #{b_allot}
+		</if>
+		<if test="is_use !=null and is_use !=''">
+			AND is_use = #{is_use}
+		</if>
+		<if test="create_date !=null and create_date !=''">
+			AND create_date = #{create_date}
+		</if>
+		ORDER BY 
+			create_date
+	</select>
+	<insert id="insertDeptProrate" parameterType="hashmap">
+	INSERT INTO t_back_dept_prorate (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id != null and sys_id !=''">sys_id,</if>
+	        <if test="p_id != null and p_id !=''">p_id,</if>
+	        <if test="ce_id != null and ce_id !=''">ce_id,</if>
+	        <if test="ch_id != null and ch_id !=''">ch_id,</if>
+	        <if test="s_id != null and s_id !=''">s_id,</if>
+	        <if test="a_id != null and a_id !=''">a_id,</if>
+	        <if test="b_id != null and b_id !=''">b_id,</if>
+	        <if test="p_allot != null and p_allot !=''">p_allot,</if>
+	        <if test="ce_allot != null and ce_allot !=''">ce_allot,</if>
+	        <if test="ch_allot != null and ch_allot !=''">ch_allot,</if>
+	        <if test="s_allot != null and s_allot !=''">s_allot,</if>
+	        <if test="va_allot != null and va_allot !=''">va_allot,</if>
+	        <if test="b_allot != null and b_allot !=''">b_allot,</if>
+	        <if test="is_use != null and is_use !=''">is_use,</if>
+	        <if test="create_date != null and create_date !=''">create_date,</if>
+	    </trim>
+    )VALUES(
+			<if test="sys_id != null and sys_id !=''">#{sys_id},</if>
+	        <if test="p_id != null and p_id !=''">#{p_id},</if>
+	        <if test="ce_id != null and ce_id !=''">#{ce_id},</if>
+	        <if test="ch_id != null and ch_id !=''">#{ch_id},</if>
+	        <if test="s_id != null and s_id !=''">#{s_id},</if>
+	        <if test="a_id != null and a_id !=''">#{a_id},</if>
+	        <if test="b_id != null and b_id !=''">#{b_id},</if>
+	        <if test="p_allot != null and p_allot !=''">#{p_allot},</if>
+	        <if test="ce_allot != null and ce_allot !=''">#{ce_allot},</if>
+	        <if test="ch_allot != null and ch_allot !=''">#{ch_allot},</if>
+	        <if test="s_allot != null and s_allot !=''">#{s_allot},</if>
+	        <if test="va_allot != null and va_allot !=''">#{va_allot},</if>
+	        <if test="b_allot != null and b_allot !=''">#{b_allot},</if>
+	        <if test="is_use != null and is_use !=''">#{is_use},</if>
+	        <if test="create_date != null and create_date !=''">#{create_date},</if>
+    )
+	</insert>
+	
+</mapper>

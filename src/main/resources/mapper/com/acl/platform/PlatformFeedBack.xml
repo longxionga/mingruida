@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.platform.dao.PlatformFeedBackDao">
+<select id="queryFeedBack" parameterType="hashMap" resultType="map">
+SELECT
+	a.feedback_id,
+	a.user_id,
+	a.advice,
+	a.mobile,
+	a.voucher_uri1,
+	a.voucher_uri2,
+	a.voucher_uri3,
+	a.broker_id,
+	a.dept_id,
+	a.agent_id,
+	a.settle_id,
+	a.ch_id,
+	a.ce_id,
+	a.p_id,
+	a.create_time,
+	a.update_time,
+	a.is_use,
+    b.user_name,
+    d.dept_name as dept_name,
+    ag.dept_name as agent_name,
+    s.dept_name as settle_name,
+    ch.dept_name as ch_name,
+    ce.dept_name as ce_name
+FROM
+	t_front_mall_feedback a INNER JOIN t_front_user_info b ON a.user_id=b.user_id
+  LEFT JOIN t_back_dept_info d ON a.dept_id=d.dept_id
+  LEFT JOIN t_back_dept_info ag ON a.agent_id=ag.dept_id
+  LEFT JOIN t_back_dept_info s ON a.settle_id=s.dept_id
+  LEFT JOIN t_back_dept_info ch ON a.ch_id=ch.dept_id
+  LEFT JOIN t_back_dept_info ce ON a.ce_id=ce.dept_id
+	WHERE 1=1
+	<if test="feedback_id!=null and feedback_id!=''">
+		AND a.feedback_id=#{feedback_id}
+	</if>
+	 <if test="ce_id!=null and ce_id!=''">
+	  AND ce.dept_id=#{ce_id}
+	 </if>
+	  <if test="ch_id!=null and ch_id!=''">
+	  AND ch.dept_id=#{ch_id}
+	 </if>
+	  <if test="settle_id!=null and settle_id!=''">
+	  AND s.dept_id=#{settle_id}
+	 </if>
+	  <if test="agent_id!=null and agent_id!=''">
+	 AND ag.dept_id=#{agent_id}
+	 </if>
+	 <if test="dept_id!=null and dept_id!=''">
+	 AND a.dept_id=#{DID}
+	 </if>
+	<if test="user_name !=null and user_name !=''">
+		AND b.user_name like CONCAT(CONCAT(#{user_name}), '%')
+	</if>
+		ORDER BY 
+			a.create_time,a.update_time desc
+</select>
+</mapper>

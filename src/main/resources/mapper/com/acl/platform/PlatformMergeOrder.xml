@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMergeOrderDao">
+    <select id="queryMergeOrder" parameterType="hashMap" resultType="map">
+		SELECT
+		t.id_card,
+		t.id_card_auth,
+		t.id_card_front,
+		t.id_card_back ,
+		t.id,
+		t.name,
+		t.mobile,
+		t.`status`,
+		t.broker_id,
+		t.settle_id,
+		t.agent_id,
+		t.create_time,
+		t1.amount,
+		t2.broker_name,
+		t2.dept_id,
+		t3.dept_name,
+		t4.dept_name AS agent_name,
+		t5.dept_name AS settle_name,
+		t5.dept_parent_id AS ch_id,
+		(select count(0)  FROM t_trade_order WHERE
+		(type = "1" AND STATUS = "1")
+		AND post_id is NULL
+		and  user_id = t.id
+		and agent_id = t.agent_id ) AS num
+		FROM
+		t_user_info t
+		INNER JOIN t_user_capital t1 ON t1.user_id = t.id
+		INNER JOIN t_front_broker t2 ON t2.broker_id = t.broker_id
+		INNER JOIN t_back_dept_info t3 ON t3.dept_id = t2.dept_id
+		INNER JOIN t_back_dept_info t4 ON t4.dept_id = t.agent_id
+		INNER JOIN t_back_dept_info t5 ON t5.dept_id = t.settle_id
+        WHERE 1=1
+		<if test="name!=null and name!=''">AND t.name like CONCAT(CONCAT(#{name}), '%')</if>
+        <if test="nick_name!=null and nick_name!=''">AND t.nick_name like CONCAT(CONCAT(#{nick_name}), '%')</if>
+		<if test="mobile!=null and mobile!=''">AND t.mobile=#{mobile}</if>
+        ORDER BY num desc,t.create_time DESC
+    </select>
+
+    <select id="queryOrderDetail" parameterType="hashMap" resultType="map">
+		SELECT
+	t.id,
+	t.user_id,
+	t.type,
+	t.product_id,
+	t.product_name,
+	t.product_price,
+	t.product_number,
+	t.product_amount,
+	t.order_amount,
+	t.payment_amount,
+	t.post_id,
+	t.post_no,
+	t.post_amount,
+	t.address_id,
+	t.order_status,
+	t.third_serial_no,
+	t.channel_serial_no,
+	t.address_mobile,
+	t.address_address,
+	t.address_name,
+	t.`status`,
+	DATE_FORMAT(
+		t.create_time,
+		'%Y-%m-%d %H:%i:%s'
+	) AS create_date,
+	DATE_FORMAT(
+		t.update_time,
+		'%Y-%m-%d %H:%i:%s'
+	) AS update_time,
+	t.del_tag
+FROM
+	t_trade_order t
+	WHERE
+	(
+	(type = "1" AND STATUS = "1")
+	OR (type = "2" AND STATUS = "2")
+	)
+	and t.user_id=#{user_id}
+	AND post_id is NULL
+ORDER BY
+	t.create_time ASC
+    </select>
+	<select id="selectByIds" parameterType="hashMap" resultType="map" >
+		SELECT
+		t.id,
+		t.user_id,
+		t.type,
+		t.product_id,
+		t.product_name,
+		t.product_price,
+		t.product_number,
+		t.product_amount,
+		t.order_amount,
+		t.payment_amount,
+		t.post_id,
+		t.post_no,
+		t.post_amount,
+		t.address_id,
+		t.address_mobile,
+		t.address_address,
+		t.address_name,
+		t.order_status,
+		t.third_serial_no,
+		t.channel_serial_no,
+		t.`status`,
+		t.create_time,
+		t.update_time,
+		t.del_tag
+		FROM
+		t_trade_order t
+		WHERE
+		(
+		(type = "1" AND STATUS = "1")
+		OR (type = "2" AND STATUS = "2")
+		)
+		and id in
+		<foreach  item="item" collection="array" index="index"  open="(" separator="," close=")">#{item}</foreach>
+	</select>
+	<insert id="insertShipped" parameterType="hashMap" >
+		INSERT INTO t_front_mall_payorder_shipped
+
+		(
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id!=''">id,</if>
+			<if test="user_id  != null and user_id!=''">user_id,</if>
+			<if test="amount  != null and amount!=''">amount,</if>
+			<if test="receiver_name  != null and receiver_name!=''">receiver_name,</if>
+			<if test="receiver_mobile  != null and receiver_mobile!=''">receiver_mobile,</if>
+			<if test="receiver_addr  != null and receiver_addr!=''">receiver_addr,</if>
+			<if test="num  != null and num!=''">num,</if>
+			<if test="create_time  != null and create_time!=''">create_time,</if>
+			<if test="remark  != null and remark!=''">remark,</if>
+		</trim>
+		)values(
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id!=''">#{id},</if>
+			<if test="user_id  != null and user_id!=''">#{user_id},</if>
+			<if test="amount  != null and amount!=''">#{amount},</if>
+			<if test="receiver_name  != null and receiver_name!=''">#{receiver_name},</if>
+			<if test="receiver_mobile  != null and receiver_mobile!=''">#{receiver_mobile},</if>
+			<if test="receiver_addr  != null and receiver_addr!=''">#{receiver_addr},</if>
+			<if test="num  != null and num!=''">#{num},</if>
+			<if test="create_time  != null and create_time!=''">#{create_time},</if>
+			<if test="remark  != null and remark!=''">#{remark},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateOrderStatus" parameterType="hashMap">
+		UPDATE t_trade_order SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="update_time  != null and update_time!=''">update_time=#{update_time},</if>
+			<if test="status  != null and status!=''">status=#{status},</if>
+			<if test="post_id  != null and post_id!=''">post_id=#{post_id},</if>
+		</trim>
+		WHERE id in(
+		<foreach collection="orderIds" item="orderIds" separator=",">
+			#{orderIds}
+		</foreach>
+		)
+	</update>
+
+
+
+	<select id="tradeOrder" parameterType="hashMap" resultType="map">
+		SELECT
+		t.id,
+		t.user_id,
+		t.order_type,
+		t.order_state,
+		t.pay_type,
+		t.unionpay_merchant_code,
+		t.auth_code,
+		t.settle_mode,
+		t.settle_state,
+		t.settle_merchant_code,
+		t.settle_merchant_name,
+		t.settle_total_amount,
+		t.settle_service_amount,
+		t.settle_service_ratio,
+		t.machine_code,
+		t.card_type,
+		t.card_code,
+		t.total_amount,
+		t.amount,
+		t.real_amount,
+		t.trade_day,
+		t.trade_time,
+		t.`status`,
+		t.notes,
+		t.broker_id,
+		t.settle_id,
+		t.agent_id,
+		t.create_day,
+		t.create_time,
+		t2.broker_name,
+		t2.dept_id,
+		t3.dept_name,
+		t4.dept_name AS agent_name,
+		t5.dept_name AS settle_name,
+		t5.dept_parent_id AS ch_id
+		FROM
+		t_trade_records t
+		INNER JOIN t_front_broker t2 ON t2.broker_id = t.broker_id
+		INNER JOIN t_back_dept_info t3 ON t3.dept_id = t2.dept_id
+		INNER JOIN t_back_dept_info t4 ON t4.dept_id = t.agent_id
+		INNER JOIN t_back_dept_info t5 ON t5.dept_id = t.settle_id
+		WHERE 1=1
+		<if test="name!=null and name!=''">AND t.name like CONCAT(CONCAT(#{name}), '%')</if>
+		<if test="nick_name!=null and nick_name!=''">AND t.nick_name like CONCAT(CONCAT(#{nick_name}), '%')</if>
+		<if test="mobile!=null and mobile!=''">AND t.mobile=#{mobile}</if>
+		<if test="machine_code!=null and machine_code!=''">
+			AND t.machine_code=#{machine_code}
+		</if>
+		<if test="id!=null and id!=''">
+			AND t.id=#{id}
+		</if>
+
+		<if test="ch_id!=null and ch_id!=''">
+			AND t5.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_id!=null and settle_id!=''">
+			AND t.settle_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			AND t.agent_id=#{agent_id}
+		</if>
+		<if test="DID!=null and DID!=''">
+			AND t2.dept_id=#{DID}
+		</if>
+		ORDER BY t.create_time DESC
+	</select>
+</mapper>

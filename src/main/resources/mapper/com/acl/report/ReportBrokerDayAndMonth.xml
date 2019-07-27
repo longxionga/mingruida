@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.ReportBrokerDayAndMonthDao">
+<select id="queryReportBrokerDay" parameterType="hashmap" resultType="map">
+SELECT
+ t.broker_id,
+ t.statistics_day,
+ t.broker_name,
+ t.agent_id,
+ t.agent_name,
+ t.settle_id,
+ t.settle_name,
+ t.recharge_day,
+ t.counter_fee_day,
+ t.withdrawals_day,
+ t.profit_loss_day,
+ t.r_counter_fee_day,
+ t.balance_day,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ v.broker_mobile as mobile,
+ v.broker_parent_id,
+ v.dept_id,
+ d.dept_name,
+ p.broker_name as broker_parent_name,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_day_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+ </if> 
+ <if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+  <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+  <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+ order by t.statistics_day desc
+</select>
+<select id="queryReportBrokerMonth" parameterType="hashmap" resultType="map">
+SELECT
+ t.broker_id,
+ t.statistics_day,
+ t.broker_name,
+ t.agent_id,
+ t.agent_name,
+ t.settle_id,
+ t.settle_name,
+ t.recharge_month,
+ t.counter_fee_month,
+ t.withdrawals_month,
+ t.profit_loss_month,
+ t.r_counter_fee_month,
+ t.balance_month,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ v.broker_mobile as mobile,
+ v.broker_parent_id,
+ v.dept_id,
+ d.dept_name,
+ p.broker_name as broker_parent_name,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_month_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{dict_name}), '%')
+ </if> 
+<if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+  <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+  order by t.statistics_day desc
+</select>
+
+<select id="queryBrokerDayResultExport" parameterType="hashmap" resultType="map">
+SELECT
+ t.broker_id,
+ t.statistics_day,
+ t.broker_name,
+ t.agent_id,
+ t.agent_name,
+ t.settle_id,
+ t.settle_name,
+ t.recharge_day,
+ t.counter_fee_day,
+ t.withdrawals_day,
+ t.profit_loss_day,
+ t.r_counter_fee_day,
+ t.balance_day,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ v.broker_mobile,
+ v.broker_parent_id,
+ v.dept_id,
+ d.dept_name,
+ p.broker_name as broker_parent_name,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_day_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+ </if> 
+ <if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+  order by t.statistics_day desc
+</select>
+
+<select id="queryBrokerMonthResultExport" parameterType="hashmap" resultType="map">
+SELECT
+ t.broker_id,
+ t.statistics_day,
+ t.broker_name,
+ t.agent_id,
+ t.agent_name,
+ t.settle_id,
+ t.settle_name,
+ t.recharge_month,
+ t.counter_fee_month,
+ t.withdrawals_month,
+ t.profit_loss_month,
+ t.r_counter_fee_month,
+ t.balance_month,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ v.broker_mobile,
+ v.broker_parent_id,
+ v.dept_id,
+ d.dept_name,
+ p.broker_name as broker_parent_name,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_month_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{dict_name}), '%')
+ </if> 
+<if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+  order by t.statistics_day desc
+</select>
+
+<select id="queryBrokerDaySum" parameterType="hashmap" resultType="map">
+SELECT
+  IFNULL(sum(t.recharge_day),0) as recharge_day_count,
+  IFNULL(sum(t.counter_fee_day),0) as counter_fee_day_count,
+  IFNULL(sum(t.withdrawals_day),0) as withdrawals_day_count,
+  IFNULL(sum(t.profit_loss_day),0) as profit_loss_day_count,
+  IFNULL(sum(t.r_counter_fee_day),0) as r_counter_fee_day_count,
+  IFNULL(sum(t.balance_day),0) as balance_day_count
+ FROM
+ t_report_day_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+ </if> 
+ <if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+  <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+</select>
+<select id="queryBrokerMonthSum" parameterType="hashmap" resultType="map">
+SELECT
+ IFNULL(sum(t.recharge_month),0) as recharge_month_count ,
+ IFNULL(sum(t.counter_fee_month),0) as counter_fee_month_count,
+ IFNULL(sum(t.withdrawals_month),0) as withdrawals_month_count,
+ IFNULL(sum(t.profit_loss_month),0) as profit_loss_month_count,
+ IFNULL(sum(t.r_counter_fee_month),0) as r_counter_fee_month_count,
+ IFNULL(sum(t.balance_month),0) as balance_month_count 
+ FROM
+ t_report_month_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{dict_name}), '%')
+ </if> 
+<if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+</select>
+<select id="countBrokerDay" parameterType="hashmap" resultType="map">
+SELECT
+ count(0) num
+ FROM
+ t_report_day_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+ </if> 
+ <if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+</select>
+<select id="countBrokerMonth" parameterType="hashmap" resultType="map">
+SELECT
+ count(0) num
+ FROM
+ t_report_month_broker_statistics t
+ left join t_front_broker v on t.broker_id=v.broker_id
+ left join t_front_broker p on v.broker_parent_id=p.broker_id
+ left join t_back_dept_info d on v.dept_id=d.dept_id
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="broker_name!=null and broker_name!=''">
+ AND t.broker_name like CONCAT(CONCAT(#{dict_name}), '%')
+ </if> 
+<if test="start_date!=null and start_date!=''">
+ AND t.statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND t.statistics_day &lt;=#{end_date}
+ </if>
+ <if test="broker_mobile!=null and broker_mobile!=''">
+ AND v.broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND t.settle_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND t.agent_id=#{agent_id}
+ </if>
+ <if test="DID!=null and DID!=''">
+ AND v.dept_id=#{DID}
+ </if>
+   <if test="broker_parent_name!=null and broker_parent_name!=''">
+ AND  p.broker_name like CONCAT(CONCAT(#{broker_parent_name}), '%')
+ </if>
+</select>
+</mapper>

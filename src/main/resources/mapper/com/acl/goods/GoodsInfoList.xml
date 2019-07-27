@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.goods.dao.GoodsInfoListDao">
+	<select id="queryGoodsListInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			goods.goods_id,
+			goods.category_id,
+			goods.goods_type,
+			goods.goods_code,
+			goods.goods_name,
+			goods.goods_alias,
+			goods.goods_label,
+			goods.STATUS,
+			goods.create_time,
+			goods.update_time,
+			goods.is_use,
+			goods.description,
+			spec.spec_id,
+			spec.is_use spec_is_use,
+			category.category_name
+		FROM
+			t_front_mall_goods goods
+		LEFT JOIN t_front_mall_goods_spec spec ON goods.goods_id = spec.goods_id
+		LEFT JOIN t_front_mall_goods_category category ON category.category_id = goods.category_id
+		WHERE
+			1 = 1
+	<if test="goods_name !=null and goods_name !=''">
+		AND goods_name like CONCAT(CONCAT(#{goods_name}), '%')
+	</if>
+	<!--<if test="sort  != null and sort !=''">
+        order by ${sort} ${order}
+    </if>-->
+	GROUP BY goods.goods_id
+	ORDER BY goods_id asc,update_time desc,create_time desc
+</select>
+	<select id="selectGoodsList" parameterType="hashmap" resultType="map">
+		SELECT
+		goods.goods_id,
+		goods.category_id,
+		goods.goods_type,
+		goods.goods_code,
+		goods.goods_name,
+		goods.goods_alias,
+		goods.goods_label,
+		goods.description,
+		goods.STATUS,
+		goods.create_time,
+		goods.update_time,
+		goods.is_use,
+		spec.spec_id,
+		spec_name,
+		spec.spec_type,
+		category.category_name
+		FROM
+		t_front_mall_goods goods
+		LEFT JOIN t_front_mall_goods_spec spec ON goods.goods_id = spec.goods_id
+		LEFT JOIN t_front_mall_goods_category category ON category.category_id = goods.category_id
+		WHERE
+		1 = 1
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods.goods_id =#{goods_id}
+		</if>
+		<if test="spec_id !=null and spec_id !=''">
+			AND spec.spec_id =#{spec_id}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+            order by ${sort} ${order}
+        </if>-->
+		ORDER BY goods_id asc, update_time desc,create_time desc
+	</select>
+
+	<insert id="insertGoodsInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="goods_id">
+		insert into t_front_mall_goods (
+		<trim suffix="" suffixOverrides=",">
+			<if test="category_id  != null and category_id !=''">category_id,</if>
+			<if test="goods_name  != null and goods_name !=''">goods_name,</if>
+			<if test="goods_alias  != null and goods_alias !=''">goods_alias,</if>
+			<if test="goods_code  != null and goods_code !=''">goods_code,</if>
+			<if test="goods_type  != null and goods_type !=''">goods_type,</if>
+			<if test="is_use  != null and is_use !=''">is_use,</if>
+			<if test="create_time  != null and create_time !=''">create_time,</if>
+			<if test="goods_label  != null and goods_label !=''">goods_label,</if>
+			<if test="description  != null and description !=''">description,</if>
+			<if test="status  != null and status !=''">status,</if>
+			<if test="update_time  != null and update_time !=''">update_time,</if>
+			<if test="is_validation  != null and is_validation !=''">is_validation,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="category_id  != null and category_id !=''">#{category_id},</if>
+			<if test="goods_name  != null and goods_name !=''">#{goods_name},</if>
+			<if test="goods_alias  != null and goods_alias !=''">#{goods_alias},</if>
+			<if test="goods_code  != null and goods_code !=''">#{goods_code},</if>
+			<if test="goods_type  != null and goods_type !=''">#{goods_type},</if>
+			<if test="is_use  != null and is_use !=''">#{is_use},</if>
+			<if test="create_time  != null and create_time !=''">#{create_time},</if>
+			<if test="goods_label  != null and goods_label !=''">#{goods_label},</if>
+			<if test="description  != null and description !=''">description,</if>
+			<if test="status  != null and status !=''">#{status},</if>
+			<if test="update_time  != null and update_time !=''">#{update_time},</if>
+			<if test="is_validation  != null and is_validation !=''">#{is_validation},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateGoodsInfo" parameterType="hashmap">
+		UPDATE t_front_mall_goods SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_name  != null and goods_name !=''">goods_name=#{goods_name},</if>
+			<if test="goods_alias  != null and goods_alias !=''">goods_alias=#{goods_alias},</if>
+			<if test="goods_code  != null and goods_code !=''">goods_code=#{goods_code},</if>
+			<if test="category_id  != null and category_id !=''">category_id=#{category_id},</if>
+			<if test="goods_type  != null and goods_type !=''">goods_type=#{goods_type},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+			<if test="create_time  != null and create_time !=''">create_time=#{create_time},</if>
+			<if test="goods_label  != null and goods_label !=''">goods_label=#{goods_label},</if>
+			<if test="description  != null and description !=''">description=#{description},</if>
+			<if test="status  != null and status !=''">status=#{status},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time}</if>
+			<if test="is_validation  != null and is_validation !=''">is_validation=#{is_validation}</if>
+		</trim>
+		WHERE goods_id=#{goods_id}
+	</update>
+
+    <select id="gzpGoodsValidate" parameterType="hashmap" resultType="map">
+	    SELECT gzp_name FROM  t_gzp_info WHERE gzp_name = #{gzp_name}
+	</select>
+	<select id="queryGoodsDeptInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.sku_id,
+			t.settle_id as dept_id,
+			t.goods_id,
+			t.spec_id
+		FROM
+			t_front_mall_goods_stock t
+		WHERE
+		goods_id= #{goods_id}
+		AND spec_id= #{spec_id}
+		<if test="is_use !=null and is_use !=''">
+			AND is_use =#{is_use}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+			AND settle_id =#{dept_id}
+		</if>
+	</select>
+
+	<insert id="insertGoodsDeptInfo" parameterType="hashmap">
+		insert into t_front_mall_goods_stock (
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id !=''">goods_id,</if>
+			<if test="dept_id  != null and dept_id !=''">settle_id,</if>
+			<if test="spec_id  != null and spec_id !=''">spec_id,</if>
+			<if test="create_time  != null and create_time !=''">create_time,</if>
+			<if test="update_time  != null and update_time !=''">update_time,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="goods_id  != null and goods_id !=''">#{goods_id},</if>
+			<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+			<if test="spec_id  != null and gzp_id !=''">#{spec_id},</if>
+			<if test="create_time  != null and create_time !=''">#{create_time},</if>
+			<if test="update_time  != null and update_time !=''">#{update_time},</if>
+		</trim>
+		)
+	</insert>
+
+	<select id="deleteGoodsDept" parameterType="hashmap" resultType="map">
+		DELETE from t_front_mall_goods_stock where goods_id=#{goods_id} and spec_id=#{spec_id}
+	</select>
+
+	<select id="queryIsValidationInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.is_validation
+		FROM
+		t_front_mall_goods t
+		WHERE
+		1 = 1
+		<if test="is_use !=null and is_use !=''">
+			AND is_use =#{is_use}
+		</if>
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods_id =#{goods_id}
+		</if>
+	</select>
+
+	<select id="queryGoodsValidationInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			img.goods_id AS img_goods_id,
+			param.goods_id AS param_goods_id,
+			spec.goods_id AS spec_goods_id,
+			pror.goods_id AS pror_goods_id,
+			img_type
+		FROM
+			t_front_mall_goods goods
+		INNER JOIN t_front_mall_goods_image img ON img.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_param param ON param.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_spec spec ON spec.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_prorate pror ON pror.goods_id = goods.goods_id
+		WHERE
+			img.goods_id = #{goods_id}
+		or spec.goods_id = #{goods_id}
+		or pror.goods_id = #{goods_id}
+		or param.goods_id= #{goods_id}
+		GROUP BY
+		img_type
+	</select>
+</mapper>

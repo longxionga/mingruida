@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformSimUserInfoDao">
+ <select id="querySimUserInfo" parameterType="hashmap" resultType="map">
+         SELECT
+			t1.user_id as user_id ,
+			t3.user_name as user_name,
+			t1.user_mobile as user_mobile ,
+		  t1.user_password as user_password ,
+			t2.user_money AS user_money ,
+			t3.create_date as create_date ,
+			t3.is_use as is_use
+		FROM
+			anchol_sim.t_front_user_login t1,
+			anchol_sim.t_front_user_wallet t2,
+			anchol_sim.t_front_user_info t3
+		WHERE
+			t1.user_id = t2.user_id
+		AND t2.user_id = t3.user_id 
+	  <if test="user_name!=null and user_name!=''">
+			AND t3.user_name like CONCAT('%',CONCAT(#{user_name}), '%')
+	  </if>
+	  
+      <if test="user_mobile!=null and user_mobile!=''">
+			AND t1.user_mobile = #{user_mobile}
+	  </if>
+	  
+	      <if test="user_id!=null and user_id!=''">
+			AND t1.user_id = #{user_id}
+	  </if>
+	  
+	  order by  t3.create_date desc	 	
+</select>   
+
+
+ <select id="querySimUserInfoByMap" parameterType="hashmap" resultType="map">
+         SELECT
+			t1.user_id as user_id ,
+			t3.user_name as user_name,
+			t1.user_mobile as user_mobile ,
+		  t1.user_password as user_password ,
+			t2.user_money AS user_money ,
+			t3.create_date as create_date ,
+			t3.is_use as is_use
+		FROM
+			anchol_sim.t_front_user_login t1,
+			anchol_sim.t_front_user_wallet t2,
+			anchol_sim.t_front_user_info t3
+		WHERE
+			t1.user_id = t2.user_id
+		AND t2.user_id = t3.user_id 
+	  
+      <if test="user_mobile!=null and user_mobile!=''">
+			AND t1.user_mobile = #{user_mobile}
+	  </if>
+	  
+	  
+	   
+      <if test="user_id!=null and user_id!=''">
+			AND t1.user_id = #{user_id}
+	  </if>
+	  
+	  limit 1	 	
+</select>   
+
+
+ 
+
+     
+	<!-- 前台用户信息临时表中插入数据 -->
+	 <insert id="insertSimUserInfo" parameterType="hashmap">
+		INSERT INTO anchol_sim.t_front_user_info(
+			<trim suffixOverrides=",">
+				user_ip,create_date,
+				<if test="user_id!=null and user_id!=''">user_id,</if>
+				<if test="broker_id!=null and broker_id!=''">broker_id,</if>
+				<if test="user_name!=null and user_name!=''">user_name,</if>
+				<if test="user_mobile!=null and user_mobile!=''">user_mobile,</if>
+				
+				<if test="p_id!=null and p_id!=''">p_id,</if>
+				<if test="ch_id!=null and ch_id!=''">ch_id,</if>
+				<if test="ce_id!=null and ce_id!=''">ce_id,</if>
+				<if test="settle_id!=null and settle_id!=''">settle_id,</if>
+				<if test="agent_id!=null and agent_id!=''">agent_id,</if>
+				<if test="is_use!=null and is_use!=''">is_use,</if>
+			</trim>
+		)VALUES(
+			<trim suffixOverrides=",">
+				'localhost',now(),
+				<if test="user_id!=null and user_id!=''">#{user_id},</if>
+				<if test="broker_id!=null and broker_id!=''">#{broker_id},</if>
+				<if test="user_name!=null and user_name!=''">#{user_name},</if>
+				<if test="user_mobile!=null and user_mobile!=''">#{user_mobile},</if>
+				
+				<if test="p_id!=null and p_id!=''">#{p_id},</if>
+				<if test="ch_id!=null and ch_id!=''">#{ch_id},</if>
+				<if test="ce_id!=null and ce_id!=''">#{ce_id},</if>
+				<if test="settle_id!=null and settle_id!=''">#{settle_id},</if>
+				<if test="agent_id!=null and agent_id!=''">#{agent_id},</if>
+				<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			</trim>
+		) 				 
+	</insert>
+	
+	
+	<!-- 前台用户信息临时表中插入数据 -->
+	 <insert id="insertSimUserLogin" parameterType="hashmap">
+		INSERT INTO anchol_sim.t_front_user_login(
+			<trim suffixOverrides=",">
+				<if test="user_id!=null and user_id!=''">user_id,</if>
+				<if test="user_mobile!=null and user_mobile!=''">user_mobile,</if>
+				<if test="user_wxid!=null and user_wxid!=''">user_wxid,</if>
+				<if test="user_pay_id!=null and user_pay_id!=''">user_mobile,</if>
+				<if test="user_password!=null and user_password!=''">user_password,</if>
+				<if test="user_login_id!=null and user_login_id!=''">user_login_id,</if>
+			</trim>
+		)VALUES(
+			<trim suffixOverrides=",">
+				<if test="user_id!=null and user_id!=''">#{user_id},</if>
+				<if test="user_mobile!=null and user_mobile!=''">#{user_mobile},</if>
+				<if test="user_wxid!=null and user_wxid!=''">#{user_wxid},</if>
+				<if test="user_pay_id!=null and user_pay_id!=''">#{user_pay_id},</if>
+				<if test="user_password!=null and user_password!=''">#{user_password},</if>
+				<if test="user_login_id!=null and user_login_id!=''">#{user_login_id},</if>
+			</trim>
+		) 				 
+	</insert>
+	
+	
+		<!-- 前台用户信息临时表中插入数据 -->
+	 <insert id="insertSimUserWallet" parameterType="hashmap">
+		INSERT INTO anchol_sim.t_front_user_wallet(
+			<trim suffixOverrides=",">
+				 create_date,
+				<if test="wallet_id!=null and wallet_id!=''">wallet_id,</if>
+				<if test="user_id!=null and user_id!=''">user_id,</if>
+				<if test="user_money!=null and user_money!=''">user_money,</if>
+				<if test="is_use!=null and is_use!=''">is_use,</if>
+			</trim>
+		)VALUES(
+			<trim suffixOverrides=",">
+				 now(),
+				<if test="wallet_id!=null and wallet_id!=''">#{wallet_id},</if>
+				<if test="user_id!=null and user_id!=''">#{user_id},</if>
+				<if test="user_money!=null and user_money!=''">#{user_money},</if>
+				<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			</trim>
+		) 				 
+	</insert>
+	
+
+ <insert id="insertSimUserProfitLoss" parameterType="hashmap">
+		INSERT INTO anchol_sim.t_front_user_profitloss(
+			<trim suffixOverrides=",">
+				 is_use,
+				 create_date,
+				<if test="profitloss_id!=null and profitloss_id!=''">profitloss_id,</if>
+				<if test="user_id!=null and user_id!=''">user_id,</if>
+				<if test="user_money_before!=null and user_money_before!=''">user_money_before,</if>
+				<if test="user_money!=null and user_money!=''">user_money,</if>
+				<if test="user_money_after!=null and user_money_after!=''">user_money_after,</if>
+				<if test="money_type!=null and money_type!=''">money_type,</if>
+			</trim>
+		)VALUES(
+			<trim suffixOverrides=",">
+				 1,now(),
+				<if test="profitloss_id!=null and profitloss_id!=''">#{profitloss_id},</if>
+				<if test="user_id!=null and user_id!=''">#{user_id},</if>
+				<if test="user_money_before!=null and user_money_before!=''">#{user_money_before},</if>
+				<if test="user_money!=null and user_money!=''">#{user_money},</if>
+				<if test="user_money_after!=null and user_money_after!=''">#{user_money_after},</if>
+				<if test="money_type!=null and money_type!=''">#{money_type},</if>
+			</trim>
+		) 				 
+	</insert>
+	
+	
+	<update id="updateSimUserLogin" parameterType="hashmap">
+		UPDATE  anchol_sim.t_front_user_login set
+		<trim suffix="" suffixOverrides=",">
+  			<if test="user_name!=null and user_name!=''">user_name = #{order_money},</if>
+			<if test="user_mobile!=null and user_mobile!=''">user_mobile =#{user_mobile} ,</if>
+			<if test="user_password!=null and user_password!=''">user_password =#{user_password} ,</if>
+		</trim>
+		WHERE user_id=#{user_id}
+	</update>
+	
+	
+	<update id="updateSimUserWallet" parameterType="hashmap">
+		UPDATE  anchol_sim.t_front_user_wallet set
+		user_money=#{user_money}
+		WHERE user_id=#{user_id}
+	</update>
+	
+		
+	<update id="updateSimUserInfo" parameterType="hashmap">
+		UPDATE  anchol_sim.t_front_user_info set
+		<trim suffix="" suffixOverrides=",">
+			<if test="is_use!=null and is_use!=''">is_use =#{is_use} ,</if>
+		</trim>
+		WHERE user_id=#{user_id}
+	</update>
+	
+
+</mapper>

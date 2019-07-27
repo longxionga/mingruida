@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.PlatformSendGoodsDao">
+    <select id="querySendGoods" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id,
+        t.goods_id,
+        t.spec_id,
+        t.settle_id,
+        t.num,
+        DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+        DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+        t.status,
+        t.reviewer,
+        g.goods_name,
+        s.spec_name,
+        d.dept_name
+        FROM
+        t_back_purchase t LEFT JOIN t_front_mall_goods g ON t.goods_id=g.goods_id
+        LEFT JOIN t_front_mall_goods_spec s ON s.goods_id=t.goods_id and s.spec_id=t.spec_id
+        LEFT JOIN t_back_dept_info d ON d.dept_id=t.settle_id
+        WHERE 1=1
+        <if test="start_date!=null and start_date!=''">
+            AND t.create_time &gt;=#{start_date}
+        </if>
+        <if test="end_date!=null and end_date!=''">
+            AND t.create_time &lt;=#{end_date}
+        </if>
+        <if test="status!=null and status!=''">
+            AND t.status =#{status}
+        </if>
+        ORDER BY status,create_time ASC
+    </select>
+
+    <select id="querySettleStock" parameterType="hashmap" resultType="map">
+        SELECT goods_id,spec_id,total_amount FROM t_front_settle_goods_stock where goods_id=#{goods_id} and spec_id=#{spec_id} and settle_id=#{settle_id}
+    </select>
+
+    <update id="sendGoods" parameterType="hashmap">
+        UPDATE t_back_purchase SET
+        <trim suffix="" suffixOverrides=",">
+            <if test="update_time  != null and update_time!=''">update_time=#{update_time},</if>
+            <if test="status  != null and status!=''">status=#{status},</if>
+            <if test="reviewer  != null and reviewer!=''">reviewer=#{reviewer},</if>
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <insert id="insertSettleStock" parameterType="hashmap">
+        INSERT INTO t_front_settle_goods_stock
+        (
+        <trim suffix="" suffixOverrides=",">
+            <if test="sku_id  != null and sku_id!=''">sku_id,</if>
+            <if test="goods_id  != null and goods_id !=''">goods_id,</if>
+            <if test="spec_id  != null and spec_id!=''">spec_id,</if>
+            <if test="settle_id  != null and settle_id!=''">settle_id,</if>
+            <if test="num  != null and num!=''">total_amount,</if>
+            <if test="sale_amount  != null and sale_amount!=''">sale_amount,</if>
+            <if test="create_time  != null and create_time!=''">create_time,</if>
+        </trim>
+        )values(
+        <trim suffix="" suffixOverrides=",">
+            <if test="sku_id  != null and sku_id!=''">#{sku_id},</if>
+            <if test="goods_id  != null and goods_id !=''">#{goods_id},</if>
+            <if test="spec_id  != null and spec_id!=''">#{spec_id},</if>
+            <if test="settle_id  != null and settle_id!=''">#{settle_id},</if>
+            <if test="num  != null and num!=''">#{num},</if>
+            <if test="sale_amount  != null and sale_amount!=''">#{sale_amount},</if>
+            <if test="create_time  != null and create_time!=''">#{create_time},</if>
+        </trim>
+        )
+    </insert>
+    <update id="addSettleStock" parameterType="hashmap">
+        UPDATE t_front_settle_goods_stock SET total_amount=total_amount+#{num} WHERE goods_id=#{goods_id} and spec_id=#{spec_id}
+    </update>
+    <update id="substractStock" parameterType="hashmap">
+        UPDATE t_front_mall_goods_stock SET total_amount=total_amount-#{num} WHERE goods_id=#{goods_id} and spec_id=#{spec_id}
+    </update>
+    <insert id="addStock" parameterType="hashmap">
+        UPDATE t_front_mall_goods_stock SET booked_amount=booked_amount+#{num} WHERE goods_id=#{goods_id} and spec_id=#{spec_id}
+    </insert>
+    <select id="queryPurchaseInfo" parameterType="hashmap" resultType="map">
+        select  settle_id,num,spec_id,goods_id from t_back_purchase where id=#{id}
+    </select>
+</mapper>

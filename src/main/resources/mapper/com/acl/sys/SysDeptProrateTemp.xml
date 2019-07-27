@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.sys.dao.ISysDeptProrateTempDao">
+    <select id="queryDeptProrateTemp" parameterType="hashmap" resultType="map">
+        SELECT sys_id, p_id, ce_id, ch_id, s_id, a_id, b_id, p_allot, ce_allot, ch_allot, s_allot, a_allot, b_allot,
+        is_use, create_date
+        FROM t_back_dept_prorate_temp
+        WHERE 1=1
+        <if test="sys_id !=null and sys_id !=''">
+            AND sys_id = #{sys_id}
+        </if>
+        <if test="p_id !=null and p_id !=''">
+            AND p_id = #{p_id}
+        </if>
+        <if test="ce_id !=null and ce_id !=''">
+            AND ce_id = #{ce_id}
+        </if>
+        <if test="ch_id !=null and ch_id !=''">
+            AND ch_id = #{ch_id}
+        </if>
+        <if test="s_id !=null and s_id !=''">
+            AND s_id = #{s_id}
+        </if>
+        <if test="a_id !=null and a_id !=''">
+            AND a_id = #{a_id}
+        </if>
+        <if test="b_id !=null and b_id !=''">
+            AND b_id = #{b_id}
+        </if>
+        <if test="p_allot !=null and p_allot !=''">
+            AND p_allot = #{p_allot}
+        </if>
+        <if test="ce_allot !=null and ce_allot !=''">
+            AND ce_allot = #{ce_allot}
+        </if>
+        <if test="ch_allot !=null and ch_allot !=''">
+            AND ch_allot = #{ch_allot}
+        </if>
+        <if test="s_allot !=null and s_allot !=''">
+            AND s_allot = #{s_allot}
+        </if>
+        <if test="a_allot !=null and a_allot !=''">
+            AND a_allot = #{a_allot}
+        </if>
+        <if test="b_allot !=null and b_allot !=''">
+            AND b_allot = #{b_allot}
+        </if>
+        <if test="is_use !=null and is_use !=''">
+            AND is_use = #{is_use}
+        </if>
+        <if test="create_date !=null and create_date !=''">
+            AND create_date = #{create_date}
+        </if>
+        ORDER BY
+        create_date
+    </select>
+    <select id="queryDeptProrateTempByView" parameterType="hashmap" resultType="map">
+        SELECT sys_id, p_id, p_name, ce_id, ce_name, ch_id, ch_name, s_id, s_name, a_id, a_name, b_id, broker_name,
+        broker_mobile, broker_parent_id, broker_use, p_allot, ce_allot, ch_allot, s_allot, a_allot, b_allot, is_use,
+        create_date
+        FROM v_dept_prorate_temp
+        WHERE broker_parent_id!=-1 and is_use = 1
+        <if test="sys_id !=null and sys_id !=''">
+            AND sys_id = #{sys_id}
+        </if>
+        <if test="p_id !=null and p_id !=''">
+            AND p_id = #{p_id}
+        </if>
+        <if test="ce_id !=null and ce_id !=''">
+            AND ce_id = #{ce_id}
+        </if>
+        <if test="ch_id !=null and ch_id !=''">
+            AND ch_id = #{ch_id}
+        </if>
+        <if test="s_id !=null and s_id !=''">
+            AND s_id = #{s_id}
+        </if>
+        <if test="a_id !=null and a_id !=''">
+            AND a_id = #{a_id}
+        </if>
+        <if test="b_id !=null and b_id !=''">
+            AND b_id = #{b_id}
+        </if>
+        <if test="broker_name !=null and broker_name !=''">
+            AND broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+        </if>
+        <if test="broker_mobile !=null and broker_mobile !=''">
+            AND broker_mobile like CONCAT(CONCAT(#{broker_mobile}), '%')
+        </if>
+        <if test="p_allot !=null and p_allot !=''">
+            AND p_allot = #{p_allot}
+        </if>
+        <if test="ce_allot !=null and ce_allot !=''">
+            AND ce_allot = #{ce_allot}
+        </if>
+        <if test="ch_allot !=null and ch_allot !=''">
+            AND ch_allot = #{ch_allot}
+        </if>
+        <if test="s_allot !=null and s_allot !=''">
+            AND s_allot = #{s_allot}
+        </if>
+        <if test="a_allot !=null and a_allot !=''">
+            AND a_allot = #{a_allot}
+        </if>
+        <if test="b_allot !=null and b_allot !=''">
+            AND b_allot = #{b_allot}
+        </if>
+        <if test="is_use !=null and is_use !=''">
+            AND is_use = #{is_use}
+        </if>
+        <if test="create_date !=null and create_date !=''">
+            AND create_date = #{create_date}
+        </if>
+        ORDER BY
+        create_date desc
+    </select>
+    <insert id="insertDeptProrateTemp" parameterType="hashmap">
+        INSERT INTO t_back_dept_prorate_temp (
+        <trim suffix="" suffixOverrides=",">
+            is_use,
+            <if test="sys_id != null and sys_id !=''">sys_id,</if>
+            <if test="p_id != null and p_id !=''">p_id,</if>
+            <if test="ce_id != null and ce_id !=''">ce_id,</if>
+            <if test="ch_id != null and ch_id !=''">ch_id,</if>
+            <if test="s_id != null and s_id !=''">s_id,</if>
+            <if test="a_id != null and a_id !=''">a_id,</if>
+            <if test="b_id != null and b_id !=''">b_id,</if>
+            <if test="p_allot != null and p_allot !=''">p_allot,</if>
+            <if test="ce_allot != null and ce_allot !=''">ce_allot,</if>
+            <if test="ch_allot != null and ch_allot !=''">ch_allot,</if>
+            <if test="s_allot != null and s_allot !=''">s_allot,</if>
+            <if test="a_allot != null and a_allot !=''">a_allot,</if>
+            <if test="b_allot != null and b_allot !=''">b_allot,</if>
+            <if test="create_date != null and create_date !=''">create_date,</if>
+        </trim>
+        )VALUES(
+        <trim suffix="" suffixOverrides=",">
+            1,
+            <if test="sys_id != null and sys_id !=''">#{sys_id},</if>
+            <if test="p_id != null and p_id !=''">#{p_id},</if>
+            <if test="ce_id != null and ce_id !=''">#{ce_id},</if>
+            <if test="ch_id != null and ch_id !=''">#{ch_id},</if>
+            <if test="s_id != null and s_id !=''">#{s_id},</if>
+            <if test="a_id != null and a_id !=''">#{a_id},</if>
+            <if test="b_id != null and b_id !=''">#{b_id},</if>
+            <if test="p_allot != null and p_allot !=''">#{p_allot},</if>
+            <if test="ce_allot != null and ce_allot !=''">#{ce_allot},</if>
+            <if test="ch_allot != null and ch_allot !=''">#{ch_allot},</if>
+            <if test="s_allot != null and s_allot !=''">#{s_allot},</if>
+            <if test="a_allot != null and a_allot !=''">#{a_allot},</if>
+            <if test="b_allot != null and b_allot !=''">#{b_allot},</if>
+            <if test="create_date != null and create_date !=''">#{create_date},</if>
+        </trim>
+        )
+    </insert>
+
+    <insert id="insertAgentProrateTemp" parameterType="hashmap">
+        INSERT INTO t_back_agent_prorate_temp (
+        <trim suffix="" suffixOverrides=",">
+            is_use,
+            <if test="sys_id != null and sys_id !=''">sys_id,</if>
+            <if test="p_id != null and p_id !=''">p_id,</if>
+            <if test="ce_id != null and ce_id !=''">ce_id,</if>
+            <if test="ch_id != null and ch_id !=''">ch_id,</if>
+            <if test="s_id != null and s_id !=''">s_id,</if>
+            <if test="a_id != null and a_id !=''">a_id,</if>
+            <if test="p_allot != null and p_allot !=''">p_allot,</if>
+            <if test="ce_allot != null and ce_allot !=''">ce_allot,</if>
+            <if test="ch_allot != null and ch_allot !=''">ch_allot,</if>
+            <if test="s_allot != null and s_allot !=''">s_allot,</if>
+            <if test="a_allot != null and a_allot !=''">a_allot,</if>
+            <if test="b_allot_1 != null and b_allot_1 !=''">b_allot_1,</if>
+            <if test="b_allot_2!= null and b_allot_2!=''">b_allot_2,</if>
+            <if test="b_allot_3 != null and b_allot_3 !=''">b_allot_3,</if>
+            <if test="create_date != null and create_date !=''">create_date,</if>
+        </trim>
+        )VALUES(
+        <trim suffix="" suffixOverrides=",">
+            1,
+            <if test="sys_id != null and sys_id !=''">#{sys_id},</if>
+            <if test="p_id != null and p_id !=''">#{p_id},</if>
+            <if test="ce_id != null and ce_id !=''">#{ce_id},</if>
+            <if test="ch_id != null and ch_id !=''">#{ch_id},</if>
+            <if test="s_id != null and s_id !=''">#{s_id},</if>
+            <if test="a_id != null and a_id !=''">#{a_id},</if>
+            <if test="p_allot != null and p_allot !=''">#{p_allot},</if>
+            <if test="ce_allot != null and ce_allot !=''">#{ce_allot},</if>
+            <if test="ch_allot != null and ch_allot !=''">#{ch_allot},</if>
+            <if test="s_allot != null and s_allot !=''">#{s_allot},</if>
+            <if test="a_allot != null and a_allot !=''">#{a_allot},</if>
+            <if test="b_allot_1 != null and b_allot_1 !=''">#{b_allot_1},</if>
+            <if test="b_allot_2 != null and b_allot_2 !=''">#{b_allot_2},</if>
+            <if test="b_allot_3 != null and b_allot_3 !=''">#{b_allot_3},</if>
+            <if test="create_date != null and create_date !=''">#{create_date},</if>
+        </trim>
+        )
+    </insert>
+
+    <update id="updateDeptProrateTemp" parameterType="hashmap">
+        UPDATE
+        t_back_dept_prorate_temp
+        SET
+        is_use = 0
+        <!-- 衹能該狀態 is_use
+            <trim suffix="" suffixOverrides=",">
+            <if test="dept_mobile  != null">dept_mobile=#{p_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{ce_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{ch_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{s_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{a_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{b_allot},</if>
+            <if test="dept_mobile  != null">dept_mobile=#{create_date},</if>
+        </trim> -->
+        WHERE b_id = #{b_id}
+    </update>
+
+    <update id="updateAgentProrateTemp" parameterType="hashmap">
+		UPDATE
+		t_back_agent_prorate_temp
+		SET
+		is_use = 0
+		WHERE  a_id =  #{a_id} and is_use =1
+	</update>
+
+    <update id="updateAgentProrateInfo" parameterType="hashmap">
+        UPDATE
+        t_back_agent_prorate_temp
+        <set>
+            <trim suffixOverrides=",">
+                <if test="p_id != null and p_id !=''">p_id=#{p_id},</if>
+                <if test="ce_id != null and ce_id !=''">ce_id=#{ce_id},</if>
+                <if test="ch_id != null and ch_id !=''">ch_id=#{ch_id},</if>
+                <if test="s_id != null and s_id !=''">s_id=#{s_id},</if>
+                <if test="p_allot != null and p_allot !=''">p_allot=#{p_allot},</if>
+                <if test="ce_allot != null and ce_allot !=''">ce_allot=#{ce_allot},</if>
+                <if test="ch_allot != null and ch_allot !=''">ch_allot=#{ch_allot},</if>
+                <if test="s_allot != null and s_allot !=''">s_allot=#{s_allot},</if>
+                <if test="a_allot != null and a_allot !=''">a_allot=#{a_allot},</if>
+                <if test="b_allot_1 != null and b_allot_1 !=''">b_allot_1=#{b_allot_1},</if>
+                <if test="b_allot_2 != null and b_allot_2 !=''">b_allot_2=#{b_allot_2},</if>
+                <if test="b_allot_3 != null and b_allot_3 !=''">b_allot_3=#{b_allot_3},</if>
+                <if test="create_date != null and create_date !=''">create_date=#{create_date},</if>
+            </trim>
+        </set>
+        WHERE a_id = #{a_id} and is_use =1
+    </update>
+
+    <select id="queryAgentProrateTempCount" parameterType="hashmap" resultType="integer">
+        SELECT count(1)
+        FROM v_agent_prorate_temp
+        WHERE is_use = 1
+        <if test="sys_id !=null and sys_id !=''">
+            AND sys_id = #{sys_id}
+        </if>
+        <if test="p_id !=null and p_id !=''">
+            AND p_id = #{p_id}
+        </if>
+        <if test="ce_id !=null and ce_id !=''">
+            AND ce_id = #{ce_id}
+        </if>
+        <if test="ch_id !=null and ch_id !=''">
+            AND ch_id = #{ch_id}
+        </if>
+        <if test="s_id !=null and s_id !=''">
+            AND s_id = #{s_id}
+        </if>
+        <if test="a_id !=null and a_id !=''">
+            AND a_id = #{a_id}
+        </if>
+        <if test="agent_name !=null and agent_name !=''">
+            AND a_name like CONCAT(CONCAT(#{agent_name}), '%')
+        </if>
+        <if test="p_allot !=null and p_allot !=''">
+            AND p_allot = #{p_allot}
+        </if>
+        <if test="ce_allot !=null and ce_allot !=''">
+            AND ce_allot = #{ce_allot}
+        </if>
+        <if test="ch_allot !=null and ch_allot !=''">
+            AND ch_allot = #{ch_allot}
+        </if>
+        <if test="s_allot !=null and s_allot !=''">
+            AND s_allot = #{s_allot}
+        </if>
+        <if test="a_allot !=null and a_allot !=''">
+            AND a_allot = #{a_allot}
+        </if>
+        <if test="b_allot_1 !=null and b_allot_1 !=''">
+            AND b_allot_1 = #{b_allot_1}
+        </if>
+        <if test="is_use !=null and is_use !=''">
+            AND is_use = #{is_use}
+        </if>
+        <if test="create_date !=null and create_date !=''">
+            AND create_date = #{create_date}
+        </if>
+    </select>
+
+    <select id="queryAgentProrateTemp" parameterType="hashmap" resultType="map">
+        SELECT sys_id, p_id, p_name, ce_id, ce_name, ch_id, ch_name, s_id, s_name, a_id, a_name,p_allot, ce_allot,
+        ch_allot, s_allot, a_allot, b_allot_1,b_allot_2,b_allot_3, is_use, create_date
+        FROM v_agent_prorate_temp
+        WHERE is_use = 1
+        <if test="sys_id !=null and sys_id !=''">
+            AND sys_id = #{sys_id}
+        </if>
+        <if test="p_id !=null and p_id !=''">
+            AND p_id = #{p_id}
+        </if>
+        <if test="ce_id !=null and ce_id !=''">
+            AND ce_id = #{ce_id}
+        </if>
+        <if test="ch_id !=null and ch_id !=''">
+            AND ch_id = #{ch_id}
+        </if>
+        <if test="s_id !=null and s_id !=''">
+            AND s_id = #{s_id}
+        </if>
+        <if test="a_id !=null and a_id !=''">
+            AND a_id = #{a_id}
+        </if>
+        <if test="agent_name !=null and agent_name !=''">
+            AND a_name like CONCAT(CONCAT(#{agent_name}), '%')
+        </if>
+        <if test="p_allot !=null and p_allot !=''">
+            AND p_allot = #{p_allot}
+        </if>
+        <if test="ce_allot !=null and ce_allot !=''">
+            AND ce_allot = #{ce_allot}
+        </if>
+        <if test="ch_allot !=null and ch_allot !=''">
+            AND ch_allot = #{ch_allot}
+        </if>
+        <if test="s_allot !=null and s_allot !=''">
+            AND s_allot = #{s_allot}
+        </if>
+        <if test="a_allot !=null and a_allot !=''">
+            AND a_allot = #{a_allot}
+        </if>
+        <if test="b_allot_1 !=null and b_allot_1 !=''">
+            AND b_allot_1 = #{b_allot_1}
+        </if>
+        <if test="is_use !=null and is_use !=''">
+            AND is_use = #{is_use}
+        </if>
+        <if test="create_date !=null and create_date !=''">
+            AND create_date = #{create_date}
+        </if>
+        ORDER BY create_date desc
+        LIMIT #{startRow},#{endRow}
+    </select>
+
+
+    <select id="queryAgentProrateList" parameterType="hashmap" resultType="map">
+        SELECT sys_id, p_id, p_name, ce_id, ce_name, ch_id, ch_name, s_id, s_name, a_id, a_name,p_allot, ce_allot,
+        ch_allot, s_allot, a_allot, b_allot_1,b_allot_2,b_allot_3, is_use, create_date
+        FROM v_agent_prorate_temp
+        WHERE is_use = 1
+        <if test="sys_id !=null and sys_id !=''">
+            AND sys_id = #{sys_id}
+        </if>
+        <if test="p_id !=null and p_id !=''">
+            AND p_id = #{p_id}
+        </if>
+        <if test="ce_id !=null and ce_id !=''">
+            AND ce_id = #{ce_id}
+        </if>
+        <if test="ch_id !=null and ch_id !=''">
+            AND ch_id = #{ch_id}
+        </if>
+        <if test="s_id !=null and s_id !=''">
+            AND s_id = #{s_id}
+        </if>
+        <if test="a_id !=null and a_id !=''">
+            AND a_id = #{a_id}
+        </if>
+        <if test="agent_name !=null and agent_name !=''">
+            AND a_name = #{agent_name}
+        </if>
+
+        <if test="p_allot !=null and p_allot !=''">
+            AND p_allot = #{p_allot}
+        </if>
+        <if test="ce_allot !=null and ce_allot !=''">
+            AND ce_allot = #{ce_allot}
+        </if>
+        <if test="ch_allot !=null and ch_allot !=''">
+            AND ch_allot = #{ch_allot}
+        </if>
+        <if test="s_allot !=null and s_allot !=''">
+            AND s_allot = #{s_allot}
+        </if>
+        <if test="a_allot !=null and a_allot !=''">
+            AND a_allot = #{a_allot}
+        </if>
+        <if test="b_allot_1 !=null and b_allot_1 !=''">
+            AND b_allot_1 = #{b_allot_1}
+        </if>
+        <if test="is_use !=null and is_use !=''">
+            AND is_use = #{is_use}
+        </if>
+        <if test="create_date !=null and create_date !=''">
+            AND create_date = #{create_date}
+        </if>
+        ORDER BY
+        create_date desc
+    </select>
+
+
+    <select id="queryAgentProrateBrand" parameterType="hashmap" resultType="map">
+        SELECT
+        t1.dept_id,
+        t1.dept_code,
+        t1.dept_name,
+        t1.dept_mobile,
+        t1.create_date,
+        t1.is_use,
+        t1.dept_money,
+        t1.ce_allot,
+        t1.ch_allot,
+        t1.s_allot,
+        t1.dept_ratio,
+        t1.dept_type,
+        t1.dept_url,
+        t1.broker_url,
+        t1.is_tj_man,
+        t1.tj_ratio,
+        t1.dept_parent_id,
+        t1.dept_parent_id _parentId,
+        t1.dept_app_id,
+        t1.dept_app_secret,
+        t1.dept_title,
+        IF (t1.dept_type = 4, 'closed', '') AS state,
+        t1.dept_id as agent_id,
+        t1.dept_name as agent_name,
+        t2.dept_id as settle_id,
+        t2.dept_name as settle_name,
+        t3.dept_id as ch_id,
+        t3.dept_name as	ch_name,
+        t4.dept_id as ce_id,
+        t4.dept_name as ce_name,
+        r.id as brand_id,
+        r.`name` as brand_name
+        FROM
+        t_front_brand_rule r
+        LEFT JOIN t_back_dept_info t1 ON t1.dept_id=t1.dept_id and t1.dept_type ='4'
+        LEFT JOIN t_back_dept_info t2 ON t2.dept_id=t1.dept_parent_id
+        LEFT JOIN t_back_dept_info t3 ON t3.dept_id=t2.dept_parent_id
+        LEFT JOIN t_back_dept_info t4 ON t4.dept_id=t3.dept_parent_id
+        WHERE
+        1 = 1
+        <if test="brand_id!=null and brand_id!=''">
+            AND r.id = #{brand_id}
+        </if>
+        <if test="broker_name!=null and broker_name!=''">
+            AND t.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+        </if>
+        <if test="broker_mobile!=null and broker_mobile!=''">
+            AND t.broker_mobile = #{broker_mobile}
+        </if>
+        <if test="ce_id!=null and ce_id!=''">
+            AND t4.dept_id=#{ce_id}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND t3.dept_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t2.dept_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t1.dept_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t1.dept_id=#{DID}
+        </if>
+        <if test="broker_level!=null and broker_level!=''">
+            AND t.broker_level=#{broker_level}
+        </if>
+        ORDER BY
+        dept_type,
+        create_date
+    </select>
+</mapper>

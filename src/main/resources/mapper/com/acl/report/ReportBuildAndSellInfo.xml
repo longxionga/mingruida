@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportBuildAndSellInfoDao">
+<select id="queryRSellmoneyInfo" parameterType="hashmap" statementType="CALLABLE" resultType="java.util.HashMap">
+    <if test="trading_rule =='01' or trading_rule =='03'">
+	{
+		call Auto_Fee_Distribution_Reverse_GZP
+		(
+			#{order_id,jdbcType=VARCHAR,mode=IN},			
+			#{retStr,jdbcType=VARCHAR,mode=OUT}
+		)
+	}
+	</if>
+	<if test="trading_rule =='02' or trading_rule =='04'">
+	{
+		call Auto_Fee_Distribution_Reverse_GDSY
+		(
+			#{order_id,jdbcType=VARCHAR,mode=IN},			
+			#{retStr,jdbcType=VARCHAR,mode=OUT}
+		)
+	}
+	</if>
+    </select>    
+		
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.platform.dao.IPlatformNumberInfoDao">
+<select id="queryNumberInfo" parameterType="hashMap" resultType="map">
+	SELECT
+		number_id,
+		number_code,
+		number_money,
+		number_type,
+		group_type,
+		is_use,
+		DATE_FORMAT(operate_date,'%Y-%m-%d %H:%i:%s') as operate_date,
+		DATE_FORMAT(create_date,'%Y-%m-%d %H:%i:%s') as create_date	,
+		number_level	
+	FROM
+		t_back_number_info
+	WHERE 1=1		
+		<if test="number_codes!=null and number_codes!=''">
+			AND number_code like CONCAT(CONCAT('%', #{number_codes}), '%')
+		</if>
+		<if test="number_types!=null and number_types!=''">
+			AND number_type=#{number_types}
+		</if>
+		<if test="group_types!=null and group_types!=''">
+			AND group_type=#{group_types}
+		</if>
+		order by number_type,create_date,operate_date
+</select>
+<!-- 新增靓号信息 -->
+<insert id="insertNumberInfo" parameterType="hashMap">
+    INSERT INTO t_back_number_info
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="number_id  != null and number_id!=''">number_id,</if>
+		<if test="number_code  != null and number_code !=''">number_code,</if>
+		<if test="number_money  != null and number_money!=''">number_money,</if>
+		<if test="number_type  != null and number_type!=''">number_type,</if>
+		<if test="group_type  != null and group_type!=''">group_type,</if>
+		<if test="is_use  != null and is_use!=''">is_use,</if>
+		<if test="operate_date  != null and operate_date!=''">operate_date,</if>
+		<if test="create_date  != null and create_date!=''">create_date,</if>
+		<if test="number_level  != null and number_level!=''">number_level,</if>
+	</trim>
+	)values(
+	<trim suffix="" suffixOverrides=",">
+		<if test="number_id  != null and number_id!=''">#{number_id},</if>
+		<if test="number_code  != null and number_code !=''">#{number_code},</if>
+		<if test="number_money  != null and number_money!=''">#{number_money},</if>
+		<if test="number_type  != null and number_type!=''">#{number_type},</if>
+		<if test="group_type  != null and group_type!=''">#{group_type},</if>
+		<if test="is_use  != null and is_use!=''">#{is_use},</if>
+		<if test="operate_date  != null and operate_date!=''">#{operate_date},</if>
+		<if test="create_date  != null and create_date!=''">#{create_date},</if>
+		<if test="number_level  != null and number_level!=''">#{number_level},</if>
+	</trim>
+	)
+</insert>
+
+<!-- 更新靓号信息 -->
+    <update id="updateNumberInfo" parameterType="hashmap">
+		UPDATE t_back_number_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="number_code  != null and number_code !=''">number_code=#{number_code},</if>
+			<if test="number_money  != null and number_money!=''">number_money=#{number_money},</if>
+			<if test="number_type  != null and number_type!=''">number_type=#{number_type},</if>
+			<if test="group_type  != null and group_type!=''">group_type=#{group_type},</if>
+			<if test="is_use  != null and is_use!=''">is_use=#{is_use},</if>
+			<if test="operate_date  != null and operate_date!=''">operate_date=#{operate_date},</if>
+			<if test="create_date  != null and create_date!=''">create_date=#{create_date},</if>
+			<if test="number_level  != null and number_level!=''">number_level=#{number_level},</if>
+		</trim>
+		WHERE number_id=#{number_id}
+	</update>
+	<!-- 删除靓号信息-->
+	 <delete id="deleteNumberInfo" parameterType="hashmap">
+		DELETE FROM t_back_number_info  WHERE number_id=#{number_id}
+	</delete>
+	
+	<select id="queryBrokerCode" parameterType="hashMap" resultType="map">
+		SELECT broker_incode FROM t_front_broker WHERE broker_incode like CONCAT(CONCAT('%', #{number_code}), '%')
+	</select>
+			
+	<select id="queryNumberInfoCode" parameterType="hashMap" resultType="map">
+		SELECT number_code FROM t_back_number_info WHERE number_code=#{number_code}
+		<if test="number_id!=null and number_id!=''">
+			AND number_id !=#{number_id}
+		</if>
+	</select>
+</mapper>

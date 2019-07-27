@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMerchatInfoDao">
+
+	<select id="queryMerchantInfoPageLists" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*, r. NAME AS brand_name,
+		cs.staffcode ,
+		getstaffname (ma.staffid) as staffname
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_data_machine_info ma ON t.merchant_code = ma.merchantcode
+		LEFT JOIN t_data_company_staff cs ON ma.staffid = cs.id
+		LEFT JOIN t_front_brand_rule r ON r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="audit_status!=null and audit_status!=''">
+			AND t.audit_status = #{audit_status}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<if test="staffname !=null and staffname !=''">
+			AND cs.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		ORDER BY t.bind_time desc,t.id asc
+	</select>
+
+	<select id="queryMerchantInfoList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.*,r.name as brand_name
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		ORDER BY t.bind_time desc,t.id asc
+	</select>
+
+	<select id="getMerchantAuditStartsCombobox" parameterType="hashmap" resultType="map">
+		SELECT DISTINCT
+			t.audit_status AS id,
+			t.audit_status AS text
+		FROM
+			t_data_merchant t
+	</select>
+
+	<update id="updateMerchantInfo" parameterType="hashmap">
+		UPDATE
+		t_data_merchant
+		SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="merchant_state  != null">merchant_state=#{merchant_state},</if>
+			<if test="machine_type  != null">machine_type=#{machine_type},</if>
+			<if test="audit_status  != null">audit_status=#{audit_status},</if>
+			<if test="rate_type  != null">rate_type=#{rate_type},</if>
+			<if test="bind_time  != null">bind_time=#{bind_time},</if>
+			<if test="bind_day  != null">bind_day=#{bind_day},</if>
+			<if test="update_time  != null">update_time=#{update_time},</if>
+
+		</trim>
+		WHERE
+		id = #{id}
+	</update>
+
+	<select id="countMerchantInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		COUNT(t.id) as mcount
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_data_machine_info ma ON t.merchant_code = ma.merchantcode
+		LEFT JOIN t_data_company_staff cs ON ma.staffid = cs.id
+		LEFT JOIN t_front_brand_rule r ON r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="audit_status!=null and audit_status!=''">
+			AND t.audit_status = #{audit_status}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<if test="staffname !=null and staffname !=''">
+			AND cs.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+	</select>
+
+	<select id="exportMerchantInfoReportInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		r.`name` AS '机具品牌',
+		t.merchant_code AS '商户编号',
+		t.merchant_name AS '商户名称',
+		t.bind_day AS '入网时间',
+		cs.staffcode AS '归属员工编号',
+		getstaffname (ma.staffid) AS '归属员工名称',
+		t.merchant_type AS '商户类型',
+		t.merchant_state AS '商户状态',
+		t.machine_type AS '机具类型',
+		t.audit_status AS '审核状态',
+		t.rate_type AS '费率类型',
+		t.create_time AS '创建时间',
+		t.update_time AS '更新时间'
+		FROM
+		t_data_merchant t
+		LEFT JOIN t_data_machine_info ma ON t.merchant_code = ma.merchantcode
+		LEFT JOIN t_data_company_staff cs ON ma.staffid = cs.id
+		LEFT JOIN t_front_brand_rule r ON r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="audit_status!=null and audit_status!=''">
+			AND t.audit_status = #{audit_status}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.bind_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.bind_day &lt;=#{end_date}
+		</if>
+		<if test="staffname !=null and staffname !=''">
+			AND cs.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		ORDER BY t.bind_time desc,t.id asc
+	</select>
+
+</mapper>

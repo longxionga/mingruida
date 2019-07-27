@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportTradwaterDao">
+	<select id="queryTradwaterPageList" parameterType="hashmap" resultType="map">
+
+
+			SELECT
+			mi.name,
+			DATE_FORMAT(tr.trade_time,'%Y-%m-%d') date,
+			<!--&#45;&#45; 按日分组
+			<if test="type == '天'">
+                DATE_FORMAT(tr.trade_time,'%Y-%m-%d') date,
+            </if>
+
+            &lt;!&ndash; 按月分组 &ndash;&gt;
+            <if test="type == '月' ">
+                DATE_FORMAT(tr.trade_time,'%Y-%c') date,
+            </if>
+
+
+            &lt;!&ndash; 按年分组 &ndash;&gt;
+            <if test="type == '年' ">
+                DATE_FORMAT(tr.trade_time,'%Y')  date,
+            </if>-->
+			SUM(tr.order_amount) AS totalsum,
+			SUM(
+
+			IF (
+			tr.pay_type = '支付宝',
+			tr.order_amount,
+			0
+			)
+			) AS zhifubaosum,
+			SUM(
+
+			IF (
+			tr.pay_type = '微信支付',
+			tr.order_amount,
+			0
+			)
+			) AS weixinsum,
+			SUM(
+
+			IF (
+			tr.pay_type = '银联二维码',
+			tr.order_amount,
+			0
+			)
+			) yinliansum,
+			SUM(
+
+			IF (
+			tr.pay_card_type = '贷记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+			tr.order_amount,
+			0
+			)
+			) daijikasum,
+			SUM(
+
+			IF (
+			tr.pay_card_type = '准贷记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+			tr.order_amount,
+			0
+			)
+			) AS zhundaijikasum,
+			SUM(
+
+			IF (
+			tr.pay_card_type = '借记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+			tr.order_amount,
+			0
+			)
+			) AS jijikasum
+			FROM
+			t_front_brand_rule mi
+			INNER JOIN t_data_trade_order tr ON mi.id = tr.brand_id
+			WHERE 1=1
+			and  tr.order_state = '1'
+			<if test="start_date != null and start_date !='' and  end_date != null and end_date !='' ">
+				and DATE_FORMAT(tr.trade_time,'%Y-%m-%d') between  #{start_date} and  #{end_date}
+			</if>
+
+			<if test="brindid != null and brindid !=''">
+				AND tr.brand_id = #{brindid}
+			</if>
+			GROUP BY
+			mi.name,
+			DATE_FORMAT(tr.trade_time,'%Y-%m-%d')
+			<!-- 按日分组 -->
+           <!-- <if test="types == '天' ">
+                DATE_FORMAT(tr.trade_time,'%Y-%m-%d')
+            </if>
+
+            &lt;!&ndash; 按月分组 &ndash;&gt;
+            <if test="types == '月' ">
+                DATE_FORMAT(tr.trade_time,'%Y-%c')
+            </if>
+
+
+            &lt;!&ndash; 按年分组 &ndash;&gt;
+            <if test="types == '年' ">
+                DATE_FORMAT(tr.trade_time,'%Y')
+            </if>-->
+			ORDER by tr.trade_time ASC;
+
+
+
+
+		<!--SELECT
+		mi.name,
+		SUM(tr.order_amount) AS totalsum,
+		SUM(
+
+		IF (
+		tr.pay_type = '支付宝',
+		tr.order_amount,
+		0
+		)
+		) AS zhifubaosum,
+		SUM(
+
+		IF (
+		tr.pay_type = '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS weixinsum,
+		SUM(
+
+		IF (
+		tr.pay_type = '银联二维码',
+		tr.order_amount,
+		0
+		)
+		) yinliansum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '贷记卡' <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) daijikasum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '准贷记卡' <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS zhundaijikasum,
+		SUM(
+
+		IF (
+		tr.pay_card_type = '借记卡' <![CDATA[ && ]]> tr.pay_type != '银联二维码' <![CDATA[ && ]]> tr.pay_type != '支付宝' <![CDATA[ && ]]> tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS jijikasum
+		FROM
+		t_front_brand_rule mi
+		INNER JOIN t_data_trade_order tr ON mi.id = tr.brand_id
+		WHERE 1=1
+
+		<if test="start_date != null and start_date !='' and  end_date != null and end_date !='' ">
+			and tr.trade_time between  #{start_date} and  #{end_date}
+		</if>
+		and  tr.order_state = '1'
+		<if test="brindid != null and brindid !=''">
+			AND tr.brand_id = #{brindid}
+		</if>
+		GROUP BY
+		mi.name;-->
+
+	</select>
+
+
+	<select id="countTradwaterInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		COUNT(t1.id) as mcount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="exportTradwaterInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		mi.name as '品牌名称',
+		DATE_FORMAT(tr.trade_time,'%Y-%m-%d')  as '日期',
+		SUM(tr.order_amount) AS  '交易总量',
+		SUM(
+
+		IF (
+		tr.pay_type = '支付宝',
+		tr.order_amount,
+		0
+		)
+		) AS '支付宝',
+		SUM(
+
+		IF (
+		tr.pay_type = '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS '微信支付',
+		SUM(
+
+		IF (
+		tr.pay_type = '银联二维码',
+		tr.order_amount,
+		0
+		)
+		) '银联二维码',
+		SUM(
+
+		IF (
+		tr.pay_card_type = '贷记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) '贷记卡',
+		SUM(
+
+		IF (
+		tr.pay_card_type = '准贷记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS '准贷记卡',
+		SUM(
+
+		IF (
+		tr.pay_card_type = '借记卡' <![CDATA[ && ]]>  tr.pay_type != '银联二维码' <![CDATA[ && ]]>  tr.pay_type != '支付宝' <![CDATA[ && ]]>  tr.pay_type != '微信支付',
+		tr.order_amount,
+		0
+		)
+		) AS '借记卡'
+		FROM
+		t_front_brand_rule mi
+		INNER JOIN t_data_trade_order tr ON mi.id = tr.brand_id
+		WHERE 1=1
+		and  tr.order_state = '1'
+		<if test="start_date != null and start_date !='' and  end_date != null and end_date !='' ">
+			and DATE_FORMAT(tr.trade_time,'%Y-%m-%d') between  #{start_date} and  #{end_date}
+		</if>
+
+		<if test="brindid != null and brindid !=''">
+			AND tr.brand_id = #{brindid}
+		</if>
+		GROUP BY
+		mi.name,DATE_FORMAT(tr.trade_time,'%Y-%m-%d') ORDER by tr.trade_time ASC;
+	</select>
+
+
+</mapper>

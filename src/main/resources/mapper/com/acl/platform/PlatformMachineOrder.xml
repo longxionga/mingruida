@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformMachineOrderDao">
+    <select id="queryMachineOrderPageList" parameterType="hashMap" resultType="map">
+		SELECT
+		t.*, r. NAME AS brand_name,
+		getstaffname(mi.staffid) AS staffnamesub
+		FROM
+		t_data_trade_order t
+		LEFT JOIN t_front_brand_rule r ON r.id = t.brand_id
+		LEFT JOIN (
+		SELECT
+		mm.*, COUNT(1) AS aa
+		FROM
+		t_data_machine_info mm
+		WHERE
+		1 = 1
+		GROUP BY
+		mm.merchantcode
+		ORDER BY
+		mm.machinecode
+		) mi ON t.merchant_code = mi.merchantcode
+		WHERE
+		1 = 1
+		<if test="id !=null and id !=''">
+			AND t.id =#{id}
+		</if>
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="order_id!=null and order_id!=''">
+			AND t.order_id = #{order_id}
+		</if>
+		<if test="order_type!=null and order_type!=''">
+			AND t.order_type = #{order_type}
+		</if>
+		<if test="pay_type!=null and pay_type!=''">
+			AND t.pay_type = #{pay_type}
+		</if>
+		<if test="order_state!=null and order_state!=''">
+			AND t.order_state = #{order_state}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.trade_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.trade_day &lt;=#{end_date}
+		</if>
+		<if test="branch!=null and branch!=''">
+			AND cs.branch =#{branch}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+            order by ${sort} ${order}
+        </if>-->
+		ORDER BY t.trade_time desc
+    </select>
+
+    <select id="queryMachineOrderById" parameterType="hashMap" resultType="map">
+		SELECT
+		t.*,r.name as brand_name
+		FROM
+		t_data_trade_order t
+		LEFT JOIN t_front_brand_rule r on r.id = t.brand_id
+		WHERE
+		1 = 1
+		<if test="orderid !=null and orderid !=''">
+			AND t.order_id =#{orderid}
+		</if>
+		<if test="machine_code !=null and machine_code !=''">
+			AND t.machine_code =#{machine_code}
+		</if>
+		<if test="merchant_name !=null and merchant_name !=''">
+			AND t.merchant_name like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+		<if test="merchant_code !=null and merchant_code !=''">
+			AND t.merchant_code =#{merchant_code}
+		</if>
+		<if test="brand_id!=null and brand_id!=''">
+			AND r.id = #{brand_id}
+		</if>
+		<if test="start_date!=null and start_date!=''">
+			AND t.trade_day &gt;=#{start_date}
+		</if>
+		<if test="end_date!=null and end_date!=''">
+			AND t.trade_day &lt;=#{end_date}
+		</if>
+
+		ORDER BY t.trade_time asc,t.id asc
+    </select>
+
+	<update id="updateMachineOrder" parameterType="hashmap">
+        UPDATE t_data_trade_order
+		SET order_state = #{order_state}
+		WHERE
+			id = #{id};
+    </update>
+
+	<select id="getOrderTypeCombobox" parameterType="hashmap" resultType="map">
+			SELECT DISTINCT
+			t.order_type AS id,
+			t.order_type AS text
+		FROM
+			t_data_trade_order t
+	</select>
+
+	<select id="getPayTypeCombobox" parameterType="hashmap" resultType="map">
+		SELECT DISTINCT
+			t.pay_type AS id,
+			t.pay_type AS text
+		FROM
+			t_data_trade_order t
+	</select>
+
+</mapper>

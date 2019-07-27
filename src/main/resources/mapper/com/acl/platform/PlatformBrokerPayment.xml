@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.acl.platform.dao.IPlatformBrokerPaymentDao">
+	
+	<select id="queryDeptInfoByBrokerCode" parameterType="hashmap" resultType="map">
+		select de.dept_id,
+					 de.dept_code,
+					 de.dept_name,
+					 de.dept_mobile,
+					 de.create_date,
+					 de.is_use,
+					 de.dept_money,
+					 de.dept_ratio,
+					 de.dept_type,
+					 de.dept_appid,
+					 de.dept_url,
+					 de.dept_parent_id,
+					 de.dept_app_id,
+					 de.dept_app_secret
+    from t_back_dept_info de left join t_back_dict_info di on de.dept_type = di.dict_id and dict_code = '1001'
+		where dept_id = #{dept_id}
+	</select>
+	
+	<update id="updatePayWxId" parameterType="map">
+		update t_front_broker set broker_zf_wx_id = #{payWxOpenId} where broker_id = #{id}
+	</update>
+
+	<select id="queryBroker" parameterType="string" resultType="map">
+		select broker_id,
+		       broker_money,
+		       is_use
+		from t_front_broker
+		where broker_id = #{broker_id}
+	</select>
+	
+	<update id="updateBroker" parameterType="hashmap">
+		update t_front_broker set 
+		<trim suffix="" suffixOverrides=",">
+			<if test="type == 'add'">     broker_money = broker_money + #{broker_money},</if>
+			<if test="type == 'subtract'">broker_money = broker_money - #{broker_money},</if>
+			<if test="is_use       != null">is_use = #{is_use},</if>
+		</trim>
+		where broker_id = #{broker_id}
+	</update>
+
+	<insert id="insertBrokerProfitLoss" parameterType="com.acl.pojo.BrokerProfitLoss">
+		insert into t_front_broker_profitloss (
+		<trim suffix="" suffixOverrides=",">
+			<if test="broker_profiloss_id != null">broker_profiloss_id,</if>
+			<if test="broker_id           != null">broker_id,</if>
+			<if test="broker_money_before != null">broker_money_before,</if>
+			<if test="broker_money        != null">broker_money,</if>
+			<if test="broker_money_after  != null">broker_money_after,</if>
+			<if test="money_type          != null">money_type,</if>
+			<if test="create_date         != null">create_date,</if>
+			<if test="is_use              != null">is_use,</if>
+			<if test="order_id              != null">order_id,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="broker_profiloss_id != null">#{broker_profiloss_id},</if>
+			<if test="broker_id           != null">#{broker_id},</if>
+			<if test="broker_money_before != null">#{broker_money_before},</if>
+			<if test="broker_money        != null">#{broker_money},</if>
+			<if test="broker_money_after  != null">#{broker_money_after},</if>
+			<if test="money_type          != null">#{money_type},</if>
+			<if test="create_date         != null">#{create_date},</if>
+			<if test="is_use              != null">#{is_use},</if>
+			<if test="order_id              != null">#{order_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	<insert id="insertDeptProrate" parameterType="com.acl.pojo.DeptProrate">
+		insert into t_back_dept_prorate (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id      != null">sys_id,</if>
+			<if test="p_id        != null">p_id,</if>
+			<if test="ce_id       != null">ce_id,</if>
+			<if test="ch_id       != null">ch_id,</if>
+			<if test="s_id        != null">s_id,</if>
+			<if test="a_id        != null">a_id,</if>
+			<if test="b_id        != null">b_id,</if>
+			<if test="p_allot     != null">p_allot,</if>
+			<if test="ce_allot    != null">ce_allot,</if>
+			<if test="ch_allot    != null">ch_allot,</if>
+			<if test="s_allot     != null">s_allot,</if>
+			<if test="a_allot     != null">a_allot,</if>
+			<if test="b_allot     != null">b_allot,</if>
+			<if test="is_use      != null">is_use,</if>
+			<if test="create_date != null">create_date,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id      != null">#{sys_id},</if>
+			<if test="p_id        != null">#{p_id},</if>
+			<if test="ce_id       != null">#{ce_id},</if>
+			<if test="ch_id       != null">#{ch_id},</if>
+			<if test="ch_id       != null">#{ch_id},</if>
+			<if test="s_id        != null">#{s_id},</if>
+			<if test="a_id        != null">#{a_id},</if>
+			<if test="b_id        != null">#{b_id},</if>
+			<if test="p_allot     != null">#{p_allot},</if>
+			<if test="ch_allot    != null">#{ch_allot},</if>
+			<if test="s_allot     != null">#{s_allot},</if>
+			<if test="a_allot     != null">#{a_allot},</if>
+			<if test="b_allot     != null">#{b_allot},</if>
+			<if test="is_use      != null">#{is_use},</if>
+			<if test="create_date != null">#{create_date},</if>
+		</trim>
+		)
+	</insert>
+	
+	<insert id="insertDeptProrateTemp" parameterType="com.acl.pojo.DeptProrate">
+		insert into t_back_dept_prorate_temp (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id      != null">sys_id,</if>
+			<if test="p_id        != null">p_id,</if>
+			<if test="ce_id       != null">ce_id,</if>
+			<if test="ch_id       != null">ch_id,</if>
+			<if test="s_id        != null">s_id,</if>
+			<if test="a_id        != null">a_id,</if>
+			<if test="b_id        != null">b_id,</if>
+			<if test="p_allot     != null">p_allot,</if>
+			<if test="ce_allot    != null">ce_allot,</if>
+			<if test="ch_allot    != null">ch_allot,</if>
+			<if test="s_allot     != null">s_allot,</if>
+			<if test="a_allot     != null">a_allot,</if>
+			<if test="b_allot     != null">b_allot,</if>
+			<if test="is_use      != null">is_use,</if>
+			<if test="create_date != null">create_date,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id      != null">#{sys_id},</if>
+			<if test="p_id        != null">#{p_id},</if>
+			<if test="ce_id       != null">#{ce_id},</if>
+			<if test="ch_id       != null">#{ch_id},</if>
+			<if test="ch_id       != null">#{ch_id},</if>
+			<if test="s_id        != null">#{s_id},</if>
+			<if test="a_id        != null">#{a_id},</if>
+			<if test="b_id        != null">#{b_id},</if>
+			<if test="p_allot     != null">#{p_allot},</if>
+			<if test="ch_allot    != null">#{ch_allot},</if>
+			<if test="s_allot     != null">#{s_allot},</if>
+			<if test="a_allot     != null">#{a_allot},</if>
+			<if test="b_allot     != null">#{b_allot},</if>
+			<if test="is_use      != null">#{is_use},</if>
+			<if test="create_date != null">#{create_date},</if>
+		</trim>
+		)
+	</insert>
+
+
+</mapper>

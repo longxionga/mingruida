@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysCompanyTXDetailedDao">
+	<insert id="insertCompanyTXDetailed" parameterType="hashmap">
+		INSERT INTO 
+		<if test="exchange_id !=null and exchange_id !=''">
+			t_back_exchange_detailed
+		</if>
+		<if test="channel_id !=null and channel_id !=''">
+			t_back_channel_detailed
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			t_back_settle_detailed
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+		    t_back_agent_detailed
+		</if>
+    	(
+        	sys_id,
+        <if test="exchange_id !=null and exchange_id !=''">
+		    exchange_id,
+		</if>
+		<if test="channel_id !=null and channel_id !=''">
+		    channel_id,
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			settle_id,
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+		    agent_id,
+		</if>
+	        fund_type,
+	        before_balance,
+	        after_balance,
+	        money,
+	        order_no,
+	        create_date
+	    )
+	    VALUES
+	    (
+	        #{sys_id},
+	    <if test="exchange_id !=null and exchange_id !=''">
+		    #{exchange_id},
+		</if>
+		<if test="channel_id !=null and channel_id !=''">
+		    #{channel_id},
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			#{settle_id},
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+		    #{agent_id},
+		</if>
+	        #{fund_type},
+	        #{before_balance},
+	        #{after_balance},
+	        #{money},
+	        #{order_no},	      
+	        #{create_date}
+   		)
+	</insert>
+</mapper>

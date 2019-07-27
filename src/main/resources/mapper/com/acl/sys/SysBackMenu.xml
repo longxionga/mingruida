@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.SysBackMenuDao">
+	<select id="queryBackMenuInfo" parameterType="hashmap"
+		resultType="map">
+		SELECT
+		menu_id,
+		menu_name,
+		menu_icon,		
+		menu_url,
+		menu_parent_id,
+		is_leaf,
+		is_use,
+		menu_index,
+		create_date
+		FROM
+		t_back_menu
+		WHERE
+		menu_id=#{menu_id}
+		ORDER BY menu_index asc
+	</select>
+
+	<select id="queryTreeBackMenu" parameterType="hashmap"
+		resultType="map">
+		SELECT MENU_ID
+		,MENU_NAME ,MENU_ICON,MENU_URL,IS_LEAF,MENU_PARENT_ID,CREATE_DATE,IS_USE,MENU_INDEX
+		FROM T_BACK_MENU
+		WHERE MENU_PARENT_ID=#{menu_id}
+		<if test="menu_name!=null and menu_name!=''">
+			AND MENU_NAME like CONCAT(CONCAT('%', #{menu_name}), '%')
+		</if>
+		ORDER BY menu_index asc
+	</select>
+
+	<select id="queryBackMenu" parameterType="hashmap" resultType="map">
+		SELECT 
+		menu_id,
+		menu_name,
+		menu_url,
+		menu_icon,
+		menu_index,
+		is_use		
+		FROM 
+		t_back_menu
+		WHERE menu_id=#{menu_id}		
+		ORDER BY menu_index asc
+	</select>
+	<insert id="insertBackMenu" parameterType="hashmap">
+		INSERT INTO T_BACK_MENU (
+		<trim suffixOverrides=",">
+			<if test="menu_id!=null and menu_id!=''">menu_id,</if>
+			<if test="menu_name!=null and menu_name!=''">menu_name,</if>
+			<if test="menu_url!=null and menu_url!=''">menu_url,</if>
+			<if test="menu_parent_id!=null and menu_parent_id!=''">menu_parent_id,</if>
+			<if test="is_leaf!=null and is_leaf!=''">is_leaf,</if>
+			<if test="is_use!=null and is_use!=''">is_use,</if>
+			<if test="create_date!=null and create_date!=''">create_date,</if>
+			<if test="menu_index!=null and menu_index!=''">menu_index,</if>
+			<if test="menu_icon!=null and menu_icon!=''">menu_icon,</if>
+		</trim>
+		)VALUES(
+		<trim suffixOverrides=",">
+			<if test="menu_id!=null and menu_id!=''">#{menu_id},</if>
+			<if test="menu_name!=null and menu_name!=''">#{menu_name},</if>
+			<if test="menu_url!=null and menu_url!=''">#{menu_url},</if>
+			<if test="menu_parent_id!=null and menu_parent_id!=''">#{menu_parent_id},</if>
+			<if test="is_leaf!=null and is_leaf!=''">#{is_leaf},</if>
+			<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			<if test="create_date!=null and create_date!=''">#{create_date},</if>
+			<if test="menu_index!=null and menu_index!=''">#{menu_index},</if>
+			<if test="menu_icon!=null and menu_icon!=''">#{menu_icon},</if>
+		</trim>
+		)
+	</insert>
+	<update id="updateBackMenu" parameterType="hashmap">
+		UPDATE T_BACK_MENU
+		<set>
+			<trim suffixOverrides=",">
+				<if test="menu_name!=null and menu_name!=''">menu_name=#{menu_name},</if>
+				<if test="menu_url!=null and menu_url!=''">menu_url=#{menu_url},</if>
+				<if test="menu_parent_id!=null and menu_parent_id!=''">menu_parent_id=#{menu_parent_id},</if>
+				<if test="is_leaf!=null and is_leaf!=''">is_leaf=#{is_leaf},</if>
+				<if test="is_use!=null and is_use!=''">is_use=#{is_use},</if>
+				<if test="menu_index!=null and menu_index!=''">menu_index=#{menu_index},</if>
+				<if test="menu_icon!=null">menu_icon=#{menu_icon},</if>
+			</trim>
+		</set>
+		WHERE MENU_ID=#{menu_id}
+	</update>
+	<delete id="deleteBackMenu" parameterType="hashmap">
+		DELETE
+		FROM
+		T_BACK_MENU
+		WHERE MENU_ID=#{menu_id}
+	</delete>
+
+	<select id="menuValidate" parameterType="map" resultType="map">
+		SELECT MENU_NAME FROM T_BACK_MENU WHERE MENU_NAME = #{menu_name}
+		<if test="menu_id!=null and menu_id!=''">AND MENU_ID!=#{menu_id}</if>
+	</select>
+	<select id="queryRoleMenuView" parameterType="hashmap" resultType="map">
+		select
+			menu_id,
+			menu_url,
+			menu_name,
+			IFNULL(menu_icon,"") AS menu_icon,
+			is_leaf,
+			menu_index,
+			menu_parent_id
+		from
+			v_menu_role
+		where 1=1 
+		<if test="role_id !=null and role_id !=''">AND role_id=#{role_id}</if>
+		<if test="menu_use !=null and menu_use !=''">AND menu_use=#{menu_use}</if>
+		and menu_url is not null
+		order by menu_parent_id,menu_index
+	</select>
+</mapper>

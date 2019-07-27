@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformRefundvouchersDao">
+	<select id="queryRefundvouchersInfoPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.rechargedate,
+		t.returndate,
+		t.expiredate,
+		t.merchantNO,
+		t.merchantname,
+		t.agentNO,
+		t.agentname,
+		t.implementstype,
+		t.rechargeamount,
+		t.returnamout,
+		t.alreadyamount
+		FROM
+		t_data_refund_vouchers t
+		WHERE
+		1 = 1
+		<if test="merchant_code  != null and merchant_code !=''">
+		AND t.merchantNO like CONCAT(CONCAT(#{merchant_code}), '%')
+		</if>
+		<if test="merchant_name  != null and merchant_name !=''">
+			AND t.merchantname like CONCAT(CONCAT(#{merchant_name}), '%')
+		</if>
+        <if test="start_date!=null and start_date!=''">
+            AND t.rechargedate &gt;=#{start_date}
+        </if>
+        <if test="end_date!=null and end_date!=''">
+            AND t.rechargedate &lt;=#{end_date}
+        </if>
+	</select>
+
+
+	<insert id="insertRefundvouchers" parameterType="hashmap">
+		insert into t_data_refund_vouchers
+		(id,rechargedate,returndate,expiredate,merchantNO,merchantname,agentNO,agentname,
+		implementstype,rechargeamount,returnamout,alreadyamount
+		)VALUES
+		<foreach collection="itemMap" separator="," item="item">
+		(#{item.id},#{item.rechargedate},#{item.returndate},#{item.expiredate},#{item.merchantNO},#{item.merchantname},
+		#{item.agentNO},#{item.agentname},#{item.implementstype},#{item.rechargeamount},#{item.returnamout},#{item.alreadyamount}
+		)
+		</foreach>
+	</insert>
+
+	<delete id="deleteRefundVoucherAll" parameterType="hashmap">
+		delete from t_data_refund_vouchers
+		<where>
+		     1=1
+			<if test="start_date!=null">
+				AND t.rechargedate &gt;=#{start_date}
+			</if>
+			<if test="end_date!=null">
+				AND t.rechargedate &lt;=#{end_date}
+			</if>
+		</where>
+	</delete>
+
+</mapper>

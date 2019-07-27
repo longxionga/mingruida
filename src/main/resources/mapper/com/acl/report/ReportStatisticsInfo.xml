@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.ReportInfoDao">
+	<select id="queryReportAgentInfo" parameterType="hashmap" resultType="map">
+			SELECT 
+			da.AGENT_ID,				
+			STATISTICS_DAY, 
+			da.AGENT_NAME,			
+			da.SETTLE_ID,			
+			da.SETTLE_NAME,		
+			RECHARGE_DAY,		
+			WITHDREWALS_DAY,
+			PROFIT_LOSS_DAY,
+			COUNTER_FEE_DAY,
+			BALANCE_DAY,		
+			BAD_DAY,				
+			FOR_YEAR,				
+			FOR_MONTH,			
+			FOR_DAY,				
+			FOR_WEEK,
+			ch.dept_parent_id as ch_id,
+ 			ce.dept_parent_id as ce_id				
+			from t_report_day_agent_statistics da
+			left join t_back_dept_info d on da.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=da.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND da.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc	
+	</select>
+	
+	<select id="queryReportAgentMonthInfo" parameterType="hashmap" resultType="map">
+			SELECT 
+			ma.AGENT_ID,
+			STATISTICS_DAY,
+			ma.AGENT_NAME,
+			ma.SETTLE_ID,
+			ma.SETTLE_NAME,
+			RECHARGE_MONTH,
+			WITHDREWALS_MONTH,
+			PROFIT_LOSS_MONTH,
+			COUNTER_FEE_MONTH,
+			BALANCE_MONTH,
+			BAD_MONTH,
+			FOR_YEAR,
+			FOR_MONTH	
+			from t_report_month_agent_statistics ma
+			left join t_back_dept_info d on ma.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=ma.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND ma.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc	
+	</select>
+	
+	<select id="queryAgentDayResultExport" parameterType="map" resultType="java.util.LinkedHashMap">
+			SELECT 						
+			STATISTICS_DAY, 
+			da.AGENT_NAME,						
+			da.SETTLE_NAME,		
+			RECHARGE_DAY,		
+			WITHDREWALS_DAY,
+			PROFIT_LOSS_DAY,
+			COUNTER_FEE_DAY,
+			BALANCE_DAY,		
+			BAD_DAY,				
+			FOR_YEAR,				
+			FOR_MONTH,			
+			FOR_DAY,				
+			FOR_WEEK				
+			from t_report_day_agent_statistics da
+			left join t_back_dept_info d on da.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=da.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND da.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc	
+	</select>
+	<select id="queryAgentMonthResultExport" parameterType="map" resultType="java.util.LinkedHashMap">
+			SELECT 			
+			STATISTICS_DAY,
+			ma.AGENT_NAME,			
+			ma.SETTLE_NAME,
+			RECHARGE_MONTH,
+			WITHDREWALS_MONTH,
+			PROFIT_LOSS_MONTH,
+			COUNTER_FEE_MONTH,
+			BALANCE_MONTH,
+			BAD_MONTH,
+			FOR_YEAR,
+			FOR_MONTH	
+			from t_report_month_agent_statistics ma
+			left join t_back_dept_info d on ma.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=ma.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>		
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND ma.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>	
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc		
+	</select>
+	
+	<select id="queryAgentDayCount" parameterType="hashmap" resultType="map">
+			SELECT
+			IFNULL(SUM(RECHARGE_DAY),0) as RECHARGE_DAYCOUNT,
+			IFNULL(SUM(WITHDREWALS_DAY),0) as WITHDRAWALS_DAYCOUNT,
+			IFNULL(SUM(PROFIT_LOSS_DAY),0) as PROFIT_LOSS_DAYCOUNT,
+			IFNULL(SUM(COUNTER_FEE_DAY),0) as COUNTER_FEE_DAYCOUNT,
+			IFNULL(SUM(BALANCE_DAY),0) as BALANCE_DAYCOUNT,			
+			IFNULL(SUM(BAD_DAY),0)as BAD_DAYCOUNT	 						
+			from t_report_day_agent_statistics da
+			left join t_back_dept_info d on da.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=da.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND da.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc	
+	</select>
+	
+	<select id="queryAgentMonthCount" parameterType="hashmap" resultType="map">
+			SELECT 
+			IFNULL(SUM(RECHARGE_MONTH),0) as RECHARGE_MONTHCOUNT,
+			IFNULL(SUM(WITHDREWALS_MONTH),0) as WITHDRAWALS_MONTHCOUNT,
+			IFNULL(SUM(PROFIT_LOSS_MONTH),0) as PROFIT_LOSS_MONTHCOUNT,
+			IFNULL(SUM(COUNTER_FEE_MONTH),0) as COUNTER_FEE_MONTHCOUNT,
+			IFNULL(SUM(BALANCE_MONTH),0) as BALANCE_MONTHCOUNT,			
+			IFNULL(SUM(BAD_MONTH),0)as BAD_MONTHCOUNT			
+			from t_report_month_agent_statistics ma
+			left join t_back_dept_info d on ma.agent_id=d.dept_id
+			left join t_back_dept_info ch on ch.dept_id=ma.settle_id
+ 			left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->  
+		WHERE
+		1 = 1
+		<if test="agent_id !=null and agent_id !=''">
+			AND AGENT_ID = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND SETTLE_ID = #{settle_id} 
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND SETTLE_NAME like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND AGENT_NAME like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND ma.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND STATISTICS_DAY &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND STATISTICS_DAY &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by STATISTICS_DAY desc	
+	</select>
+</mapper>

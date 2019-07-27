@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportStaffWagesDao">
+	<select id="queryshuabaoStaffWagesPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t5.id,
+		t5.branch,
+		t5.staffname,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '刷卡支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkxkzf,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '快捷支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkkjzf
+		FROM
+		(
+		SELECT
+		t1.id,
+		t1.branch,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type,
+		SUM(t4.total_amount) AS sumamount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_data_merchant t3 ON  t1.agentcode = t3.broker_code
+		LEFT JOIN t_data_trade_order t4 ON t3.merchant_code = t4.merchant_code
+		WHERE
+		t1.channel = '1' -- 渠道 1公司 2.个人
+		AND t1.staffstate = '1' -- 员工状态：1在职 2离职 3其他
+		AND t4.id IS NOT NULL -- 过滤未刷卡消费的商户
+		AND t4.pay_card_type = '贷记卡'
+		AND t4.order_state = '1'
+		AND t4.arrival_state = '1'
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''">
+			AND t3.brand_id = #{brindnameid} -- --品牌
+		</if>
+		<if test="company  != null and company !=''">
+			AND t1.branch = #{company} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT('%',#{create_day},'%')
+		</if>
+		GROUP BY
+		t1.id,
+		t1.branch,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type
+		) t5
+		GROUP BY
+		t5.id,
+		t5.branch,
+		t5.staffname
+		ORDER BY t5.branch
+
+	</select>
+
+	<select id="queryshuabaoStaffPaymentFlowSum" parameterType="hashmap" resultType="map">
+		SELECT
+		t5.parentid,
+		t5.staffname,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '刷卡支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkxkzf,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '快捷支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkkjzf
+		FROM
+		(
+		SELECT
+		t1.parentid,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type,
+		SUM(t4.total_amount) AS sumamount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_data_merchant t3 ON  t1.agentcode = t3.broker_code
+		LEFT JOIN t_data_trade_order t4 ON t3.merchant_code = t4.merchant_code
+		WHERE
+		t1.channel = '1' -- 渠道 1公司 2.个人
+
+		AND t1.staffstate = '1' -- 员工状态：1在职 2离职 3其他
+		AND t4.id IS NOT NULL -- 过滤未刷卡消费的商户
+		AND t4.pay_card_type = '贷记卡'
+		AND t4.order_state = '1'
+		AND t4.arrival_state = '1'
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''">
+			AND t3.brand_id = #{brindnameid} -- --品牌
+		</if>
+		<if test="company  != null and company !=''">
+			AND t1.branch = #{company} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT('%',#{create_day},'%')
+		</if>
+		GROUP BY
+		t1.parentid,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type
+		) t5
+		GROUP BY
+		t5.parentid,
+		t5.staffname
+	</select>
+</mapper>

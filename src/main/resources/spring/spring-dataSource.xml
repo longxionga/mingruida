@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${anchol.url}"/>
+        <property name="username" value="${anchol.username}"/>
+        <property name="password" value="${anchol.password}"/>
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${anchol.initialSize}"/>
+        <!-- 连接池最大使用连接数量 -->
+        <property name="maxActive" value="${anchol.maxActive}"/>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${anchol.minIdle}"/>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${anchol.maxWait}"/>
+        <!-- <property name="poolPreparedStatements" value="true" /> <property
+            name="maxPoolPreparedStatementPerConnectionSize" value="33" /> -->
+        <property name="validationQuery" value="${anchol.validationQuery}"/>
+        <property name="testOnBorrow" value="${anchol.testOnBorrow}"/>
+        <property name="testOnReturn" value="${anchol.testOnReturn}"/>
+        <property name="testWhileIdle" value="${anchol.testWhileIdle}"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${anchol.timeBetweenEvictionRunsMillis}"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${anchol.minEvictableIdleTimeMillis}"/>
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="${anchol.removeAbandoned}"/>
+        <!-- 1800秒，也就是30分钟 -->
+        <property name="removeAbandonedTimeout" value="${anchol.removeAbandonedTimeout}"/>
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="${anchol.logAbandoned}"/>
+        <!-- 监控数据库 -->
+        <!-- <property name="filters" value="config" /> -->
+        <property name="filters" value="config"/>
+        <!-- <property name="connectionProperties" value="config.decrypt=true"/> -->
+        <!-- 配置输出日志输出可执行的SQL -->
+        <property name="proxyFilters">
+            <list>
+                <ref bean="log-filter"/>
+            </list>
+        </property>
+        <!-- 连接属性 -->
+        <!-- <property name="connectionProperties" value="clientEncoding=UTF-8"/> -->
+    </bean>
+
+</beans>

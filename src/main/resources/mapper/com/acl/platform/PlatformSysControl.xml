@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformSysControlDao">
+<select id="querySysControl" parameterType="hashmap" resultType="map">
+	SELECT 
+	  sys_id,
+	  remark,
+	  is_use,
+	  sys_type
+	FROM 
+	  t_back_sys_control
+	  WHERE 1=1
+	  <if test="is_use!=null and is_use!=''">
+	  AND is_use=#{is_use}
+	  </if>
+</select>
+<insert id="insertSysControl" parameterType="hashmap">
+ 	INSERT INTO 
+ 	  t_back_sys_control(
+ 	  <trim suffixOverrides=",">
+ 	  <if test="sys_id!=null and sys_id!=''">sys_id,</if>
+ 	  <if test="remark!=null and remark!=''">remark,</if>
+ 	  <if test="is_use!=null and is_use!=''">is_use,</if>
+ 	  <if test="sys_type!=null and sys_type!=''">sys_type,</if>
+ 	  </trim>
+ 	  )
+ 	  VALUES (
+ 	  <trim suffixOverrides=",">
+ 	  <if test="sys_id!=null and sys_id!=''">#{sys_id},</if>
+ 	  <if test="remark!=null and remark!=''">#{remark},</if>
+ 	  <if test="is_use!=null and is_use!=''">#{is_use},</if>
+ 	  <if test="sys_type!=null and sys_type!=''">#{sys_type},</if>
+ 	  </trim>
+ 	  )
+</insert>
+<update id="updateSysControl" parameterType="hashmap">
+ 	UPDATE 		
+ 	  t_back_sys_control
+ 	  SET
+ 	  <trim suffix="" suffixOverrides=",">
+ 	  <if test="remark!=null and remark!=''">remark=#{remark},</if>
+ 	  <if test="is_use!=null and is_use!=''">is_use=#{is_use},</if>
+ 	  <if test="sys_type!=null and sys_type!=''">sys_type=#{sys_type},</if>
+ 	  </trim> 	 
+ 	 WHERE sys_id=#{sys_id} 
+</update>
+	<!-- 删除系统控制信息 -->
+	 <delete id="deleteSysControl" parameterType="hashmap">
+		DELETE FROM t_back_sys_control
+		  WHERE sys_id =#{sys_id}
+	</delete>
+	<select id="checkUse" parameterType="hashmap" resultType="map">
+	SELECT is_use FROM t_back_sys_control where sys_type=#{sys_type}
+	</select>
+	
+	<select id="typeValidate" parameterType="map" resultType="map">
+	SELECT
+		sys_type FROM t_back_sys_control
+		WHERE sys_type = 
+		(SELECT dict_id FROM t_back_dict_info WHERE dict_code="1011" AND dict_name=#{sys_type})
+	</select>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.acl.platform.dao.IPlatformUserPaymentDao">
+	
+	<insert id="insertUserProfitLoss" parameterType="com.acl.pojo.UserProfitLoss">
+    insert into t_front_user_profitloss (
+		<trim suffix="" suffixOverrides=",">
+			<if test="profitloss_id     != null">profitloss_id,</if>
+			<if test="user_id           != null">user_id,</if>
+			<if test="user_money_before != null">user_money_before,</if>
+			<if test="user_money        != null">user_money,</if>
+			<if test="user_money_after  != null">user_money_after,</if>
+			<if test="money_type        != null">money_type,</if>
+			<if test="create_date       != null">create_date,</if>
+			<if test="is_use            != null">is_use,</if>
+			<if test="order_id       != null and order_id!=''">order_id,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="profitloss_id     != null">#{profitloss_id},</if>
+			<if test="user_id           != null">#{user_id},</if>
+			<if test="user_money_before != null">#{user_money_before},</if>
+			<if test="user_money        != null">#{user_money},</if>
+			<if test="user_money_after  != null">#{user_money_after},</if>
+			<if test="money_type        != null">#{money_type},</if>
+			<if test="create_date       != null">#{create_date},</if>
+			<if test="is_use            != null">#{is_use},</if>
+			<if test="order_id       != null and order_id!=''">#{order_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	<update id="updateWallet" parameterType="hashmap">
+		update t_front_user_wallet set
+		<trim suffix="" suffixOverrides=",">
+			<if test="type == 'add'">     user_money  = user_money + #{order_money},</if>
+			<if test="type == 'subtract'">user_money  = user_money - #{order_money},</if>
+		</trim>
+		where wallet_id = #{wallet_id}
+	</update>
+	
+	<update id="updatePayWxId" parameterType="map">
+		update t_front_user_login set user_pay_id = #{payWxOpenId} where user_id = #{id}
+	</update>
+</mapper>

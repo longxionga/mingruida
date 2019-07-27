@@ -1,0 +1,2 @@
+<script type="text/javascript" src='<c:url value="/static/ueditor/ueditor.config.js?v=${applicationScope.v}"></c:url>'></script>
+<script type="text/javascript" src='<c:url value="/static/ueditor/ueditor.all.min.js?v=${applicationScope.v}"></c:url>'></script>

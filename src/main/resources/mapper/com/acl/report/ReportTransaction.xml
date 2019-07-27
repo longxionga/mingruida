@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportTransactionDao">
+	<select id="queryTransactionPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t1.id,
+		m.`name` AS brandname,
+		bd.dept_name,
+		t1.staffcode,
+		getstaffname(t1.id) AS staffname
+
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="querytradeSum" parameterType="hashmap" resultType="map">
+		SELECT
+		COUNT(1) AS mcount,
+		CASE
+		WHEN SUM(t2.order_amount) IS NULL THEN
+		0
+		ELSE
+		SUM(t2.order_amount)
+		END AS msum
+		FROM
+		(SELECT
+		mm.*
+		FROM
+		t_data_machine_info mm
+		WHERE
+		1 = 1
+		GROUP BY
+		mm.merchantcode) t1
+		LEFT JOIN t_data_trade_order t2 ON t1.merchantcode = t2.merchant_code
+		WHERE
+		t2.order_state = '1'
+			<if test="staffid  != null and staffid !=''">
+				AND t1.staffid  = #{staffid}
+			</if>
+		<if test="brindid  != null and brindid !=''">
+		   AND t1.brindid = #{brindid} -- --品牌
+		</if>
+		<if test="startdate!=null and startdate!='' ">
+			AND t2.trade_day  >= #{startdate}
+		</if>
+		<if test="enddate!=null and enddate!='' ">
+			AND t2.trade_day <![CDATA[ <= ]]> #{enddate}
+		</if>
+
+	</select>
+
+	<select id="countTradeInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		COUNT(t1.id) as mcount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+	<select id="exportTradeReportInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		t1.id,
+		m.`name` AS '机具品牌',
+		bd.dept_name AS '所属部门',
+		getstaffname(t1.id) AS '员工名称'
+
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_front_brand_rule m ON t1.brandid = m.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1' -- 可用
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+
+		<if test="branch  != null and branch !=''">
+			AND t1.branch = #{branch} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT(#{create_day},'%')
+		</if>
+		ORDER BY
+		t1.brandid,
+		t1.branch,
+		t1.position
+	</select>
+
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.SysBackDictInfoDao">
+	<select id="queryBackDictInfo" parameterType="hashmap" resultType="map">
+	SELECT
+	dict_code,
+	dict_id ,
+	dict_name,
+	dict_value,
+	is_use,
+	is_order,
+	dict_desc
+	FROM
+	t_back_dict_info
+	WHERE 1=1
+		<if test="dict_name!=null and dict_name!=''">
+			AND DICT_NAME like CONCAT(CONCAT('%', #{dict_name}), '%')
+		</if>
+		<if test="dict_code!=null and dict_code!=''">
+			AND DICT_CODE=#{dict_code}
+		</if>
+		<if test="dict_id!=null and dict_id!=''">
+			AND DICT_ID=#{dict_id}
+		</if>
+		<if test="is_use_s!=null and is_use_s!=''">
+			AND is_use in (#{is_use_s})
+		</if>
+		<if test="dict_desc!=null and dict_desc!=''">
+			AND dict_desc=#{dict_desc}
+		</if>
+		order by dict_code asc
+	</select>
+	<insert id="insertBackDictInfo" parameterType="hashmap">
+		INSERT INTO T_BACK_DICT_INFO(
+		<trim suffixOverrides=",">
+			<if test="dict_code!=null and dict_code!=''">DICT_CODE,</if>
+			<if test="dict_id!=null and dict_id!=''">DICT_ID,</if>
+			<if test="dict_name!=null and dict_name!=''">DICT_NAME,</if>
+			<if test="dict_value!=null and dict_value!=''">DICT_VALUE,</if>
+			<if test="is_use!=null and is_use!=''">IS_USE,</if>
+			<if test="is_order!=null and is_order!=''">IS_ORDER,</if>
+			<if test="dict_desc!=null and dict_desc!=''">DICT_DESC,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="dict_code!=null and dict_code!=''">#{dict_code},</if>
+			<if test="dict_id!=null and dict_id!=''">#{dict_id},</if>
+			<if test="dict_name!=null and dict_name!=''">#{dict_name},</if>
+			<if test="dict_value!=null and dict_value!=''">#{dict_value},</if>
+			<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			<if test="is_order!=null and is_order!=''">#{is_order},</if>
+			<if test="dict_desc!=null and dict_desc!=''">#{dict_desc},</if>
+		</trim>
+		)
+	</insert>
+	<update id="updateBackDictInfo" parameterType="hashmap">
+		UPDATE T_BACK_DICT_INFO
+		<set>
+			<trim suffixOverrides=",">
+				<if test="dict_desc!=null and dict_desc!=''">DICT_DESC=#{dict_desc},</if>
+				<if test="dict_name!=null and dict_name!=''">DICT_NAME=#{dict_name},</if>
+				<if test="dict_value!=null and dict_value!=''">DICT_VALUE=#{dict_value},</if>
+				<if test="is_use!=null and is_use!=''">IS_USE=#{is_use},</if>
+				<if test="is_order!=null and is_order!=''">IS_ORDER=#{is_order},</if>
+			</trim>
+		</set>
+		WHERE DICT_CODE=#{dict_code} AND DICT_ID=#{dict_id}
+	</update>
+	<delete id="deleteBackDictInfo" parameterType="hashmap">
+		DELETE
+		FROM
+		t_back_dict_info
+		WHERE
+		DICT_CODE=#{dict_code}
+		AND
+		DICT_ID=#{dict_id}
+	</delete>
+
+	<select id="dictValidate" parameterType="map" resultType="map">
+		SELECT DICT_NAME FROM T_BACK_DICT_INFO WHERE 1=2
+		<if test="dict_code!=null and dict_code!=''">AND DICT_CODE =#{dict_code}</if>
+	</select>
+
+	<select id="queryDictByCodeId" parameterType="map" resultType="map">
+		SELECT dict_name,dict_id,dict_value,concat(dict_name,'(',dict_desc,')') as dict_cname FROM t_back_dict_info WHERE 1=1
+		<if test="dict_code!=null and dict_code!=''">AND DICT_CODE =#{dict_code}</if>
+		<if test="dict_id!=null and dict_id!=''">AND DICT_ID=#{dict_id}</if>
+		order by is_order
+	</select>
+	
+	<select id="queryDictDesc" parameterType="map" resultType="map">
+		SELECT DISTINCT(dict_desc) as dict_desc FROM t_back_dict_info 
+	</select>
+</mapper>

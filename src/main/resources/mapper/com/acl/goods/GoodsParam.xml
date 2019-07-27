@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsParamDao">
+<select id="queryGoodsParam" parameterType="hashmap" resultType="map">
+	SELECT
+		a.param_id,
+		a.goods_id as param_goods_id,
+		a.param_name as param_names,
+		a.param_value as param_values,
+		a.param_status,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+		a.is_use as param_is_use,
+		b.goods_name
+	FROM
+		t_front_mall_goods_param a
+	INNER JOIN t_front_mall_goods b ON a.goods_id = b.goods_id	
+		WHERE 1=1
+	<if test="good_name !=null and good_name !=''">
+	AND goods_name like CONCAT(CONCAT(#{good_name}), '%')
+	</if>
+	<if test="goods_id !=null and goods_id !=''">
+	AND a.goods_id =#{goods_id}
+	</if>
+</select>
+<insert id="insertGoodsParam" parameterType="hashmap">
+	INSERT INTO t_front_mall_goods_param 
+	(
+	<trim suffixOverrides=",">
+	<if test="param_goods_id !=null and param_goods_id !=''">goods_id,</if>
+	<if test="param_names !=null and param_names !=''">param_name,</if>
+	<if test="param_values !=null and param_values !=''">param_value,</if>
+	<if test="param_status !=null and param_status !=''">param_status,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="param_is_use !=null and param_is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="param_goods_id !=null and param_goods_id !=''">#{param_goods_id},</if>
+	<if test="param_names !=null and param_names !=''">#{param_names},</if>
+	<if test="param_values !=null and param_values !=''">#{param_values},</if>
+	<if test="param_status !=null and param_status !=''">#{param_status},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="param_is_use !=null and param_is_use !=''">#{param_is_use},</if>
+	</trim>
+	)
+</insert>
+<update id="updateGoodsParam" parameterType="hashmap">
+	UPDATE t_front_mall_goods_param SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="param_goods_id  != null and param_goods_id !=''">goods_id=#{param_goods_id},</if>
+			<if test="param_names  != null and param_names !=''">param_name=#{param_names},</if>
+			<if test="param_values  != null and param_values !=''">param_value=#{param_values},</if>
+			<if test="param_status  != null and param_status !=''">param_status=#{param_status},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time},</if>
+			<if test="param_is_use  != null and param_is_use !=''">is_use=#{param_is_use},</if>
+	</trim>
+	WHERE param_id=#{param_id}
+</update>
+<select id="paramValidate" parameterType="hashmap" resultType="map">
+	SELECT
+		param_id
+	FROM
+		t_front_mall_goods_param
+	WHERE 
+		param_name=#{param_name} 
+		<if test="param_id !=null and param_id !=''">
+			AND param_id !=#{param_id}
+		</if>
+		<if test="goods_id !=null and goods_id !=''">
+			AND goods_id=#{goods_id}
+		</if>
+		
+</select>
+
+<select id="queryGoodsName" parameterType="hashmap" resultType="map">
+	SELECT goods_id,goods_name FROM t_front_mall_goods		
+</select>
+</mapper>

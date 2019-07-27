@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformUserAgentRechargeDao">
+<select id="queryUserAgentRecharge" parameterType="hashmap" resultType="map">
+			SELECT
+			order_id,
+			order_money,
+			poundage,
+			receipts,
+			user_id,
+			user_name,
+			user_mobile,
+			create_date,
+			update_date,
+			recharge_status,
+			recharge_desc,
+			reason,
+			agent_id,
+			agent_name,
+			settle_id,
+			settle_name,
+			ch_id,
+			ch_name,
+			ce_id,
+			ce_name
+		FROM
+			t_user_agent_recharge
+	 	WHERE 1=1
+	  <if test="user_name !=null and user_name !=''">
+	  AND user_name like CONCAT(CONCAT(#{user_name}), '%')
+	  </if>
+	  <if test="user_mobile !=null and user_mobile !=''">
+	  AND user_mobile=#{user_mobile}
+	  </if>
+	  <if test="dept_id !=null and dept_id !=''">
+	  AND settle_id=#{dept_id}
+	  </if>
+	 <if test="start_date!=null and start_date!=''">
+ 	  AND  DATE_FORMAT(update_date, '%Y-%m-%d') &gt;=#{start_date}
+
+	 </if>
+	<if test="end_date!=null and end_date!=''">
+		AND DATE_FORMAT(update_date, '%Y-%m-%d') &lt;=#{end_date}
+	</if>
+	<if test="recharge_status !=null and recharge_status !=''">
+		<if test="recharge_status==1">
+			AND recharge_status=#{recharge_status}
+		</if>
+		<if test="recharge_status==0">
+			AND (recharge_status='2' or recharge_status='0')
+		</if>
+	</if>
+
+	<if test="recharge_status ==null or recharge_status ==''">
+		AND recharge_status=1
+	</if>
+	<if test="order_id !=null and order_id !=''">
+		AND order_id=#{order_id}
+	</if>
+  order by create_date ASC
+</select>
+
+<update id="updateStatus" parameterType="hashmap">
+ 	UPDATE 		
+ 	  t_user_agent_recharge
+ 	  SET
+ 	  <trim suffix="" suffixOverrides=",">
+ 	  <if test="recharge_status !=null and recharge_status !=''">recharge_status=#{recharge_status},</if>
+ 	  <if test="reason !=null and reason !=''">reason=#{reason},</if>
+ 	  <if test="update_date !=null and update_date !=''">update_date=#{update_date},</if>
+ 	  </trim> 	 
+ 	 WHERE order_id=#{order_id} 
+</update>
+
+<select id="queryRechargeSum" parameterType="hashmap" resultType="map">
+			SELECT
+			IFNULL(sum(order_money),0) as sumMoney
+		FROM
+			t_user_agent_recharge
+	 	WHERE recharge_status=0
+	  <if test="user_name !=null and user_name !=''">
+	  AND user_name like CONCAT(CONCAT(#{user_name}), '%')
+	  </if>
+	  <if test="user_mobile !=null and user_mobile !=''">
+	  AND user_mobile=#{user_mobile}
+	  </if>
+	  <if test="dept_id !=null and dept_id !=''">
+	  AND settle_id=#{dept_id}
+	  </if>
+	  <if test="start_date!=null and start_date!=''">
+ 	  AND  DATE_FORMAT(update_date, '%Y-%m-%d') &gt;=#{start_date}
+
+	 </if>
+	 <if test="end_date!=null and end_date!=''">
+	  AND DATE_FORMAT(update_date, '%Y-%m-%d') &lt;=#{end_date}
+	 </if>
+	 <if test="recharge_status !=null and recharge_status !=''">
+		<if test="recharge_status==1">
+			AND recharge_status=#{recharge_status}
+		</if>
+		<if test="recharge_status==0">
+			AND (recharge_status='2' or recharge_status='0')
+		</if>		
+		</if>
+	<if test="recharge_status ==null or recharge_status ==''">
+		AND recharge_status=1
+	</if>
+	<if test="order_id !=null and order_id !=''">
+		AND order_id=#{order_id}
+	</if>
+ 
+  order by create_date ASC
+</select>
+</mapper>

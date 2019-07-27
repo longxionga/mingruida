@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.attendance.dao.AttendanceStaffDetailDao">
+	<select id="queryAttendanceStaffDetailPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		sf.staffname,
+		sf.branch,
+		CASE
+		WHEN sf2.staffname IS NOT NULL THEN
+		sf2.staffname
+		WHEN sf1.staffname IS NOT NULL THEN
+		sf1.staffname
+		ELSE
+		sf.staffname
+		END AS managername,
+		sf.position as  pos,
+		sf.brandid,
+		t1.attendance_time,
+		t1.day_count,
+		t.staff_name,
+		t.department,
+		t.staff_code,
+		t.position,
+		t.entry_time,
+		t.departure_time,
+		t.state,
+		t.attendance_days,
+		t.rest_days,
+		t.working_hours,
+		t.late_ness,
+		t.late_arrival_time,
+		t.severe_lateness,
+		t.severe_arrival_time,
+		t.ads_late_days,
+		t.early_time,
+		t.early_hours,
+		t.goto_absence_num,
+		t.gooff_absence_num,
+		t.abs_days,
+		t.goout,
+		t.compassionate_leave,
+		t.marriage_leave,
+		t.special_leave,
+		t.sick_leave,
+		t.road_leave,
+		t.h_1 AS '1',
+		t.h_2 AS '2',
+		t.h_3 AS '3',
+		t.h_4 AS '4',
+		t.h_5 AS '5',
+		t.h_6 AS '6',
+		t.h_7 AS '7',
+		t.h_8 AS '8',
+		t.h_9 AS '9',
+		t.h_10 AS '10',
+		t.h_11 AS '11',
+		t.h_12 AS '12',
+		t.h_13 AS '13',
+		t.h_14 AS '14',
+		t.h_15 AS '15',
+		t.h_16 AS '16',
+		t.h_17 AS '17',
+		t.h_18 AS '18',
+		t.h_19 AS '19',
+		t.h_20 AS '20',
+		t.h_21 AS '21',
+		t.h_22 AS '22',
+		t.h_23 AS '23',
+		t.h_24 AS '24',
+		t.h_25 AS '25',
+		t.h_26 AS '26',
+		t.h_27 AS '27',
+		t.h_28 AS '28',
+		t.h_29 AS '29',
+		t.h_30 AS '30',
+		t.h_31 AS '31',
+		t.h_32 AS '32',
+		t.h_33 AS '33',
+		t.h_34 AS '34',
+		t.h_35 AS '35'
+		FROM
+		t_data_company_staff sf
+		LEFT JOIN t_data_company_staff sf1 ON sf.parentid = sf1.id
+		LEFT JOIN t_data_company_staff sf2 ON sf1.parentid = sf2.id
+		LEFT JOIN t_data_staff_attendance_detail t ON sf.staffname = t.staff_name
+		AND INSTR(t.department, sf.branch) > 0
+		LEFT JOIN t_data_staff_attendance t1 ON t.attendance_id = t1.id
+		WHERE
+		1 = 1
+        AND  t1.attendance_status = '01' -- 考勤状态 01 启用 02 停用
+
+		<if test="state  != null and state !=''">
+			AND t.state = #{state} -- 状态 01 在职 02离职
+		</if>
+		<if test="attendance_time  != null and attendance_time !=''">
+			AND t1.attendance_time = #{attendance_time} -- 考勤月份
+		</if>
+        <if test="staffname  != null and staffname !=''">
+            AND sf.staffname = #{staffname} -- 员工名称
+        </if>
+
+		<if test="brand_id  != null and brand_id !=''">
+			AND sf.brandid = #{brand_id} -- --品牌
+		</if>
+		<if test="company_name  != null and company_name !=''">
+			AND sf.branch = #{company_name} -- -- 所属分公司
+		</if>
+		<if test="manager_name  != null and manager_name !=''">
+			AND (sf.id = #{manager_name} or sf1.id = #{manager_name} or  sf2.id = #{manager_name} ) -- 分公司经理
+		</if>
+		ORDER BY t.id
+
+	</select>
+
+	<select id="queryshuabaoStaffPaymentFlowSum" parameterType="hashmap" resultType="map">
+		SELECT
+		t5.parentid,
+		t5.staffname,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '刷卡支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkxkzf,
+		MAX(
+		CASE
+		WHEN (
+		t5.pay_card_type = '贷记卡'
+		AND t5.pay_type = '快捷支付'
+		) THEN
+		t5.sumamount
+		ELSE
+		0
+		END
+		) AS jjkkjzf
+		FROM
+		(
+		SELECT
+		t1.parentid,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type,
+		SUM(t4.total_amount) AS sumamount
+		FROM
+		t_data_company_staff t1
+		LEFT JOIN t_data_merchant t3 ON  t1.agentcode = t3.broker_code
+		LEFT JOIN t_data_trade_order t4 ON t3.merchant_code = t4.merchant_code
+		WHERE
+		t1.channel = '1' -- 渠道 1公司 2.个人
+
+		AND t1.staffstate = '1' -- 员工状态：1在职 2离职 3其他
+		AND t4.id IS NOT NULL -- 过滤未刷卡消费的商户
+		AND t4.pay_card_type = '贷记卡'
+		AND t4.order_state = '1'
+		AND t4.arrival_state = '1'
+		<if test="position  != null and position !=''">
+			AND t1.position = #{position} -- 岗位1 经理2主管3组员4人事5其他
+		</if>
+		<if test="brindnameid  != null and brindnameid !=''">
+			AND t3.brand_id = #{brindnameid} -- --品牌
+		</if>
+		<if test="company  != null and company !=''">
+			AND t1.branch = #{company} -- -- 所属分公司
+		</if>
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname = #{staffname} -- -- 员工名称
+		</if>
+		<if test="create_day  != null and create_day !=''">
+			AND t4.trade_day like CONCAT('%',#{create_day},'%')
+		</if>
+		GROUP BY
+		t1.parentid,
+		t1.staffname,
+		t4.pay_card_type,
+		t4.pay_type
+		) t5
+		GROUP BY
+		t5.parentid,
+		t5.staffname
+	</select>
+</mapper>

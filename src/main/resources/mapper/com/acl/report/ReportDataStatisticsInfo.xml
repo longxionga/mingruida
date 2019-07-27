@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportDataInfoDao">
+	<select id="queryReportDataInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0),"-",F.FOR_DAY) as curr_date,
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY,
+				F.SETTLE_ID,
+				D.dept_name as settle_name,
+				F.AGENT_ID,				
+				D1.dept_name as agent_name,
+				SUM(F.PROFIT_LOSS) AS PROFIT_LOSS,
+				SUM(F.COUNTER_FEE) AS COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			GROUP BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY,
+				F.SETTLE_ID,
+				F.AGENT_ID,
+				D.dept_name,
+				D1.dept_name
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY DESC		
+	</select>
+	
+	<select id="queryReportDataMonthInfo" parameterType="hashmap" resultType="map">
+			SELECT
+				CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0)) as curr_date,
+				F.FOR_YEAR,
+				F.AGENT_ID,
+				F.SETTLE_ID,
+				F.FOR_MONTH,
+				D.dept_name as settle_name,	
+				D1.dept_name as agent_name,
+				SUM(F.PROFIT_LOSS) AS PROFIT_LOSS,
+				SUM(F.COUNTER_FEE) AS COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			GROUP BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.AGENT_ID,
+				F.SETTLE_ID
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH DESC		
+	</select>
+	
+		
+	<select id="queryReportDataCount" parameterType="hashmap" resultType="map">
+			SELECT
+				IFNULL(SUM(F.PROFIT_LOSS),0) as PROFIT_LOSS,
+				IFNULL(SUM(F.COUNTER_FEE),0) as COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY DESC
+	</select>
+	
+	<select id="queryReportDeptDataInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0),"-",F.FOR_DAY) as curr_date,	
+			FOR_YEAR,
+			FOR_MONTH,
+			FOR_DAY,
+			f.SETTLE_ID,
+            f.AGENT_ID,
+            <if test="feetype=='02'">
+            b.BROKER_ID,
+            b.broker_name,
+            b.broker_level,
+            </if>
+			F.DEPT_ID,
+			d.DEPT_NAME,
+			SUM(PROFIT_LOSS) AS PROFIT_LOSS,
+			SUM(COUNTER_FEE) AS COUNTER_FEE
+		FROM
+			t_back_counter_fee F
+			
+		LEFT JOIN t_back_dept_info D ON D.dept_id = F.dept_id
+		 <if test="feetype=='02'">
+		LEFT JOIN t_front_broker b ON b.broker_id = F.broker_id
+		</if>
+
+		WHERE
+		1=1
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND d.dept_id = #{dept_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="day !=null and day !=''">
+				AND F.FOR_DAY = #{day}
+			</if>
+			group by 
+			d.dept_name,
+			f.SETTLE_ID,
+            f.AGENT_ID,
+			d.DEPT_ID,
+			<if test="feetype=='02'">
+			b.broker_name,
+			</if>
+			FOR_YEAR,
+			FOR_MONTH,
+			FOR_DAY
+		order by FOR_DAY desc
+				
+	</select>
+	
+	<select id="queryReportDeptDataMonthInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0)) as curr_date,	
+			FOR_YEAR,
+			FOR_MONTH,
+			f.SETTLE_ID,
+      		f.AGENT_ID,
+			d.DEPT_ID,
+			d.DEPT_NAME,	
+			SUM(PROFIT_LOSS) AS PROFIT_LOSS,
+			SUM(COUNTER_FEE) AS COUNTER_FEE
+		FROM
+			t_back_counter_fee F
+		LEFT JOIN t_back_dept_info D ON D.dept_id = F.dept_id
+
+		WHERE
+		1=1
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="day !=null and day !=''">
+				AND F.FOR_DAY = #{day}
+			</if>
+			group by 
+			d.dept_name,
+			f.SETTLE_ID,
+            f.AGENT_ID,
+			d.DEPT_ID,
+			FOR_YEAR,
+			FOR_MONTH
+		order by FOR_YEAR, FOR_MONTH desc
+				
+	</select>
+	
+	<select id="queryReportDataDetailInfo" parameterType="hashmap" resultType="map">
+			SELECT
+				CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0),"-",F.FOR_DAY) as curr_date,
+				F.ORDER_ID,
+				F.ORDER_DATE,				
+				B.broker_name,
+				U.USER_NAME,
+				F.USER_ID,
+				F.PROFIT_LOSS,
+				F.COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+				LEFT JOIN t_front_user_info U ON U.USER_ID=F.USER_ID
+				LEFT JOIN t_front_broker B ON B.broker_id = F.BROKER_ID
+				LEFT JOIN t_back_dept_info D ON D.dept_id = F.dept_id
+			WHERE
+			1=1
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND d.dept_id = #{dept_id}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="broker_id !=null and broker_id !=''">
+				AND B.BROKER_ID = #{broker_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="day !=null and day !=''">
+				AND F.FOR_DAY = #{day}
+			</if>			
+			order by F.ORDER_DATE desc
+				
+	</select>
+	
+	<select id="queryDeptReportDataInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0),"-",F.FOR_DAY) as curr_date,
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY,
+				F.SETTLE_ID,
+				D.dept_name as settle_name,
+				F.AGENT_ID,				
+				D1.dept_name as agent_name,
+				D2.dept_name,
+				D2.dept_id as dept_id,
+				SUM(F.PROFIT_LOSS) AS PROFIT_LOSS,
+				SUM(F.COUNTER_FEE) AS COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT JOIN t_back_dept_info D2 ON D2.dept_id = F.dept_id
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND D2.DEPT_ID = #{dept_id}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			GROUP BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY,
+				F.SETTLE_ID,
+				F.AGENT_ID,
+				D.dept_name,
+				D1.dept_name,
+				D2.dept_id
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY DESC		
+	</select>
+	
+	<select id="queryReportDeptDataCount" parameterType="hashmap" resultType="map">
+			SELECT
+				IFNULL(SUM(F.PROFIT_LOSS),0) as PROFIT_LOSS,
+				IFNULL(SUM(F.COUNTER_FEE),0) as COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT JOIN t_back_dept_info D2 ON D2.dept_id = F.dept_id
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND D2.DEPT_ID = #{dept_id}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY DESC
+	</select>
+	
+	
+	<select id="queryReportCenterDataInfo" parameterType="hashmap" resultType="map">
+		select CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0)) as curr_date,
+				f.FOR_YEAR,
+				f.EXCHANGE_ID,
+				f.CHANNEL_ID,
+				f.FOR_MONTH,
+				DE.dept_name as c_center,	
+				DC.dept_name as q_qudao,
+				SUM(f.E_COUNTER_FEE) AS E_COUNTER_FEE,
+				SUM(f.C_COUNTER_FEE) AS C_COUNTER_FEE
+		from  t_back_counter_fee f
+			LEFT JOIN t_back_dept_info DE ON DE.dept_id = F.EXCHANGE_ID
+			LEFT JOIN t_back_dept_info DC ON DC.dept_id = F.CHANNEL_ID
+			LEFT JOIN t_back_dept_info D2 ON D2.dept_id = F.dept_id
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE 1=1
+			<if test="channel_id !=null and channel_id !=''">
+				AND F.CHANNEL_ID = #{channel_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND D2.DEPT_ID = #{dept_id}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+				GROUP BY
+				f.FOR_YEAR,
+				f.FOR_MONTH,
+				f.EXCHANGE_ID,
+				f.CHANNEL_ID
+			ORDER BY
+				f.FOR_YEAR,
+				f.FOR_MONTH DESC		
+	</select>
+	
+	<select id="queryReportCenterDataMonthInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0)) as curr_date,	
+			FOR_YEAR,
+			FOR_MONTH,
+			f.SETTLE_ID,
+      		f.AGENT_ID,
+			d.DEPT_ID,
+			d.DEPT_NAME,	
+			SUM(PROFIT_LOSS) AS PROFIT_LOSS,
+			SUM(COUNTER_FEE) AS COUNTER_FEE
+		FROM
+			t_back_counter_fee F
+			LEFT JOIN t_back_dept_info D2 ON D2.dept_id = F.dept_id
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		1=1
+			<if test="channel_id !=null and channel_id !=''">
+				AND F.CHANNEL_ID = #{channel_id}
+			</if>
+			<if test="exchange_id !=null and exchange_id !=''">
+				AND F.EXCHANGE_ID = #{exchange_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="day !=null and day !=''">
+				AND F.FOR_DAY = #{day}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND D2.DEPT_ID = #{dept_id}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>
+			group by 
+			d.dept_name,
+			f.SETTLE_ID,
+            f.AGENT_ID,
+			d.DEPT_ID,
+			FOR_YEAR,
+			FOR_MONTH
+		order by FOR_YEAR, FOR_MONTH desc
+				
+	</select>
+	
+	<select id="queryReportCenterDetailInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			CONCAT(F.FOR_YEAR,"-",LPAD(F.FOR_MONTH, 2, 0)) as curr_date,	
+			FOR_YEAR,
+			FOR_MONTH,
+			f.channel_id,
+			f.SETTLE_ID,
+			d.DEPT_NAME AS q_qudao,
+			d1.DEPT_NAME AS settle_name,
+			SUM(PROFIT_LOSS) AS PROFIT_LOSS,
+			SUM(COUNTER_FEE) AS COUNTER_FEE
+		FROM
+			t_back_counter_fee F
+		LEFT JOIN t_back_dept_info D ON D.dept_id = F.channel_id
+		LEFT JOIN t_back_dept_info D1 ON D1.dept_id = F.SETTLE_ID
+
+		WHERE
+		1=1
+			<if test="channel_id !=null and channel_id !=''">
+				AND F.CHANNEL_ID = #{channel_id}
+			</if>
+			<if test="exchange_id !=null and exchange_id !=''">
+				AND F.EXCHANGE_ID = #{exchange_id}
+			</if>
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="day !=null and day !=''">
+				AND F.FOR_DAY = #{day}
+			</if>
+			group by 
+			d.dept_name,
+			f.SETTLE_ID,
+            f.AGENT_ID,
+			d.DEPT_ID,
+			FOR_YEAR,
+			FOR_MONTH
+		order by FOR_YEAR, FOR_MONTH desc
+				
+	</select>
+	
+	<select id="queryReportCenterDataCount" parameterType="hashmap" resultType="map">
+			SELECT
+				IFNULL(SUM(F.E_COUNTER_FEE),0) as E_COUNTER_FEE
+			FROM
+				t_back_counter_fee F
+			LEFT JOIN t_back_dept_info D2 ON D2.dept_id = F.dept_id
+			LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+			LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+			left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+			left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+			left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+			WHERE
+			1=1
+			<if test="year !=null and year !=''">
+				AND F.FOR_YEAR = #{year}
+			</if>
+			<if test="month !=null and month !=''">
+				AND F.FOR_MONTH = #{month}
+			</if>
+			<if test="settle_id !=null and settle_id !=''">
+				AND F.SETTLE_ID = #{settle_id}
+			</if>
+			<if test="agent_id !=null and agent_id !=''">
+				AND F.AGENT_ID = #{agent_id}
+			</if>
+			<if test="DID !=null and DID !=''">
+				AND D2.DEPT_ID = #{DID}
+			</if>
+			<if test="dept_id !=null and dept_id !=''">
+				AND D2.DEPT_ID = #{dept_id}
+			</if>
+			<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_parent_id=#{ce_id}
+			 </if>
+			 <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_parent_id=#{ch_id}
+			</if>			
+			ORDER BY
+				F.FOR_YEAR,
+				F.FOR_MONTH,
+				F.FOR_DAY DESC
+	</select>
+
+
+	<select id="queryReportMerchantInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		#{create_day} as curr_date ,
+		D.dept_name as settle_name,
+		F.AGENT_ID,
+		D1.dept_name as agent_name,
+		SUM(F.total_amount) AS total_amount,
+		SUM(F.real_amount) AS real_amount,
+		SUM(F.total_activation) AS total_activation,
+		SUM(F.total_unactivation) AS total_unactivation,
+		SUM(F.total_standard) AS total_standard,
+		SUM(F.total_unstandard) AS total_unstandard,
+		SUM(F.total_order_num) AS total_order_num,
+		SUM(F.total_order_amount) AS total_order_amount
+		FROM
+		t_statistics_merchant F
+		LEFT OUTER JOIN t_back_dept_info D ON F.SETTLE_ID = D.dept_id
+		LEFT OUTER JOIN t_back_dept_info D1 ON F.AGENT_ID = D1.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= F.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=F.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		1=1
+		<if test="create_day !=null and create_day !=''">
+			AND F.create_day like  CONCAT(CONCAT(#{create_day}), '%')
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND F.SETTLE_ID = #{settle_id}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND F.AGENT_ID = #{agent_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND D2.DEPT_ID = #{DID}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND ce.dept_parent_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND ch.dept_parent_id=#{ch_id}
+		</if>
+		GROUP BY
+		F.CREATE_DAY,
+		F.SETTLE_ID,
+		F.AGENT_ID,
+		D.dept_name,
+		D1.dept_name
+		ORDER BY
+		F.CREATE_DAY DESC
+	</select>
+
+</mapper>

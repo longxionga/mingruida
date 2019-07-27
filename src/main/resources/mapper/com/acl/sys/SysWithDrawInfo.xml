@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysWithDrawInfoDao">
+	<select id="queryWithDrawInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.company_id,
+			t.tx_money,
+			t.tx_name,
+			t.tx_bank,
+			t.tx_number,
+			t.create_date,
+			t.is_status,
+			t.dept_id,			
+			(select d.dept_mobile from t_back_dept_info d where d.dept_id= t.dept_id) dept_mobile,
+			CASE t.dept_type WHEN '3' THEN			
+			(select d.after_balance  from t_back_settle_detailed  d where d.ORDER_NO= t.company_id and fund_type='06' and d.settle_id=t.dept_id)
+			WHEN '4' THEN
+			(select d.after_balance  from t_back_agent_detailed d where d.ORDER_NO= t.company_id and fund_type='06' and d.agent_id=t.dept_id)
+			ELSE
+			(select d.after_balance from t_back_channel_detailed d where d.ORDER_NO= t.company_id and fund_type='06' and d.channel_id=t.dept_id)
+			END AS dept_money,
+			CASE t.dept_type WHEN '3' THEN
+			s.dept_id 
+			WHEN '4' THEN
+			ch.dept_id 
+			ELSE
+			a.dept_id 
+			END AS ex_dept_id,
+			CASE t.dept_type WHEN '3' THEN
+			s.dept_name 
+			WHEN '4' THEN
+			ch.dept_name 
+			ELSE
+			a.dept_name 
+			END AS ex_dept_name,
+			CASE t.dept_type WHEN '3' THEN
+			s.dept_money 
+			WHEN '4' THEN
+			ch.dept_money 
+			ELSE
+			a.dept_money
+			END AS ex_dept_money,
+			t.dept_name,
+			t.operation_name,
+			t.user_role,
+			t.user_name,
+			t.user_id,
+			(select d.dict_name from t_back_dict_info d where d.dict_code='1001' and d.dict_id=t.dept_type) dept_type,
+			(select u.user_mobile from t_back_user u where u.user_id= t.user_id) user_mobile,
+			IFNULL(t.prop_values,0) as prop_values,
+ 			IFNULL(t.dept_counter_fee,0) as dept_counter_fee,
+ 			IFNULL(t.real_tx_money,t.tx_money) as real_tx_money
+		FROM
+			t_back_company_tx t
+			left join t_back_dept_info d on d.dept_id=t.dept_id
+			left join t_back_dept_info a on a.dept_id=d.dept_parent_id
+			left join t_back_dept_info s on s.dept_id=a.dept_parent_id
+			left join t_back_dept_info ch on ch.dept_id=s.dept_parent_id
+			left join t_back_dept_info ce on ce.dept_id=ch.dept_parent_id
+		WHERE 1=1
+		<if test="company_id !=null and company_id !=''">
+			AND t.company_id = #{company_id}
+		</if>
+		<if test="user_id !=null and user_id !=''">
+			AND t.user_id = #{user_id}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+			AND t.dept_id IN ( #{dept_id} )
+		</if>
+		<if test="tx_money !=null and tx_money !=''">
+			AND t.tx_money = #{tx_money}
+		</if>
+		<if test="tx_name !=null and tx_name !=''">
+			AND t.tx_name like CONCAT(CONCAT(#{tx_name}), '%')
+		</if>
+		<if test="tx_bank !=null and tx_bank !=''">
+			AND t.tx_bank like CONCAT(CONCAT(#{tx_bank}), '%')
+		</if>
+		<if test="tx_number !=null and tx_number !=''">
+			AND t.tx_number like CONCAT(CONCAT(#{tx_number}), '%')
+		</if>
+		<if test="begin_date !=null and begin_date !=''">
+			AND t.create_date BETWEEN #{begin_date} AND #{end_date}
+		</if>
+		<if test="is_status !=null and is_status !=''">
+			AND t.is_status in (${is_status})
+		</if>
+		<if test="dept_type !=null and dept_type !=''">
+			AND t.dept_type=#{dept_type}
+		</if>
+		ORDER BY t.is_status,t.create_date
+	</select>
+	
+	<insert id="insertWithDrawInfo" parameterType="hashmap" >
+		INSERT
+		INTO
+		    t_back_company_tx
+		    (        
+			<trim suffix="" suffixOverrides=",">
+		        <if test="company_id  != null and company_id !=''">company_id,</if>
+		        <if test="tx_money  != null and tx_money !=''">tx_money,</if>
+		        <if test="tx_name  != null and tx_name !=''">tx_name,</if>
+		        <if test="tx_bank  != null and tx_bank !=''">tx_bank,</if>
+		        <if test="tx_number  != null and tx_number !=''">tx_number,</if>
+		        <if test="create_date  != null and create_date !=''">create_date,</if>
+		        <if test="is_status  != null and is_status !=''">is_status,</if>
+		        <if test="dept_id  != null and dept_id !=''">dept_id,</if>
+		        <if test="dept_name  != null and dept_name !=''">dept_name,</if>
+		        <if test="operation_name  != null and operation_name !=''">operation_name,</if>
+		        <if test="user_role  != null and user_role !=''">user_role,</if>
+		        <if test="user_name  != null and user_name !=''">user_name,</if>
+		        <if test="user_id  != null and user_id !=''">user_id,</if>
+		        <if test="dept_type  != null and dept_type !=''">dept_type,</if>
+		        <if test="real_tx_money  != null and real_tx_money !=''">real_tx_money,</if>
+		        <if test="prop_values  != null and prop_values !=''">prop_values,</if>
+		         <if test="dept_counter_fee  != null and dept_counter_fee !=''">dept_counter_fee,</if>
+			</trim>
+		    )
+		    VALUES
+		    (
+			<trim suffix="" suffixOverrides=",">
+		        <if test="company_id  != null and company_id !=''">#{company_id},</if>
+		        <if test="tx_money  != null and tx_money !=''">#{tx_money},</if>
+		        <if test="tx_name  != null and tx_name !=''">#{tx_name},</if>
+		        <if test="tx_bank  != null and tx_bank !=''">#{tx_bank},</if>
+		        <if test="tx_number  != null and tx_number !=''">#{tx_number},</if>
+		        <if test="create_date  != null and create_date !=''">#{create_date},</if>
+		        <if test="is_status  != null and is_status !=''">#{is_status},</if>
+		        <if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+		        <if test="dept_name  != null and dept_name !=''">#{dept_name},</if>
+		        <if test="operation_name  != null and operation_name !=''">#{operation_name},</if>
+		        <if test="user_role  != null and user_role !=''">#{user_role},</if>
+		        <if test="user_name  != null and user_name !=''">#{user_name},</if>
+		        <if test="user_id  != null and user_id !=''">#{user_id},</if>
+		        <if test="dept_type  != null and dept_type !=''">#{dept_type},</if>
+		        <if test="real_tx_money  != null and real_tx_money !=''">#{real_tx_money},</if>
+		        <if test="prop_values  != null and prop_values !=''">#{prop_values},</if>
+		        <if test="dept_counter_fee  != null and dept_counter_fee !=''">#{dept_counter_fee},</if>
+			</trim>
+		    );
+	</insert>
+	
+	<update id="updateWithDrawApproveInfo" parameterType="hashmap" >
+		UPDATE
+		    t_back_company_tx
+		SET
+		    <trim suffix="" suffixOverrides=",">
+				<if test="new_status  != null and new_status !=''">is_status =#{new_status},</if>
+		     	<if test="operation_name  != null and operation_name !=''">operation_name= #{operation_name},</if>
+		     	<if test="user_role  != null and user_role !=''">user_role=#{user_role},</if>
+		     </trim>
+		WHERE
+		    company_id = #{company_id}
+		AND is_status = #{is_status}
+		AND tx_money = #{tx_money}
+	</update>
+
+	<select id="sumUserWalletByDept" parameterType="String" resultType="java.math.BigDecimal">
+		select
+			sum( w.user_money )
+		from
+			t_front_user_wallet w left join t_front_user_info u on
+			w.user_id = u.user_id
+		where
+			u.settle_id != 3
+			and u.settle_id = #{value}
+	</select>
+	<update id="updateDeptMoneyInfo" parameterType="hashmap" >
+		UPDATE
+		    t_back_dept_info
+		SET	
+			dept_money = #{money}
+		WHERE
+		    dept_id = #{dept_id}
+		AND dept_money = #{dept_money}
+	</update>
+	<select id="queryDeptMoney" parameterType="String" resultType="java.math.BigDecimal">
+	SELECT 
+	 dept_money
+	 FROM 
+	 t_back_dept_info
+	 WHERE dept_id=#{dept_id}
+	</select>
+	
+	<select id="queryDepositInfo" parameterType="hashmap" resultType="map">
+		select 
+			dept_id,
+			dept_code,
+			dept_name,
+			dept_mobile,
+			is_use,
+			dept_money
+		from t_back_dept_info t
+		 where dept_type=3
+		<if test="settle_id !=null and settle_id !=''">
+			AND t.dept_id  = #{settle_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND t.dept_name like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		order by (dept_id+0) asc
+	</select>
+	<select id="queryDepositCount" parameterType="hashmap" resultType="map">
+		select
+			IFNULL(sum(dept_money),0) as DEPT_MONEYCOUNT
+		from t_back_dept_info t
+		where dept_type=3
+		<if test="settle_id !=null and settle_id !=''">
+			AND t.dept_id  = #{settle_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND t.dept_name like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		order by (dept_id+0) asc
+	</select>
+	
+	<select id="queryDeptMoneyInfo" parameterType="hashmap" statementType="CALLABLE" resultType="java.util.HashMap">
+		call Auto_Dept_Money_Data
+		(
+			#{dept_id,jdbcType=VARCHAR,mode=IN},
+			#{dept_money,jdbcType=VARCHAR,mode=IN},			
+			#{retStr,jdbcType=VARCHAR,mode=OUT}
+		)
+    </select>
+</mapper>

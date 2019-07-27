@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformWithDrawalsApplyDao">
+ <select id="queryWithDrawalsApply" parameterType="hashmap" resultType="map">
+	 SELECT
+	 t.id,
+	 t.user_id,
+	 t.order_id,
+	 t.money,
+	 t.duty_money,
+	 t.transaction_money,
+	 t.refund_channel_rule_id,
+	 t.out_trade_id,
+	 t.user_mobile,
+	 t.user_name,
+	 t.user_bank_type,
+	 t.user_bank_no,
+	 t.`status`,
+	 DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+	 DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+	 DATE_FORMAT(t.refund_time,'%Y-%m-%d %H:%i:%s') as refund_time,
+	 t.del_tag,
+	 u.agent_id,
+	 u.settle_id,
+	 d.dept_name as agent_name,
+	 s.dept_name as settle_name,
+	 z.dict_name as tx_type,
+	 st.dict_name
+	 FROM
+	 t_pay_refund_order t LEFT JOIN t_user_info u ON t.user_id=u.id
+	 LEFT JOIN t_back_dept_info d ON d.dept_id =u.agent_id
+	 LEFT JOIN t_back_dept_info s ON s.dept_id=u.settle_id
+	 LEFT  JOIN  t_back_dict_info z ON  z.dict_code='1008' and z.dict_value=t.refund_channel_rule_id
+	 LEFT  JOIN  t_back_dict_info st ON st.dict_code='1027' and st.dict_id=t.status
+	WHERE 1=1
+	<if test="settle_id!=null and settle_id!=''">
+	AND  u.settle_id=#{settle_id}
+	</if>
+	<if test="agent_id!=null and agent_id!=''">
+	AND u.agent_id=#{agent_id}
+	</if>
+	<if test="start_date!=null and start_date!=''">
+	AND t.create_time &gt;=#{start_date}
+	</if>
+	<if test="end_date!=null and end_date!=''">
+	AND t.create_time &lt;=#{end_date}
+	</if>
+	<if test="user_name!=null and user_name!=''">
+	AND t.user_name=#{user_name}
+	</if>
+	<if test="status!=null and status!=''">
+	AND t.status=#{status}
+	</if>
+	 <if test="id!=null and id!=''">
+		 AND t.id=#{id}
+	 </if>
+	 <if test="out_trade_id!=null and out_trade_id!=''">
+	AND t.out_trade_id=#{out_trade_id}
+	</if>	
+	<if test="user_mobile!=null and user_mobile!=''">
+	AND t.user_mobile=#{user_mobile}
+	</if>
+	order by t.create_time asc
+</select> 
+
+
+<select id="queryOrderWithdrawalsMoney" parameterType="hashmap" resultType="hashmap">
+   SELECT
+	 t.id,
+	 t.user_id,
+	 t.order_id,
+	 t.money,
+	 t.duty_money,
+	 t.transaction_money,
+	 t.refund_channel_rule_id,
+	 t.out_trade_id,
+	 t.user_mobile,
+	 t.user_name,
+	 t.user_bank_type,
+	 t.user_bank_no,
+	 t.`status`,
+	 t.refund_time,
+	 t.create_time,
+	 t.update_time,
+	 t.del_tag
+	 FROM
+	 t_pay_refund_order t
+WHERE
+	t.id = #{id}
+</select>
+
+<select id="queryOrderWithdrawalsIsUse" parameterType="hashmap" resultType="map">
+    SELECT
+	transaction_money,
+	refund_channel_rule_id
+FROM
+	t_pay_refund_order
+WHERE
+	id = #{id} and status='1'
+</select>
+	<update id="updateTxOrder" parameterType="hashMap">
+		UPDATE
+		t_pay_refund_order SET
+		<trim suffix="" suffixOverrides=",">
+		<if test="status!=null and status!=''">
+			status=#{status},
+		</if>
+		<if test="out_trade_id!=null and out_trade_id!=''">
+			out_trade_id=#{out_trade_id},
+		</if>
+		<if test="update_time!=null and update_time!=''">
+			update_time=#{update_time},
+		</if>
+		<if test="refund_time!=null and refund_time!=''">
+			refund_time=#{refund_time},
+		</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+	<update id="updateCaptical" parameterType="hashMap">
+		update t_user_capital  set amount=#{balance} WHERE user_id=#{user_id}
+	</update>
+	<insert id="insertCapticalBilling" parameterType="hashMap">
+		INSERT INTO t_user_capital_billing
+		(
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id!=''">id,</if>
+			<if test="user_id  != null and user_id!=''">user_id,</if>
+			<if test="amount  != null and amount!=''">amount,</if>
+			<if test="balance  != null and balance!=''">balance,</if>
+			<if test="operate  != null and operate!=''">operate,</if>
+			<if test="purpose  != null and purpose!=''">purpose,</if>
+			<if test="correlation  != null and correlation!=''">correlation,</if>
+			<if test="description  != null and description!=''">description,</if>
+			<if test="create_time  != null and create_time!=''">create_time,</if>
+		</trim>
+		)values(
+		<trim suffix="" suffixOverrides=",">
+			<if test="id  != null and id!=''">#{id},</if>
+			<if test="user_id  != null and user_id!=''">#{user_id},</if>
+			<if test="amount  != null and amount!=''">#{amount},</if>
+			<if test="balance  != null and balance!=''">#{balance},</if>
+			<if test="operate  != null and operate!=''">#{operate},</if>
+			<if test="purpose  != null and purpose!=''">#{purpose},</if>
+			<if test="correlation  != null and correlation!=''">#{correlation},</if>
+			<if test="description  != null and description!=''">#{description},</if>
+			<if test="create_time  != null and create_time!=''">#{create_time},</if>
+		</trim>
+		)
+	</insert>
+
+
+<select id="querySettleInfoForCombox"  parameterType="hashmap" resultType="map">
+    SELECT distinct dept_id as 'id',dept_name as 'text' FROM t_back_dept_info WHERE dept_type='3'
+    <if test="dept_type==1">
+    AND (select DISTINCT(d.dept_parent_id) as jyzx_id from (select * from t_back_dept_info where dept_type=3)t,t_back_dept_info d
+    where t.dept_parent_id=d.dept_id and d.dept_parent_id=#{dept_id}) 
+    </if>
+    <if test="dept_type==2">
+     AND dept_parent_id =#{dept_id}
+    </if>
+    <if test="dept_type==3">
+   <!--  AND FIND_IN_SET(dept_id,getDeptChildList(#{dept_id})) -->
+    AND dept_id =#{dept_id}
+    </if>
+    <if test="dept_type &gt;3">
+    AND dept_id=#{settle_id}
+    </if>   
+</select>
+
+<select id="queryAgentInfoForCombox"  parameterType="hashmap" resultType="map">
+	SELECT dept_id as 'id',dept_name as 'text' FROM t_back_dept_info
+	WHERE  dept_type='4'
+	<if test="dept_type &lt;=3">
+		AND dept_parent_id=#{settle_id}
+	</if>
+	<if test="dept_type &gt;=4">
+		AND dept_id=#{agent_id}
+	</if>      
+</select>
+
+<select id="queryDeptInfoForCombox"  parameterType="hashmap" resultType="map">
+	SELECT dept_id as 'id',dept_name as 'text' FROM t_back_dept_info
+	WHERE  dept_type='5'
+	<if test="dept_type &lt;=4">
+		AND dept_parent_id=#{agent_id}
+	</if>
+	<if test="dept_type &gt;4">
+		<!-- AND FIND_IN_SET(dept_id,getDeptParentList(#{dept_id})) -->
+		AND dept_id=#{dept_id}
+	</if>      
+</select>
+
+<select id="querySumUserTX" parameterType="hashmap" resultType="map">
+     select IFNULL(sum(money),0) as sumTX from t_pay_refund_order where to_days(create_time)=to_days(now())
+</select>
+
+<select id="querySumOutTX" parameterType="hashmap" resultType="map">
+   select IFNULL(sum(transaction_money),0) as sumOut from t_pay_refund_order where status=4 and to_days(create_time)=to_days(now())
+</select>
+<select id="queryUserCapital" parameterType="hashmap" resultType="map">
+		select id,user_id,amount,status,create_time from t_user_capital WHERE user_id=#{user_id}
+</select>
+
+<select id="queryAgentInfoForCombox2"  parameterType="hashmap" resultType="map">
+    SELECT dept_id as 'id',dept_name as 'text' FROM t_back_dept_info
+    WHERE  dept_type='4'
+	<if test="dept_name !=null and dept_name!=''">
+		AND dept_name=#{dept_name}
+	</if>
+</select>
+
+</mapper>
+

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.goods.dao.GoodsStockInfoDao">
+	<select id="queryGoodsStockListInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			stock.sku_id,
+			stock.goods_id,
+			stock.spec_id,
+			stock.settle_id,
+			stock.original_price,
+			stock.discounted_price,
+			stock.total_amount,
+			stock.buy_amount,
+			stock.booked_amount,
+			stock.fare_price,
+			stock.rebate,
+			stock.fare_rule,
+			stock.is_activity,
+			stock.create_time,
+			stock.update_time,
+			stock.is_use,
+			goods.goods_name,
+			spec.spec_type,
+			spec.spec_name
+		FROM
+			t_front_mall_goods_stock stock
+		INNER JOIN t_front_mall_goods goods ON stock.goods_id = goods.goods_id
+		INNER JOIN t_front_mall_goods_spec spec ON spec.spec_id = stock.spec_id
+		<if test="settle_id !=null and settle_id !=''">
+			AND settle_id =#{settle_id}
+		</if>
+		<if test="spec_id !=null and spec_id !=''">
+			AND spec_id =#{spec_id}
+		</if>
+		<if test="goods_name !=null and goods_name !=''">
+			AND goods_name like CONCAT(CONCAT(#{goods_name}), '%')
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		ORDER BY goods_id asc, create_time asc
+	</select>
+
+
+	<update id="updateGoodsStockInfo" parameterType="hashmap">
+		UPDATE t_front_mall_goods_stock SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="original_price  != null and original_price !=''">original_price=#{original_price},</if>
+			<if test="discounted_price  != null and discounted_price !=''">discounted_price=#{discounted_price},</if>
+			<if test="total_amount  != null and total_amount !=''">total_amount=#{total_amount},</if>
+			<if test="buy_amount  != null and buy_amount !=''">buy_amount=#{buy_amount},</if>
+			<if test="booked_amount  != null and booked_amount !=''">booked_amount=#{booked_amount},</if>
+			<if test="fare_price  != null and fare_price !=''">fare_price=#{fare_price},</if>
+			<if test="rebate  != null and rebate !=''">rebate=#{rebate},</if>
+			<if test="fare_rule  != null and fare_rule !=''">fare_rule=#{fare_rule},</if>
+			<if test="is_activity  != null and is_activity !=''">is_activity=#{is_activity},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+			<if test="create_time  != null and create_time !=''">create_time=#{create_time},</if>
+			<if test="update_time  != null and update_time !=''">update_time=#{update_time}</if>
+		</trim>
+		WHERE sku_id=#{sku_id}
+	</update>
+	<select id="queryGoodsSpecSum" parameterType="hashmap" resultType="map">
+		select IFNULL(sum(num),0) as num from t_back_purchase
+		where spec_id=#{spec_id} and status ='0'
+	</select>
+</mapper>

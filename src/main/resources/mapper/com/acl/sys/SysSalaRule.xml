@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysSalaRuleDao">
+	<select id="querySalaRule" parameterType="hashmap"
+		resultType="map">
+		SELECT
+		a.id,
+		a.sala_type,
+		a.sala_title,
+		a.sala_status,
+		a.start_time,
+		a.end_time,
+		a.create_time,
+		t1.create_time as update_time
+		FROM
+		t_sala_rule a
+		LEFT JOIN (SELECT t2.sala_rule_id,MAX(t2.create_time) as create_time FROM t_front_sala_agent_info t2 WHERE 1=1 GROUP BY t2.sala_rule_id ) t1 ON t1.sala_rule_id = a.id
+		WHERE 1=1
+		<if test="sala_type!=null and sala_type!=''">
+			AND a.sala_type =#{sala_type}
+		</if>
+		order by create_time asc
+	</select>
+	<insert id="insertSalaRule" parameterType="hashmap">
+		INSERT INTO t_sala_rule(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">id,</if>
+			<if test="sala_type!=null and sala_type!=''">sala_type,</if>
+			<if test="sala_title!=null and sala_title!=''">sala_title,</if>
+			<if test="sala_status!=null and sala_status!=''">sala_status,</if>
+			<if test="create_time!=null and create_time!=''">create_time,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">#{id},</if>
+			<if test="sala_type!=null and sala_type!=''">#{sala_type},</if>
+			<if test="sala_title!=null and sala_title!=''">#{sala_title},</if>
+			<if test="sala_status!=null and tx_min_money!=''">#{sala_status},</if>
+			<if test="create_time!=null and tx_max_money!=''">#{create_time},</if>
+		</trim>
+		)
+	</insert>
+	<update id="updateSalaRule" parameterType="hashmap">
+		UPDATE t_sala_rule
+		<set>
+			<trim suffixOverrides=",">
+			<if test="sala_title!=null and sala_title!=''">sala_title=#{sala_title},</if>
+			<if test="sala_status!=null and tx_date!=''">sala_status=#{sala_status},</if>
+			<if test="update_time!=null and update_time!=''">update_time=now(),</if>
+			</trim>
+		</set>
+		WHERE id=#{id}
+	</update>
+	<!--<delete id="deleteBankRule" parameterType="hashmap">-->
+		<!--DELETE-->
+		<!--FROM-->
+		<!--t_bank_rule-->
+		<!--WHERE-->
+		<!--sys_id=#{sys_id}		-->
+	<!--</delete>-->
+
+
+	<select id="queryDictSalaRule" parameterType="hashmap"
+			resultType="map">
+		SELECT
+		a.id,
+		a.sala_type,
+		a.sala_title,
+		a.sala_status,
+		a.start_time,
+		a.end_time,
+		a.create_time,
+		a.update_time
+		FROM
+		t_sala_rule a
+		WHERE 1=1
+		<if test="sala_type!=null and sala_type!=''">
+			AND a.sala_type =#{sala_type}
+		</if>
+		<if test="sala_status!=null and sala_status!=''">
+			AND a.sala_status =#{sala_status}
+		</if>
+		<if test="id!=null and id!=''">
+			AND a.id =#{id}
+		</if>
+		order by create_time asc
+	</select>
+
+
+
+	<select id="queryDictBrandRule" parameterType="hashmap"
+			resultType="map">
+		SELECT
+		a.id,
+		a.name,
+		a.activation_subsidy,
+		a.activation_total,
+		a.un_activation_total,
+		a.standard_total,
+		a.un_standard_total,
+		a.status,
+		a.create_time,
+		a.update_time
+		FROM
+		t_front_brand_rule a
+		WHERE 1=1
+		<if test="status!=null and status!=''">
+			AND a.status =#{status}
+		</if>
+		<if test="id!=null and id!=''">
+			AND a.id =#{id}
+		</if>
+		order by create_time asc
+	</select>
+
+
+	<insert id="insertStatisticsMerchant" parameterType="hashmap">
+		INSERT INTO t_statistics_merchant(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">id,</if>
+			<if test="type!=null and type!=''">type,</if>
+			<if test="brand_id!=null and brand_id!=''">brand_id,</if>
+			<if test="total_amount!=null and total_amount!=''">total_amount,</if>
+			<if test="real_amount!=null and real_amount!=''">real_amount,</if>
+			<if test="total_activation!=null and total_activation!=''">total_activation,</if>
+			<if test="total_unactivation!=null and total_unactivation!=''">total_unactivation,</if>
+			<if test="total_standard!=null and total_standard!=''">total_standard,</if>
+
+			<if test="total_unstandard!=null and total_unstandard!=''">total_unstandard,</if>
+			<if test="total_order_num!=null and total_order_num!=''">total_order_num,</if>
+
+			<if test="total_order_amount!=null and total_order_amount!=''">total_order_amount,</if>
+
+			<if test="agent_id!=null and agent_id!=''">agent_id,</if>
+			<if test="settle_id!=null and settle_id!=''">settle_id,</if>
+			<if test="ch_id!=null and ch_id!=''">ch_id,</if>
+			<if test="ce_id!=null and ce_id!=''">ce_id,</if>
+			<if test="dept_id!=null and dept_id!=''">dept_id,</if>
+			<if test="create_day!=null and create_day!=''">create_day,</if>
+			<if test="create_time!=null and create_time!=''">create_time,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="id!=null and id!=''">#{id},</if>
+			<if test="type!=null and type!=''">#{type},</if>
+			<if test="brand_id!=null and brand_id!=''">#{brand_id},</if>
+			<if test="total_amount!=null and total_amount!=''">#{total_amount},</if>
+			<if test="real_amount!=null and real_amount!=''">#{real_amount},</if>
+			<if test="total_activation!=null and total_activation!=''">#{total_activation},</if>
+			<if test="total_unactivation!=null and total_unactivation!=''">#{total_unactivation},</if>
+			<if test="total_standard!=null and total_standard!=''">#{total_standard},</if>
+
+			<if test="total_unstandard!=null and total_unstandard!=''">#{total_unstandard},</if>
+			<if test="total_order_num!=null and total_order_num!=''">#{total_order_num},</if>
+
+			<if test="total_order_amount!=null and total_order_amount!=''">#{total_order_amount},</if>
+
+			<if test="agent_id!=null and agent_id!=''">#{agent_id},</if>
+			<if test="settle_id!=null and settle_id!=''">#{settle_id},</if>
+			<if test="ch_id!=null and ch_id!=''">#{ch_id},</if>
+			<if test="ce_id!=null and ce_id!=''">#{ce_id},</if>
+			<if test="dept_id!=null and dept_id!=''">#{dept_id},</if>
+			<if test="create_day!=null and create_day!=''">#{create_day},</if>
+			<if test="create_time!=null and create_time!=''">#{create_time},</if>
+		</trim>
+		)
+	</insert>
+
+
+	<delete id="deleteStatisticsMerchant" parameterType="hashmap">
+		DELETE
+		FROM
+		t_statistics_merchant
+	  	<where>
+			<if test="brand_id!=null and brand_id!=''">
+				and	brand_id = #{brand_id}
+			</if>
+			<if test="create_day!=null and create_day!=''">
+				AND create_day like CONCAT(CONCAT(#{create_day}), '%')
+			</if>
+		</where>
+	</delete>
+
+	<select id="queryBrandList" parameterType="hashmap"
+			resultType="map">
+		SELECT
+			t.brand AS id,
+			t.brand AS textname
+		FROM
+			(
+				SELECT DISTINCT
+					tt.brand
+				FROM
+					t_front_sala_agent_info tt
+			) t ORDER BY t.brand DESC
+	</select>
+</mapper>

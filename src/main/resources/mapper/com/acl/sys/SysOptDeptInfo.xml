@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.sys.dao.ISysOptDeptInfoDao">
+	<select id="queryDeptInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		    dept_id,
+		    dept_code,
+		    dept_name,
+		    dept_mobile,
+		    create_date,
+		    is_use,
+		    dept_money,
+		    ce_allot,
+			ch_allot,
+			s_allot,
+		    dept_ratio,
+		    dept_type,
+		    dept_url,
+		    broker_url,
+		    is_tj_man,
+		    tj_ratio,
+		    dept_parent_id,
+		    dept_parent_id _parentId,
+		    dept_app_id,
+			dept_app_secret
+		FROM
+		    t_back_dept_info
+		WHERE 1=1
+		<if test="dept_id !=null and dept_id !=''">
+			AND dept_id = #{dept_id} 
+		</if>
+		<if test="action !=null and action !='' and action == 'init'">
+			AND dept_type &lt; 5
+		</if>
+		<if test="dept_parent_id !=null and dept_parent_id !=''">
+			AND dept_parent_id = #{dept_parent_id} 
+		</if>
+		<if test="dept_ratio !=null and dept_ratio !=''">
+			AND dept_ratio = #{dept_ratio} 
+		</if>
+		<if test="dept_type !=null and dept_type !=''">
+			AND dept_type = #{dept_type} 
+		</if>
+		<if test="dept_code !=null and dept_code !=''">
+			AND dept_code like  CONCAT(CONCAT('%', #{dept_code}), '%')
+		</if>
+		<if test="dept_name !=null and dept_name !=''">
+			AND dept_name like CONCAT(CONCAT('%', #{dept_name}), '%')
+		</if>
+		<if test="dept_mobile !=null and dept_mobile !=''">
+			AND dept_mobile like CONCAT(CONCAT('%', #{dept_mobile}), '%')
+		</if>
+		<if test="dept_url !=null and dept_url !=''">
+			AND dept_url like CONCAT(CONCAT('%', #{dept_url}), '%')
+		</if>
+		<if test="search !=null and search !=''">
+			<!-- AND FIND_IN_SET(dept_id,getDeptChildList(#{search} )) -->
+			AND dept_id in (#{search})
+		</if>
+		ORDER BY 
+			dept_type,create_date
+	</select>
+	
+	<select id="queryDeptParentInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		    dept_id,
+		    dept_code,
+		    dept_name,
+		    dept_mobile,
+		    create_date,
+		    is_use,
+		    dept_money,
+		    ce_allot,
+			ch_allot,
+			s_allot,
+		    dept_ratio,
+		    dept_type,
+		    dept_url,
+		    broker_url,
+		    is_tj_man,
+		    tj_ratio,
+		    dept_parent_id,
+		    dept_parent_id _parentId,
+		    dept_app_id,
+			dept_app_secret,
+			if(dept_type=4,'closed','') as state
+		FROM
+		    t_back_dept_info
+		WHERE 1=1
+			AND FIND_IN_SET(dept_id,getDeptParentList(#{dept_id} ))
+		ORDER BY 
+			dept_type,create_date
+	</select>
+	
+	<select id="queryDeptChildInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		    dept_id,
+		    dept_code,
+		    dept_name,
+		    dept_mobile,
+		    create_date,
+		    is_use,
+		    dept_money,
+		    ce_allot,
+			ch_allot,
+			s_allot,
+		    dept_ratio,
+		    dept_type,
+		    dept_url,
+		    broker_url,
+		    is_tj_man,
+		    tj_ratio,
+		    dept_parent_id,
+		    dept_parent_id _parentId,
+		    dept_app_id,
+			dept_app_secret,
+			if(dept_type=4,'closed','') as state
+		FROM
+		    t_back_dept_info
+		WHERE 1=1
+			AND FIND_IN_SET(dept_id,getDeptChildList(#{dept_id} ))
+		ORDER BY 
+			dept_type,create_date
+	</select>
+	<select id="queryDeptChildNodeInfo" parameterType="hashmap" statementType="CALLABLE"  >
+    <if test="dept_id !=null and dept_id !=''">
+	{		
+		call showDeptNodes(#{dept_id})  
+	}
+	</if>	
+    </select>
+    
+    <select id="queryQuitDeptInfo" parameterType="hashmap" statementType="CALLABLE"  resultType="String">
+    <if test="dept_id !=null and dept_id !=''">
+	{		
+		call Auto_CheckTradeInfo
+		(
+			#{order_date,jdbcType=VARCHAR,mode=IN},
+			#{odept_id,jdbcType=VARCHAR,mode=IN},
+			#{dept_id,jdbcType=VARCHAR,mode=IN},
+			#{dept_type,jdbcType=VARCHAR,mode=IN},			
+			#{retStr,jdbcType=VARCHAR,mode=OUT}
+		)  
+	}
+	</if>	
+    </select>
+    
+    <select id="settlementInfo" parameterType="hashmap" statementType="CALLABLE"  resultType="String">
+    <if test="dept_id !=null and dept_id !=''">
+	{		
+		call Auto_Fee_Closing_Account_Reverse
+		(
+			#{dept_id,jdbcType=VARCHAR,mode=IN},
+			#{retStr,jdbcType=VARCHAR,mode=OUT}
+		)  
+	}
+	</if>	
+    </select>
+    
+    <select id="saveOdeptToNdeptInfo" parameterType="hashmap" statementType="CALLABLE"  >    		
+		call Auto_DeptCODE2Settle(
+		#{oPID},
+		#{oCEID},
+		#{oCHID},
+		#{oSID},
+		#{oAID},
+		#{oDeptID},
+		#{oDeptCODE},
+		#{nPID},
+		#{nCEID},
+		#{nCHID},
+		#{nSID},
+		#{nAID},
+		#{nDeptID},
+		#{nDeptCODE}
+		)	
+    </select> 
+        
+	<select id="queryDeptChildInfoPojo" parameterType="hashmap" resultType="com.acl.pojo.DeptInfo">
+		SELECT
+		    dept_id,
+		    dept_code,
+		    dept_name,
+		    dept_mobile,
+		    create_date,
+		    is_use,
+		    dept_money,
+		    ce_allot,
+			ch_allot,
+			s_allot,
+		    dept_ratio,
+		    dept_type,
+		    dept_url,
+		    broker_url,
+		    is_tj_man,
+		    tj_ratio,
+		    dept_parent_id,
+		    dept_parent_id _parentId,
+		    dept_app_id,
+			dept_app_secret,
+			if(dept_type=4,'closed','') as state
+		FROM
+		    t_back_dept_info
+		WHERE 1=1
+			<!-- AND FIND_IN_SET(dept_id,getDeptChildList(#{dept_id} )) -->
+			AND dept_id = b.id
+		ORDER BY 
+			dept_type,create_date
+	</select>
+	
+	<select id="countDeptInfo" parameterType="hashmap" resultType="map">
+		SELECT count(0) num,fGetNextVal('dept_id') num1  FROM  t_back_dept_info WHERE 1=1
+		<if test="countBy !=null and countBy !='' and countBy == 'codeOrName'">
+			AND
+					dept_code = #{dept_code} 
+	        	OR 
+	       			dept_name = #{dept_name} 
+		</if>
+	</select>
+	
+	<insert id="insertDeptInfo" parameterType="hashmap">
+	INSERT
+	INTO
+	t_back_dept_info
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="dept_id  != null and dept_id !=''">dept_id,</if>
+		<if test="dept_code  != null and dept_code !=''">dept_code,</if>
+		<if test="dept_name  != null and dept_name !=''">dept_name,</if>
+		<if test="dept_mobile  != null and dept_mobile !=''">dept_mobile,</if>
+		<if test="create_date  != null and create_date !=''">create_date,</if>
+		<if test="is_use  != null and is_use !=''">is_use,</if>
+		<if test="dept_money  != null and dept_money !=''">dept_money,</if>
+		<if test="ce_allot  != null and ce_allot !=''">ce_allot,</if>
+		<if test="ch_allot  != null and ch_allot !=''">ch_allot,</if>
+		<if test="s_allot  != null and s_allot !=''">s_allot,</if>
+		<if test="dept_ratio  != null and dept_ratio !=''">dept_ratio,</if>
+		<if test="dept_type  != null and dept_type !=''">dept_type,</if>
+		<if test="dept_url  != null and dept_url !=''">dept_url,</if>
+		<if test="broker_url  != null and broker_url !=''">broker_url,</if>
+		<if test="is_tj_man  != null and is_tj_man !=''">is_tj_man,</if>
+		<if test="tj_ratio  != null and tj_ratio !=''">tj_ratio,</if>
+		<if test="dept_parent_id  != null and dept_parent_id !=''">dept_parent_id,</if>
+		<if test="dept_app_id  != null and dept_app_id !=''">dept_app_id,</if>
+		<if test="dept_app_secret  != null and dept_app_secret !=''">dept_app_secret,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffix="" suffixOverrides=",">
+		<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+		<if test="dept_code  != null and dept_code !=''">#{dept_code},</if>
+		<if test="dept_name  != null and dept_name !=''">#{dept_name},</if>
+		<if test="dept_mobile  != null and dept_mobile !=''">#{dept_mobile},</if>
+		<if test="create_date  != null and create_date !=''">#{create_date},</if>
+		<if test="is_use  != null and is_use !=''">#{is_use},</if>
+		<if test="dept_money  != null and dept_money !=''">#{dept_money},</if>
+		<if test="ce_allot  != null and ce_allot !=''">#{ce_allot},</if>
+		<if test="ch_allot  != null and ch_allot !=''">#{ch_allot},</if>
+		<if test="s_allot  != null and s_allot !=''">#{s_allot},</if>
+		<if test="dept_ratio  != null and dept_ratio !=''">#{dept_ratio},</if>
+		<if test="dept_type  != null and dept_type !=''">#{dept_type},</if>
+		<if test="dept_database  != null and dept_database !=''">#{dept_database},</if>
+		<if test="dept_url  != null and dept_url !=''">#{dept_url},</if>
+		<if test="broker_url  != null and broker_url !=''">#{broker_url},</if>
+		<if test="is_tj_man  != null and is_tj_man !=''">#{is_tj_man},</if>
+		<if test="tj_ratio  != null and tj_ratio !=''">#{tj_ratio},</if>
+		<if test="dept_parent_id  != null and dept_parent_id !=''">#{dept_parent_id},</if>
+		<if test="dept_app_id  != null and dept_app_id !=''">#{dept_app_id},</if>
+		<if test="dept_app_secret  != null and dept_app_secret !=''">#{dept_app_secret},</if>
+	</trim>
+	)
+	</insert>
+	
+	<update id="updateDeptInfo" parameterType="hashmap">
+		UPDATE
+		    t_back_dept_info
+		SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="dept_mobile  != null">dept_mobile=#{dept_mobile},</if>
+			<if test="create_date  != null">create_date=#{create_date},</if>
+			<if test="is_use  != null">is_use=#{is_use},</if>
+			<if test="dept_money  != null">dept_money=#{dept_money},</if>
+			<if test="ce_allot  != null">ce_allot=#{ce_allot},</if>
+			<if test="ch_allot  != null">ch_allot=#{ch_allot},</if>
+			<if test="s_allot  != null">s_allot=#{s_allot},</if>
+			<if test="dept_ratio  != null">dept_ratio=#{dept_ratio},</if>
+			<if test="dept_url  != null">dept_url=#{dept_url},</if>
+			<if test="broker_url  != null">broker_url=#{broker_url},</if>
+			<if test="is_tj_man  != null">is_tj_man=#{is_tj_man},</if>
+			<if test="tj_ratio  != null">tj_ratio=#{tj_ratio},</if>
+			<if test="dept_app_id  != null">dept_app_id=#{dept_app_id},</if>
+			<if test="dept_app_secret  != null">dept_app_secret=#{dept_app_secret},</if>
+		</trim>
+		WHERE
+		    dept_id = #{dept_id}
+	</update>
+	
+	<select id="queryDeptMoneyInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.dept_id,
+			t.dept_code,
+			t.dept_name,
+			t.dept_mobile,
+			t.create_date,
+			t.is_use,
+			t.dept_money,
+			t.ce_allot,
+			t.ch_allot,
+			t.s_allot,
+			t.dept_ratio,
+			t.dept_type,
+			t.dept_url,
+			t.broker_url,
+			t.is_tj_man,
+			t.tj_ratio,
+			t.dept_parent_id,
+			t.dept_parent_id _parentId,
+			t.dept_app_id,
+			t.dept_app_secret,
+			<if test="dept_type!=null and dept_type==4">
+			se.dept_id AS settle_id,
+			</if>
+			ch.dept_id AS ch_id,
+		    ce.dept_id AS ce_id
+		FROM
+			t_back_dept_info t
+		<if test="dept_type!=null and dept_type==4">
+		LEFT JOIN t_back_dept_info se ON se.dept_id = t.dept_parent_id
+		LEFT JOIN t_back_dept_info ch ON ch.dept_id = se.dept_parent_id
+		LEFT JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+		</if>
+		<if test="dept_type!=null and dept_type==3">
+		LEFT JOIN t_back_dept_info ch ON ch.dept_id = t.dept_parent_id
+		LEFT JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+		</if>		
+		WHERE
+		t.dept_type=#{dept_type}			
+		<if test="dept_name !=null and dept_name !=''">
+			AND t.dept_name like CONCAT(CONCAT('%', #{dept_name}), '%')
+		</if>
+		<if test="dept_mobile !=null and dept_mobile !=''">
+			AND t.dept_mobile like CONCAT(CONCAT('%', #{dept_mobile}), '%')
+		</if>	
+		<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_id=#{ce_id}
+	    </if>
+	    <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_id=#{ch_id}
+	    </if>	
+	    <if test="settle_id!=null and settle_id!='' and dept_type!=null and dept_type==4">
+			 AND se.dept_id=#{settle_id}
+		</if>
+		<if test="settle_id!=null and settle_id!='' and dept_type!=null and dept_type==3">
+			 AND t.dept_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			  AND t.dept_id=#{agent_id}
+		</if>
+		<if test="dept_id!=null and dept_id!=''">
+		     AND t.dept_id=#{dept_id}
+		</if>
+		ORDER BY 
+			t.create_date
+	</select>
+	
+	<select id="queryDeptMoneySum" parameterType="hashmap" resultType="map">
+		SELECT		   
+		    IFNULL(sum(t.dept_money),0) as sumdeptmoney		   
+		FROM
+		    t_back_dept_info t
+		<if test="dept_type!=null and dept_type==4">
+		LEFT JOIN t_back_dept_info se ON se.dept_id = t.dept_parent_id
+		LEFT JOIN t_back_dept_info ch ON ch.dept_id = se.dept_parent_id
+		LEFT JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+		</if>
+		<if test="dept_type!=null and dept_type==3">
+		LEFT JOIN t_back_dept_info ch ON ch.dept_id = t.dept_parent_id
+		LEFT JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+		</if>	
+		WHERE t.dept_type=#{dept_type}	
+		<if test="dept_name !=null and dept_name !=''">
+			AND t.dept_name like CONCAT(CONCAT('%', #{dept_name}), '%')
+		</if>
+		<if test="dept_mobile !=null and dept_mobile !=''">
+			AND t.dept_mobile like CONCAT(CONCAT('%', #{dept_mobile}), '%')
+		</if>		
+		<if test="ce_id!=null and ce_id!=''">
+			 AND ce.dept_id=#{ce_id}
+	    </if>
+	    <if test="ch_id!=null and ch_id!=''">
+			 AND ch.dept_id=#{ch_id}
+	    </if>	
+	     <if test="settle_id!=null and settle_id!='' and dept_type!=null and dept_type==4">
+			 AND se.dept_id=#{settle_id}
+		</if>
+		<if test="settle_id!=null and settle_id!='' and dept_type!=null and dept_type==3">
+			 AND t.dept_id=#{settle_id}
+		</if>
+		<if test="agent_id!=null and agent_id!=''">
+			  AND t.dept_id=#{agent_id}
+		</if>
+		<if test="dept_id!=null and dept_id!=''">
+		     AND t.dept_id=#{dept_id}
+		</if>
+	</select>
+	
+	<select id="queryOdeptOrNdeptInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			T1.dept_id,
+			T1.dept_code,
+			T1.dept_name,
+			T2.dept_id AS d_id,
+			T2.dept_code AS d_code,
+			T2.dept_name AS d_name,
+			T3.dept_id AS s_id,
+			T3.dept_code AS s_code,
+			T3.dept_name AS s_name,
+			T4.dept_id AS q_id,
+			T4.dept_code AS q_code,
+			T4.dept_name AS q_name,
+			T5.dept_id AS c_id,
+			T5.dept_code AS c_code,
+			T5.dept_name AS c_name,
+			T6.dept_id AS p_id,
+			T6.dept_code AS p_code,
+			T6.dept_name AS p_name
+		FROM
+			t_back_dept_info T1
+		LEFT JOIN t_back_dept_info T2 ON T1.dept_parent_id = t2.dept_id
+		LEFT JOIN t_back_dept_info T3 ON T2.dept_parent_id = t3.dept_id
+		LEFT JOIN t_back_dept_info T4 ON T3.dept_parent_id = t4.dept_id
+		LEFT JOIN t_back_dept_info T5 ON T4.dept_parent_id = t5.dept_id
+		LEFT JOIN t_back_dept_info T6 ON T5.dept_parent_id = t6.dept_id
+		WHERE
+			T1.dept_id = #{odept_id}
+		UNION
+			SELECT
+				T1.dept_id,
+				T1.dept_code,
+				T1.dept_name,
+				T2.dept_id AS d_id,
+				T2.dept_code AS d_code,
+				T2.dept_name AS d_name,
+				T3.dept_id AS s_id,
+				T3.dept_code AS s_code,
+				T3.dept_name AS s_name,
+				T4.dept_id AS q_id,
+				T4.dept_code AS q_code,
+				T4.dept_name AS q_name,
+				T5.dept_id AS c_id,
+				T5.dept_code AS c_code,
+				T5.dept_name AS c_name,
+				T6.dept_id AS p_id,
+				T6.dept_code AS p_code,
+				T6.dept_name AS p_name
+			FROM
+				t_back_dept_info T1
+			LEFT JOIN t_back_dept_info T2 ON T1.dept_parent_id = t2.dept_id
+			LEFT JOIN t_back_dept_info T3 ON T2.dept_parent_id = t3.dept_id
+			LEFT JOIN t_back_dept_info T4 ON T3.dept_parent_id = t4.dept_id
+			LEFT JOIN t_back_dept_info T5 ON T4.dept_parent_id = t5.dept_id
+			LEFT JOIN t_back_dept_info T6 ON T5.dept_parent_id = t6.dept_id
+			WHERE
+				T1.dept_id = #{ndept_id}	
+	</select>
+	
+	<select id="queryDeptBalanceInfo" parameterType="hashmap" resultType="map">
+			SELECT
+				dept_code,
+				dept_name,
+				dept_mobile,
+				dept_money
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_type = #{type}
+			AND dept_id = #{dept_id}
+	</select>
+	
+	<select id="queryDeptUserBalanceInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			w.user_id wid,
+			u.user_id uid,
+			u.user_name,
+			u.user_mobile,
+			w.user_money
+		FROM
+			t_front_user_wallet w
+			LEFT OUTER JOIN t_front_user_info u ON w.user_id = u.user_id
+			WHERE
+			w.user_id IN (
+			SELECT
+			user_id
+		FROM
+			t_front_user_info
+			WHERE
+			is_use = 4
+			<if test="type !=null and type==3">
+			AND AGENT_ID in (select dept_id from t_back_dept_info where dept_parent_id=#{dept_id})
+			</if>
+			<if test="type !=null and type==4">
+			AND AGENT_ID = #{dept_id}
+			</if>
+			)
+	</select>
+	
+	<select id="queryDeptBrokerBalanceInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			broker_name,
+			broker_mobile,
+			broker_money
+			FROM
+			t_front_broker
+		WHERE
+			is_use = 4
+			AND broker_parent_id !='-1'	
+			AND dept_id in 
+			(
+			<if test="type !=null and type==3">
+				SELECT
+			dept_id
+		FROM
+			t_back_dept_info
+		WHERE
+			dept_parent_id = #{dept_id}
+		UNION
+			SELECT
+				dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id IN (
+					SELECT
+						dept_id
+					FROM
+						t_back_dept_info
+					WHERE
+						dept_parent_id = #{dept_id}
+				)
+	</if>
+	<if test="type !=null and type==4">
+	SELECT
+			dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id = #{dept_id}
+	</if>		
+	)
+	</select>	
+	
+	<select id="queryDeptBalanceCount" parameterType="hashmap" resultType="map">
+		SELECT
+				sum(dept_money) as sumdeptmoney
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_type = #{type}
+			AND dept_id = #{dept_id}
+	</select>
+	
+	<select id="queryUserBalanceCount" parameterType="hashmap" resultType="map">
+		SELECT
+			CASE WHEN ISNULL(sum(w.user_money)) 
+				THEN
+					0
+				ELSE
+					SUM(w.user_money)
+				END AS sumusermoney	
+		FROM
+			t_front_user_wallet w
+			LEFT OUTER JOIN t_front_user_info u ON w.user_id = u.user_id
+			WHERE
+			w.user_id IN (
+			SELECT
+			user_id
+		FROM
+			t_front_user_info
+			WHERE
+			is_use = 4
+			<if test="type !=null and type==3">
+			AND AGENT_ID in (select dept_id from t_back_dept_info where dept_parent_id=#{dept_id})
+			</if>
+			<if test="type !=null and type==4">
+			AND AGENT_ID = #{dept_id}
+			</if>
+			)
+	</select>
+	<select id="queryBrokerBalanceCount" parameterType="hashmap" resultType="map">
+		SELECT		
+			CASE WHEN ISNULL(sum(broker_money)) 
+				THEN
+					0
+				ELSE
+					SUM(broker_money)
+				END AS sumbrokermoney		
+			FROM
+			t_front_broker
+		WHERE
+		is_use=4 
+		AND broker_parent_id !='-1'	
+		AND dept_id in 
+			(
+			<if test="type !=null and type==3">
+				SELECT
+			dept_id
+		FROM
+			t_back_dept_info
+		WHERE
+			dept_parent_id = #{dept_id}
+		UNION
+			SELECT
+				dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id IN (
+					SELECT
+						dept_id
+					FROM
+						t_back_dept_info
+					WHERE
+						dept_parent_id = #{dept_id}
+				)
+	</if>
+	<if test="type !=null and type==4">
+	SELECT
+			dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id = #{dept_id}
+	</if>		
+	)
+	</select>
+	
+	<select id="queryDeptsInfo" parameterType="hashmap" resultType="map">
+		<if test="type !=null and type ==4">
+			SELECT
+				GROUP_CONCAT(dept_id) dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id = #{dept_id}
+		</if>
+		<if test="type !=null and type ==3">
+			SELECT
+				GROUP_CONCAT(tb.dept_id) dept_id
+			FROM 
+			(
+				SELECT
+						dept_id
+					FROM
+						t_back_dept_info
+					WHERE
+						dept_parent_id = #{dept_id}
+				UNION
+				SELECT dept_id from t_back_dept_info where dept_parent_id in(
+					SELECT
+						dept_id
+					FROM
+						t_back_dept_info
+					WHERE
+						dept_parent_id = #{dept_id})) tb 
+		</if>
+	</select>
+	
+	<select id="queryUserResultExport" parameterType="hashmap" resultType="map">
+			SELECT
+			u.user_id '用户ID',
+			u.user_name '用户名',
+			u.user_mobile '用户电话',
+			w.user_money '用户余额'
+		FROM
+			t_front_user_wallet w
+			LEFT OUTER JOIN t_front_user_info u ON w.user_id = u.user_id
+			WHERE
+			w.user_id IN (
+			SELECT
+			user_id
+		FROM
+			t_front_user_info
+			WHERE
+			is_use = 4
+			<if test="type !=null and type==3">
+			AND AGENT_ID in (select dept_id from t_back_dept_info where dept_parent_id=#{dept_id})
+			</if>
+			<if test="type !=null and type==4">
+			AND AGENT_ID = #{dept_id}
+			</if>
+			)
+	</select>
+	
+	<select id="queryBrokerResultExport" parameterType="hashmap" resultType="map">
+		SELECT
+			broker_id,
+			broker_name '经纪人名',
+			broker_mobile '经纪人电话',
+			broker_money '经纪人余额'
+			FROM
+			t_front_broker
+		WHERE
+			is_use = 4 
+			AND broker_parent_id !='-1'	
+			AND dept_id in 
+			(
+			<if test="type !=null and type==3">
+				SELECT
+			dept_id
+		FROM
+			t_back_dept_info
+		WHERE
+			dept_parent_id = #{dept_id}
+		UNION
+			SELECT
+				dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id IN (
+					SELECT
+						dept_id
+					FROM
+						t_back_dept_info
+					WHERE
+						dept_parent_id = #{dept_id}
+				)
+	</if>
+	<if test="type !=null and type==4">
+	SELECT
+			dept_id
+			FROM
+				t_back_dept_info
+			WHERE
+				dept_parent_id = #{dept_id}
+	</if>		
+	)
+	</select>
+
+<update id="updUserMobileInfo" parameterType="hashmap">
+		UPDATE t_front_user_info
+		<set>
+			<trim suffixOverrides=",">
+				<if test="user_mobile!=null and user_mobile!=''">user_mobile=#{user_mobile},</if>				
+			</trim>
+		</set>
+		WHERE user_id=#{user_id}
+	</update>
+	
+	<update id="updBrokerMobileInfo" parameterType="hashmap">
+		UPDATE t_front_broker
+		<set>
+			<trim suffixOverrides=",">
+				<if test="broker_mobile!=null and broker_mobile!=''">broker_mobile=#{broker_mobile},</if>				
+			</trim>
+		</set>
+		WHERE broker_id=#{broker_id}
+	</update>
+
+	<select id="findDeptInfoByDeptName" parameterType="hashmap" resultType="map">
+		SELECT
+		dept_id,
+		dept_code,
+		dept_name,
+		dept_mobile,
+		create_date,
+		is_use,
+		dept_money,
+		ce_allot,
+		ch_allot,
+		s_allot,
+		dept_ratio,
+		dept_type,
+		dept_url,
+		broker_url,
+		is_tj_man,
+		tj_ratio,
+		dept_parent_id,
+		dept_parent_id _parentId,
+		dept_app_id,
+		dept_app_secret
+		FROM
+		t_back_dept_info
+		WHERE 1=1
+		<if test="dept_id !=null and dept_id !=''">
+			AND dept_id = #{dept_id}
+		</if>
+		<if test="action !=null and action !='' and action == 'init'">
+			AND dept_type &lt; 5
+		</if>
+		<if test="dept_parent_id !=null and dept_parent_id !=''">
+			AND dept_parent_id = #{dept_parent_id}
+		</if>
+		<if test="dept_ratio !=null and dept_ratio !=''">
+			AND dept_ratio = #{dept_ratio}
+		</if>
+		<if test="dept_type !=null and dept_type !=''">
+			AND dept_type = #{dept_type}
+		</if>
+		<if test="dept_code !=null and dept_code !=''">
+			AND dept_code like  CONCAT(CONCAT('%', #{dept_code}), '%')
+		</if>
+		<if test="dept_name !=null and dept_name !=''">
+			AND dept_name like CONCAT(CONCAT('%', #{dept_name}), '%')
+		</if>
+		<if test="dept_mobile !=null and dept_mobile !=''">
+			AND dept_mobile like CONCAT(CONCAT('%', #{dept_mobile}), '%')
+		</if>
+		<if test="dept_url !=null and dept_url !=''">
+			AND dept_url like CONCAT(CONCAT('%', #{dept_url}), '%')
+		</if>
+		<if test="search !=null and search !=''">
+			<!-- AND FIND_IN_SET(dept_id,getDeptChildList(#{search} )) -->
+			AND dept_id in (#{search})
+		</if>
+		<if test="dept_name2 !=null and dept_name2 !=''">
+			AND dept_name like CONCAT(CONCAT('%', #{dept_name2}), '%')
+		</if>
+		ORDER BY
+		dept_type,create_date
+	</select>
+</mapper>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformExceptionMachineInfoDao">
+	<select id="queryExceptionMachineInfoPageList" parameterType="hashmap" resultType="map">
+		SELECT
+		t.id,
+		t.machineSN,
+		t.machinecode,
+		t.merchantcode,
+		t.attagentcode,
+		t.isbound,
+		t.machinetype,
+		t.machinemodel,
+		t.warehousingtype,
+		t.vipstatus,
+		t.attagentname,
+		t.merchantname,
+		t.machineryT1rate,
+		t.machineryT0rate,
+		t.machineryamount,
+		m.`name` AS brindname,
+		t.del_tag,
+		t.batchcode,
+		t.dotcode,
+		t.dotname,
+		t.isencryption,
+		t.machineident,
+		t.policyident,
+		t.allocationnum,
+		t.ifdeposit,
+		t.staffid,
+		t.brindid,
+		t1.staffcode,
+		CONCAT_WS(
+		'-',
+		bd.dept_name,
+		t1.staffname
+		) AS staffname,
+		t.create_time,
+		t.create_day,
+		t.update_time
+		FROM
+		t_data_machine_info t
+		LEFT JOIN t_front_brand_rule m ON t.brindid = m.id
+		LEFT JOIN t_data_company_staff t1 ON t.staffid = t1.id
+		LEFT JOIN t_back_dept_info bd ON t1.branch = bd.dept_id
+		WHERE
+		t1.isstate = '1'
+
+		<if test="id  != null and id !=''">
+			AND t.id =#{id}
+		</if>
+
+		<if test="staffname  != null and staffname !=''">
+			AND t1.staffname like CONCAT(CONCAT(#{staffname}), '%')
+		</if>
+
+		<if test="machinecode  != null and machinecode !=''">
+			AND t.machinecode = #{machinecode}
+		</if>
+
+		<!--<if test="update_time  != null and update_time !=''">
+			AND  (DATE_FORMAT(t.update_time,'%Y-%c-%d')>= #{update_time}
+			OR  DATE_FORMAT(t.create_time,'%Y-%c-%d')>= #{update_time} )
+		</if>-->
+
+        <if test="update_time  != null and update_time !=''">
+            <if test="ischange  == 1">
+                AND  (DATE_FORMAT(t.update_time,'%Y-%c-%d') <![CDATA[< STR_TO_DATE( ]]>  #{update_time} <![CDATA[ ,'%Y-%c-%d') ]]>
+                OR  (t.update_time IS NULL AND  DATE_FORMAT(t.create_time,'%Y-%c-%d') <![CDATA[< STR_TO_DATE( ]]>#{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]> ) )
+            </if>
+            <if test="ischange  == 2">
+                AND  (DATE_FORMAT(t.update_time,'%Y-%c-%d') <![CDATA[>= STR_TO_DATE( ]]> #{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]>
+                OR  DATE_FORMAT(t.create_time,'%Y-%c-%d') <![CDATA[>= STR_TO_DATE( ]]> #{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]> )
+            </if>
+        </if>
+
+	</select>
+
+	<update id="updateExceptionMachineinfo" parameterType="hashmap">
+        UPDATE
+        t_data_machine_info
+        set
+        staffid=#{staffid},update_time = now(), attagentcode=#{agentcode}, attagentname=#{agentname}
+        WHERE id=#{machine_id}
+    </update>
+
+    <select id="queryExceptionMachineInfoById" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id as machineid,
+        t.machineSN,
+        t.machinecode,
+        t.merchantcode,
+        t.attagentcode,
+        t.isbound,
+        t.machinetype,
+        t.machinemodel,
+        t.warehousingtype,
+        t.vipstatus,
+        t.attagentname,
+        t.merchantname,
+        t.machineryT1rate,
+        t.machineryT0rate,
+        t.machineryamount,
+        t.del_tag,
+        t.batchcode,
+        t.dotcode,
+        t.dotname,
+        t.isencryption,
+        t.machineident,
+        t.policyident,
+        t.allocationnum,
+        t.ifdeposit,
+        t.staffid,
+        t.brindid,
+        t.create_time,
+        t.create_day,
+        t.update_time
+        FROM
+        t_data_machine_info t
+        WHERE
+        1=1
+        <if test="machineid  != null and machineid !=''">
+            AND t.id =#{machineid}
+        </if>
+
+        <if test="machinecode  != null and machinecode !=''">
+            AND t.machinecode = #{machinecode}
+        </if>
+        <if test="brindnameid  != null and brindnameid !=''" >
+                AND t.brindid = #{brindnameid}
+        </if>
+
+        <if test="update_time  != null and update_time !=''">
+            <if test="ischange  == 1">
+                AND  (DATE_FORMAT(t.update_time,'%Y-%c-%d') <![CDATA[< STR_TO_DATE( ]]>  #{update_time} <![CDATA[ ,'%Y-%c-%d') ]]>
+                OR  (t.update_time IS NULL AND  DATE_FORMAT(t.create_time,'%Y-%c-%d') <![CDATA[< STR_TO_DATE( ]]>#{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]> ) )
+            </if>
+            <if test="ischange  == 2">
+                AND  (DATE_FORMAT(t.update_time,'%Y-%c-%d') <![CDATA[>= STR_TO_DATE( ]]> #{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]>
+                OR  DATE_FORMAT(t.create_time,'%Y-%c-%d') <![CDATA[>= STR_TO_DATE( ]]> #{update_time}  <![CDATA[ ,'%Y-%c-%d') ]]> )
+            </if>
+        </if>
+
+    </select>
+
+   <!-- <insert id="intertMachineTempAllocation" parameterType="hashmap">
+        INSERT INTO t_data_machine_info
+        (id,machineSN,machinecode,batchcode,isbound,machinetype,attagentcode,attagentname,
+        perattagentname,merchantcode,merchantname,dotcode,dotname,isencryption,
+        machineident,policyident,allocationnum,ifdeposit,staffid,brindid,create_time,create_day,remore_time
+        )VALUES
+        <foreach collection="itemMap" separator="," item="item">
+            (#{item.id},#{item.machineSN},#{item.machinecode},#{item.batchcode},#{item.isbound},#{item.machinetype},
+            #{item.attagentcode},#{item.attagentname},#{item.perattagentname},#{item.merchantcode},#{item.merchantname},#{item.dotcode},
+            #{item.dotname},#{item.isencryption},#{item.machineident},#{item.policyident},#{item.allocationnum},
+            #{item.ifdeposit}, #{item.staffid},#{item.brindid},#{item.create_time},#{item.create_day},now()
+            )
+
+        </foreach>
+    </insert>-->
+
+    <insert id="intertMachineTempAllocation" parameterType="hashmap">
+        INSERT INTO t_data_machine_info_temp (
+        <trim suffixOverrides=",">
+            <if test="id!=null and id!=''">id,</if>
+            <if test="machineid!=null and machineid!=''">machineid,</if>
+            <if test="machineSN!=null and machineSN!=''">machineSN,</if>
+            <if test="machinecode!=null and machinecode!=''">machinecode,</if>
+            <if test="batchcode!=null and batchcode!=''">batchcode,</if>
+            <if test="isbound!=null and isbound!=''">isbound,</if>
+            <if test="machinetype!=null and machinetype!=''">machinetype,</if>
+            <if test="attagentcode!=null and attagentcode!=''">attagentcode,</if>
+            <if test="attagentname!=null and attagentname!=''">attagentname,</if>
+            <if test="perattagentname!=null and perattagentname!=''">perattagentname,</if>
+
+            <if test="merchantcode!=null and merchantcode!=''">merchantcode,</if>
+            <if test="merchantname!=null and merchantname!=''">merchantname,</if>
+            <if test="dotcode!=null and dotcode!=''">dotcode,</if>
+            <if test="dotname!=null and dotname!=''">dotname,</if>
+            <if test="isencryption!=null and isencryption!=''">isencryption,</if>
+            <if test="machineident!=null and machineident!=''">machineident,</if>
+            <if test="policyident!=null and policyident!=''">policyident,</if>
+            <if test="allocationnum!=null and allocationnum!=''">allocationnum,</if>
+            <if test="ifdeposit!=null and ifdeposit!=''">ifdeposit,</if>
+            <if test="staffid!=null and staffid!=''">staffid,</if>
+            <if test="brindid!=null and brindid!=''">brindid,</if>
+            <if test="create_time!=null and create_time!=''">create_time,</if>
+
+            <if test="create_day!=null and create_day!=''">create_day,</if>
+            <if test="remore_time!=null and remore_time!=''">remore_time,</if>
+        </trim>
+        )VALUES(
+        <trim suffixOverrides=",">
+
+            <if test="id!=null and id!=''">#{id},</if>
+            <if test="machineid!=null and machineid!=''">#{machineid},</if>
+            <if test="machineSN!=null and machineSN!=''">#{machineSN},</if>
+            <if test="machinecode!=null and machinecode!=''">#{machinecode},</if>
+            <if test="batchcode!=null and batchcode!=''">#{batchcode},</if>
+            <if test="isbound!=null and isbound!=''">#{isbound},</if>
+            <if test="machinetype!=null and machinetype!=''">#{machinetype},</if>
+            <if test="attagentcode!=null and attagentcode!=''">#{attagentcode},</if>
+            <if test="attagentname!=null and attagentname!=''">#{attagentname},</if>
+            <if test="perattagentname!=null and perattagentname!=''">#{perattagentname},</if>
+
+            <if test="merchantcode!=null and merchantcode!=''">#{merchantcode},</if>
+            <if test="merchantname!=null and merchantname!=''">#{merchantname},</if>
+            <if test="dotcode!=null and dotcode!=''">#{dotcode},</if>
+            <if test="dotname!=null and dotname!=''">#{dotname},</if>
+            <if test="isencryption!=null and isencryption!=''">#{isencryption},</if>
+            <if test="machineident!=null and machineident!=''">#{machineident},</if>
+            <if test="policyident!=null and policyident!=''">#{policyident},</if>
+            <if test="allocationnum!=null and allocationnum!=''">#{allocationnum},</if>
+            <if test="ifdeposit!=null and ifdeposit!=''">#{ifdeposit},</if>
+            <if test="staffid!=null and staffid!=''">#{staffid},</if>
+            <if test="brindid!=null and brindid!=''">#{brindid},</if>
+            <if test="create_time!=null and create_time!=''">#{create_time},</if>
+
+            <if test="create_day!=null and create_day!=''">#{create_day},</if>
+            <if test="remore_time!=null and remore_time!=''"> now(),</if>
+        </trim>
+        )
+    </insert>
+
+
+</mapper>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.sys.dao.SysUserInfoDao">
+	<select id="queryUserInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			t.user_id,
+			t.user_name,
+			t.user_password,
+			t.user_icon,
+			t.user_nick_name,
+			t.user_gender,
+			t.user_mobile,
+			t.user_qq,
+			t.dept_id,
+			t.is_use,
+			DATE_FORMAT(t.create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+			t.user_ip,
+			t.login_date,
+			t1.dict_name,
+			t2.dept_name,
+      t3.dict_name as  user_dict_gender
+		FROM
+			t_back_user t
+		LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use
+    LEFT JOIN t_back_dict_info t3 ON t3.dict_id=t.user_gender
+		LEFT JOIN t_back_dept_info t2 ON t2.dept_id = t.dept_id
+		WHERE 1=1 and
+		t1.dict_code = '1002' 
+        and t3.dict_code='1003'
+      <if test="login_name!=null and login_name!=''">
+			AND t.user_name like CONCAT(CONCAT( #{login_name}), '%')
+		</if>
+		<if test="user_name!=null and user_name!=''">
+			AND t.user_nick_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="mobile!=null and mobile!=''">
+			AND t.user_mobile like CONCAT(CONCAT(#{mobile}), '%')
+		</if>
+		  <if test="idept_id!=null and idept_id!=''">
+			AND t.dept_id = #{idept_id}
+		</if>  
+      
+			order by  t.create_date desc
+	 	
+	</select>
+
+
+	<insert id="insertUserInfo" parameterType="hashmap">
+		insert into t_back_user (
+		<trim suffix="" suffixOverrides=",">
+			<if test="user_id  != null and user_id !=''">user_id,</if>
+			<if test="user_name  != null and user_name !=''">user_name,</if>
+			<if test="user_password  != null and user_password !=''">user_password,</if>
+			<if test="user_nick_name  != null and user_nick_name !=''">user_nick_name,</if>
+			<if test="user_icon  != null and user_icon !=''">user_icon,</if>
+			<if test="user_gender  != null and user_gender !=''">user_gender,</if>
+			<if test="user_mobile  != null and user_mobile !=''">user_mobile,</if>
+			<if test="user_qq  != null and user_qq !=''">user_qq,</if>
+			<if test="is_use  != null and is_use !=''">is_use,</if>
+			<if test="dept_id  != null and dept_id !=''">dept_id,</if>
+			<if test="create_date  != null and create_date !=''">create_date,</if>
+			<if test="user_ip  != null and user_ip !=''">user_ip,</if>
+			<if test="login_date  != null and login_date !=''">login_date,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="user_id  != null and user_id !=''">#{user_id},</if>
+			<if test="user_name  != null and user_name !=''">#{user_name},</if>
+			<if test="user_password  != null and user_password !=''">#{user_password},</if>
+			<if test="user_nick_name  != null and user_nick_name !=''">#{user_nick_name},</if>
+			<if test="user_icon  != null and user_icon !=''">#{user_icon},</if>
+			<if test="user_gender  != null and user_gender !=''">#{user_gender},</if>
+			<if test="user_mobile  != null and user_mobile !=''">#{user_mobile},</if>
+			<if test="user_qq  != null and user_qq !=''">#{user_qq},</if>
+			<if test="is_use  != null and is_use !=''">#{is_use},</if>
+			<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+			<if test="create_date  != null and create_date !=''">#{create_date},</if>
+			<if test="user_ip  != null and user_ip !=''">#{user_ip},</if>
+			<if test="login_date  != null and login_date !=''">#{login_date},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateUserInfo" parameterType="hashmap">
+		UPDATE t_back_user SET 
+		<trim suffix="" suffixOverrides=",">
+			<if test="user_name  != null and user_name !=''">user_name=#{user_name},</if>
+			<if test="user_password  != null and user_password !=''">user_password=#{user_password},</if>
+			<if test="user_nick_name  != null and user_nick_name !=''">user_nick_name=#{user_nick_name},</if>
+			<if test="user_icon  != null and user_icon !=''">user_icon=#{user_icon},</if>
+			<if test="user_gender  != null and user_gender !=''">user_gender=#{user_gender},</if>
+			<if test="user_mobile  != null and user_mobile !=''">user_mobile=#{user_mobile},</if>
+			<if test="user_qq  != null and user_qq !=''">user_qq=#{user_qq},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+			<if test="dept_id  != null and dept_id !=''">dept_id=#{dept_id},</if>
+			<if test="user_ip  != null and user_ip !=''">user_ip=#{user_ip},</if>
+			<if test="error_count  != null and error_count !=''">error_count=#{error_count},</if>
+			<if test="login_date  != null and login_date !=''">login_date=#{login_date},</if>
+			<if test="auth_code  != null and auth_code !=''">auth_code=#{auth_code},</if>
+			<if test="decryption_code  != null and decryption_code !=''">decryption_code=#{decryption_code},</if>
+		</trim>
+		WHERE user_id=#{user_id}
+	</update>
+	
+	<select id="queryDeptInfoByChildList" parameterType="hashmap" resultType="map">
+		<!-- 该方法暂时没有用到 -->
+		SELECT 
+	        DEPT_ID id,
+	        CASE dept_type WHEN 1 THEN CONCAT('1_',dept_name ) 
+	        WHEN 2 THEN CONCAT('2_',dept_name ) 
+	        WHEN 3 THEN CONCAT('3_',dept_name ) 
+	        WHEN 4 THEN CONCAT('4_',dept_name ) 
+	        WHEN 5 THEN CONCAT('5_',dept_name ) 
+	        ELSE dept_name END as text
+		FROM t_back_dept_info
+		WHERE 1=1
+			AND FIND_IN_SET(DEPT_ID,getDeptChildList(#{dept_id} ))
+	  </select>
+	  
+	  <select id="queryTreeDeptInfo" parameterType="hashmap" resultType="map">
+		SELECT  DEPT_ID 
+	      ,DEPT_NAME 
+	       FROM t_back_dept_info v
+	       where v.dept_parent_id=#{dept_id}
+	  </select>
+	  
+	  <select id="userValidate" parameterType="map" resultType="map">
+	    SELECT user_name FROM  t_back_user WHERE user_name = #{name} 
+	  </select>
+	  
+	  <select id="mobileValidate" parameterType="map" resultType="map">
+	    SELECT user_mobile FROM  t_back_user WHERE user_mobile = #{name} 
+	  </select>
+	  
+	 <update id="resetUserInfoPwd" parameterType="map">
+      UPDATE 
+         t_back_user 
+      SET 
+         user_password = #{user_password}
+      WHERE 
+         user_id = #{user_id}
+    </update>
+    
+     <select id="queryRoleMenuBase" parameterType="map" resultType="map">
+		    select t5.menu_id,t5.menu_url,t5.menu_name,t5.is_leaf,t5.menu_parent_id from t_back_user  t1
+			LEFT JOIN t_back_user_role t2  on t1.user_id=t2.user_id 
+			LEFT JOIN t_back_role t3       on t2.role_id= t3.role_id
+			LEFT JOIN t_back_role_menu t4  on t3.role_id=t4.role_id 
+			LEFT JOIN t_back_menu t5       on t4.menu_id=t5.menu_id
+			where t1.user_id=#{user_id}
+			and t5.menu_url is not null
+	  </select>
+    
+  <update id="restPwd" parameterType="map">
+      UPDATE 
+         t_admin_user 
+      SET 
+         PWD = #{pwd}
+      WHERE 
+         USER_ID = #{user_id}
+    </update>
+    <select id="queryUserDeptInfo" parameterType="hashmap" resultType="map">
+    SELECT
+       dept_id
+    FROM
+       t_back_user
+    WHERE 
+       user_id=#{user_id}
+    </select>
+    <delete id="deleteUserRole" parameterType="hashmap">
+		DELETE
+		FROM
+		t_back_user_role
+		WHERE
+		user_id=#{user_id}
+	</delete>
+	
+	<select id="queryUserBalanceInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			u.user_id,
+			u.user_name,
+			user_mobile,
+			w.user_money
+		FROM
+			t_front_user_info u
+		INNER JOIN t_front_user_wallet w ON u.user_id = w.user_id
+		WHERE
+		1=1
+		<if test="mobile  != null and mobile !=''">	
+		 AND u.user_mobile = #{mobile}
+		</if>
+		<if test="user_id  != null and user_id !=''">	
+		 AND u.user_id = #{user_id}
+		</if>		
+	  </select>
+	  
+	<select id="queryReportUserBalanceInfo" parameterType="hashmap" resultType="map">
+		SELECT
+			u.user_id,
+			u.user_name,
+			user_mobile,
+			w.user_money
+		FROM
+			t_front_user_info u
+		INNER JOIN t_front_user_wallet w ON u.user_id = w.user_id
+		WHERE
+		1=1
+		<if test="mobile  != null and mobile !=''">	
+		 AND u.user_mobile = #{mobile}
+		</if>
+		<if test="user_id  != null and user_id !=''">	
+		 AND u.user_id = #{user_id}
+		</if>		
+	  </select>
+	  
+<select id="queryUserBalanceExport" parameterType="hashmap" resultType="map">
+		SELECT
+			*
+		FROM
+			user_inactive;
+	</select>
+
+	<update id="updateUserMobile" parameterType="map">
+		UPDATE
+		user_inactive
+		SET
+		user_name = #{user_mb}
+		WHERE
+		user_id = #{user_id}
+	</update>
+
+	<delete id="deleteStaffUser" parameterType="hashmap">
+		DELETE
+		FROM
+		t_back_user
+		WHERE
+		user_id=#{user_id}
+	</delete>
+	
+</mapper>

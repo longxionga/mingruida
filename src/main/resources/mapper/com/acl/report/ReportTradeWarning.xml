@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.report.dao.IReportTradeWarningDao">
+    <!-- 查询用户预警信息 -->
+    <select id="queryReportTradeWarning" parameterType="hashmap" resultType="map">
+        SELECT
+        t.user_id,
+        u.user_name,
+        u.user_mobile,
+        t.brokerage_amount,
+        t.threshold_amount,
+        t.record_date,
+        t.create_time,
+        b.broker_name,
+        b.broker_mobile as mobile,
+        b.broker_parent_id,
+        b.dept_id as dept_id,
+        d.dept_name as dept_name,
+        d1.dept_id as agent_id,
+        d1.dept_name as agent_name,
+        d2.dept_id as settle_id,
+        d2.dept_name as settle_name,
+        d3.dept_id as ch_id,
+        d3.dept_name as ch_name,
+        d4.dept_id as ce_id,
+        d4.dept_name as ce_name
+        FROM t_user_day_brokerage_threshold t
+        LEFT JOIN t_front_user_info u on u.user_id=t.user_id
+        LEFT JOIN t_front_broker b ON u.broker_id=b.broker_id
+        LEFT JOIN t_back_dept_info d ON d.dept_id=b.dept_id
+        LEFT JOIN t_back_dept_info d1 ON d1.dept_id=d.dept_parent_id
+        LEFT JOIN t_back_dept_info d2 ON d2.dept_id=d1.dept_parent_id
+        LEFT JOIN t_back_dept_info d3 ON d3.dept_id=d2.dept_parent_id
+        LEFT JOIN t_back_dept_info d4 ON d4.dept_id=d3.dept_parent_id
+        WHERE
+        1=1
+        <if test="user_name!=null and user_name!=''">
+            AND u.user_name like CONCAT(CONCAT(#{user_name}), '%')
+        </if>
+        <if test="broker_name!=null and broker_name!=''">
+            AND b.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+        </if>
+        <if test="user_mobile!=null and user_mobile!=''">
+            AND u.user_mobile=#{user_mobile}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND b.broker_mobile=#{mobile}
+        </if>
+        <if test="start_date!=null and start_date!=''">
+            AND t.record_date &gt;=#{start_date}
+        </if>
+        <if test="end_date!=null and end_date!=''">
+            AND t.record_date &lt;=#{end_date}
+        </if>
+        <if test="ce_id!=null and ce_id!=''">
+            AND d4.dept_id=#{ce_id}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND d3.dept_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND d2.dept_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND d1.dept_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND b.dept_id=#{DID}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.report.dao.IReportProfitlossDao">
+<!-- 查询用户流水信息 -->
+<select id="queryReportUserProfitloss" parameterType="hashmap" resultType="map">
+	SELECT
+	t.id,
+	t.user_id,
+	t.amount,
+	t.balance,
+	t.operate,
+	t.purpose,
+	t.correlation,
+	t.description,
+	DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+	DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+	t.del_tag,
+	d.dict_name,
+	u.agent_id,
+	u.settle_id,
+	u.ch_id,
+	u.ce_id,
+	u.user_name,
+	u.mobile
+	FROM
+	t_user_capital_billing t LEFT JOIN t_back_dict_info d ON d.dict_code='1025' and t.purpose=d.dict_id
+	LEFT JOIN t_front_user_info u ON t.user_id=u.user_id
+	<if test="purpose!=null and purpose!=''">
+		 AND t.purpose =#{purpose}
+		 </if> 
+		<if test="user_name!=null and user_name!=''">
+		 AND u.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		 </if>
+		 <if test="mobile!=null and mobile!=''">
+		 AND u.mobile=#{mobile}
+		 </if> 
+		 <if test="start_date!=null and start_date!=''">
+		 AND t.create_time &gt;=#{start_date}
+		 </if>
+		 <if test="end_date!=null and end_date!=''">
+		 AND t.create_time &lt;=#{end_date}
+		 </if>
+		 <if test="ce_id!=null and ce_id!=''">
+		 AND u.ce_id=#{ce_id}
+		 </if>
+		  <if test="ch_id!=null and ch_id!=''">
+		 AND u.ch_id=#{ch_id}
+		 </if>
+		  <if test="settle_id!=null and settle_id!=''">
+		 AND u.settle_id=#{settle_id}
+		 </if>
+		  <if test="agent_id!=null and agent_id!=''">
+		 AND u.agent_id=#{agent_id}
+		 </if>
+	ORDER  BY t.create_time DESC
+</select>
+
+<!-- 统计用户充值信息-->
+<select id="queryReportUserInto" parameterType="hashmap" resultType="map">
+	SELECT
+	IFNULL(sum(amount), 0) AS intoCount
+	FROM
+	t_user_capital_billing t
+	LEFT JOIN t_front_user_info u ON t.user_id = u.user_id
+	WHERE
+	t.purpose = '101'
+	<if test="user_name!=null and user_name!=''">
+		AND u.user_name like CONCAT(CONCAT(#{user_name}), '%')
+	</if>
+	<if test="mobile!=null and mobile!=''">
+		AND u.mobile=#{mobile}
+	</if>
+	<if test="start_date!=null and start_date!=''">
+		AND t.create_time &gt;=#{start_date}
+	</if>
+	<if test="end_date!=null and end_date!=''">
+		AND t.create_time &lt;=#{end_date}
+	</if>
+	<if test="ce_id!=null and ce_id!=''">
+		AND u.ce_id=#{ce_id}
+	</if>
+	<if test="ch_id!=null and ch_id!=''">
+		AND u.ch_id=#{ch_id}
+	</if>
+	<if test="settle_id!=null and settle_id!=''">
+		AND u.settle_id=#{settle_id}
+	</if>
+	<if test="agent_id!=null and agent_id!=''">
+		AND u.agent_id=#{agent_id}
+	</if>
+	<if test="DID!=null and DID!=''">
+		AND u.dept_id=#{DID}
+	</if>
+</select>
+
+<!-- 统计用户提现信息-->
+<select id="queryReportUserRollOut" parameterType="hashmap" resultType="map">
+	SELECT
+	IFNULL(sum(amount), 0) AS outCount
+	FROM
+	t_user_capital_billing t
+	LEFT JOIN t_front_user_info u ON t.user_id = u.user_id
+	WHERE
+	t.purpose = '102'
+	<if test="user_name!=null and user_name!=''">
+		AND u.user_name like CONCAT(CONCAT(#{user_name}), '%')
+	</if>
+	<if test="mobile!=null and mobile!=''">
+		AND u.mobile=#{mobile}
+	</if>
+	<if test="start_date!=null and start_date!=''">
+		AND t.create_time &gt;=#{start_date}
+	</if>
+	<if test="end_date!=null and end_date!=''">
+		AND t.create_time &lt;=#{end_date}
+	</if>
+	<if test="ce_id!=null and ce_id!=''">
+		AND u.ce_id=#{ce_id}
+	</if>
+	<if test="ch_id!=null and ch_id!=''">
+		AND u.ch_id=#{ch_id}
+	</if>
+	<if test="settle_id!=null and settle_id!=''">
+		AND u.settle_id=#{settle_id}
+	</if>
+	<if test="agent_id!=null and agent_id!=''">
+		AND u.agent_id=#{agent_id}
+	</if>
+	<if test="DID!=null and DID!=''">
+		AND u.dept_id=#{DID}
+	</if>
+</select>
+
+</mapper>

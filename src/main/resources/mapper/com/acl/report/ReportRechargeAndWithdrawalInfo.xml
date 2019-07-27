@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.ReportRechargeAndWithdrawalInfoDao">
+<select id="queryReportRechargeInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		CZ.create_time,
+		CZ.prepay_id,
+		CZ.transaction_money,
+		<if test="dept_type&lt;2">
+		concat(dict.dict_name,'(',dict.dict_desc,')') as pay_method,
+		</if>
+		<if test="dept_type&gt;2">
+		  dict.dict_name as pay_method,
+		</if>
+		CZ.order_id,
+		B.broker_name,
+		D.dept_name,
+		U.agent_id,
+		U.settle_id,
+	    U.name,
+	    U.mobile,
+	    CZ.money,
+		CZ.pay_method AS cz_value,
+		CZ.duty_money,
+		ag.dept_id as a_id,
+		ag.dept_name as a_name,
+		ch.dept_id as s_id,
+		ch.dept_name as s_name,
+	    CZ.`status`
+		FROM
+		t_pay_payment_order CZ
+		LEFT OUTER JOIN t_user_info U ON CZ.user_id = U.id
+		LEFT OUTER JOIN t_front_broker B ON U.broker_id = B.broker_id
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id = D.dept_id
+		LEFT OUTER JOIN t_back_dept_info ag ON ag.dept_id = u.agent_id
+		LEFT OUTER JOIN t_back_dept_info ch ON ch.dept_id = u.settle_id
+		LEFT OUTER JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+		LEFT JOIN t_back_dict_info dict ON dict.dict_value = CZ.pay_method
+		WHERE
+		1 = 1
+		<if test="order_id !=null and order_id !=''">
+			AND CZ.order_id =#{order_id}
+		</if>
+		<!--<if test="cz_state !=null and cz_state !=''">-->
+			<!--AND IFNULL(RS.is_use,2) =#{cz_state}-->
+		<!--</if>-->
+		<if test="name !=null and name !=''">
+			AND U.name like CONCAT(CONCAT(#{name}), '%')
+		</if>
+		<if test="DID !=null and DID !=''">
+		 AND d.dept_id =#{DID}
+		</if>
+		<if test="pay_method !=null and pay_method !=''">
+		 AND CZ.pay_method =#{pay_method}
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND U.agent_id = #{agent_id}
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND U.settle_id = #{settle_id}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND u.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		 </if>
+		<if test="status!=null and status !=''">
+			AND CZ.status =#{status}
+		</if>
+	<!--<if test="settle_name !=null and settle_name !=''">-->
+	<!--AND CZ.settle_name like CONCAT(CONCAT(#{settle_name}), '%')-->
+	<!--</if>-->
+	<!--<if test="agent_name !=null and agent_name !=''">-->
+	<!--AND CZ.agent_name like CONCAT(CONCAT(#{agent_name}), '%')-->
+	<!--</if>-->
+		<if test="begindate!=null and begindate !=''">
+			 AND CZ.create_time &gt;=#{begindate}
+			</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND CZ.create_time &lt;=#{enddate}
+		</if>
+		<if test="begin_date!=null and begin_date !=''">
+		 AND RS.create_time &gt;=#{begin_date}
+		</if>
+		<if test="end_date!=null and end_date !=''">
+		 AND RS.create_time &lt;=#{end_date}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_time desc
+</select>
+
+	<select id="queryRechargeExport" parameterType="hashmap" resultType="map">
+		SELECT
+		CZ.create_time '订单创建时间',
+		IFNULL(CZ.prepay_id,'') '订单编码',
+		CZ.money '充值金额',
+		<if test="dept_type&lt;2">
+		concat(dict.dict_name,'(',dict.dict_desc,')')	'充值类型',
+		</if>
+		<if test="dept_type&gt;2">
+			dict.dict_name	'充值类型',
+		</if>
+		CZ.order_id '订单ID',
+		U.name '用户名',
+		U.mobile '用户电话',
+		B.broker_name '经纪人',
+		D.dept_name  '部门',
+		/*CZ.agent_name '代理商',
+		CZ.settle_name '服务商',*/
+		CZ.duty_money '手续费',
+		IF(IFNULL(CZ.status,2)=1,'成功','未成功') '充值状态'
+		FROM
+		t_pay_payment_order CZ
+		LEFT OUTER JOIN t_user_info U ON CZ.user_id=U.id
+		LEFT OUTER JOIN t_front_broker B ON U.broker_id=B.broker_id
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= U.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=U.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		left JOIN t_back_dict_info dict on dict.dict_value = CZ.pay_method
+		WHERE
+		1 = 1
+		<if test="order_id !=null and order_id !=''">
+			AND CZ.order_id =#{order_id}
+		</if>
+		<!--<if test="role_type !=null and role_type !=''">-->
+			<!--AND CZ.role_type =#{role_type}-->
+		<!--</if>-->
+		<!--<if test="role_type=='01' and mobile !=null and mobile !=''">-->
+			<!--AND U.user_mobile =#{mobile}-->
+		<!--</if>-->
+		<!--<if test="role_type=='02' and mobile !=null and mobile !=''">-->
+			<!--AND B.broker_mobile =#{mobile}-->
+		<!--</if>-->
+		<if test="status !=null and status !=''">
+			AND IFNULL(CZ.status,2) =#{status}
+		</if>
+		<if test="name !=null and name !=''">
+			AND U.name like CONCAT(CONCAT(#{name}), '%')
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND d.dept_id =#{DID}
+		</if>
+		<if test="pay_method !=null and pay_method !=''">
+			AND CZ.pay_method =#{pay_method}
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND U.agent_id = #{agent_id}
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND U.settle_id = #{settle_id}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+			AND u.dept_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND ce.dept_parent_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<!--<if test="settle_name !=null and settle_name !=''">-->
+			<!--AND CZ.settle_name like CONCAT(CONCAT(#{settle_name}), '%')-->
+		<!--</if>-->
+		<!--<if test="agent_name !=null and agent_name !=''">-->
+			<!--AND CZ.agent_name like CONCAT(CONCAT(#{agent_name}), '%')-->
+		<!--</if>-->
+		<if test="begindate!=null and begindate !=''">
+			AND CZ.create_time &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+			AND CZ.create_time &lt;=#{enddate}
+		</if>
+		<!--<if test="begin_date!=null and begin_date !=''">-->
+			<!--AND RS.create_time &gt;=#{begin_date}-->
+		<!--</if>-->
+		<!--<if test="end_date!=null and end_date !=''">-->
+			<!--AND RS.create_time &lt;=#{end_date}-->
+		<!--</if>-->
+		<!--<if test="entrance!=null and entrance !=''">-->
+			<!--AND CZ.entrance =#{entrance}-->
+		<!--</if>-->
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_time desc
+	</select>
+
+<select id="queryReportRechargeCount" parameterType="hashmap" resultType="map">
+		SELECT 
+		IFNULL(SUM(CZ.money),0) as ORDER_MONEYCOUNT
+		FROM
+	    t_pay_payment_order CZ
+		LEFT OUTER JOIN t_user_info U ON CZ.user_id=U.id
+		<!--<if test="role_type=='02'">-->
+		<!--LEFT OUTER JOIN t_front_broker B ON CZ.user_id=B.broker_id-->
+		<!--</if>		-->
+		<!--<if test="role_type=='01'">-->
+		<!--LEFT OUTER JOIN t_front_broker B ON U.broker_id=B.broker_id-->
+		<!--</if>-->
+	    LEFT OUTER JOIN t_front_broker B ON CZ.user_id=B.broker_id
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= U.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=U.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		1 = 1
+        <if test="order_id !=null and order_id !=''">
+            AND CZ.order_id =#{order_id}
+        </if>
+		<!--<if test="role_type !=null and role_type !=''">-->
+			<!--AND CZ.role_type =#{role_type}-->
+		<!--</if>-->
+		<!--<if test="role_type=='01' and mobile !=null and mobile !=''">		-->
+			<!--AND U.user_mobile =#{mobile}-->
+
+		<!--</if>-->
+		<!--<if test="role_type=='02' and mobile !=null and mobile !=''">-->
+			<!--AND B.broker_mobile =#{mobile}-->
+		<!--</if>-->
+		<if test="name !=null and name !=''">
+			AND U.name like CONCAT(CONCAT(#{name}), '%')
+		</if>
+		<if test="status !=null and status !=''">
+			AND IFNULL(CZ.status,2) =#{status}
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="DID !=null and DID !=''">
+		 AND d.dept_id =#{DID}
+		</if>
+		<if test="pay_method !=null and pay_method !=''">
+		 AND CZ.pay_method =#{pay_method}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND U.agent_id = #{agent_id}
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND U.settle_id = #{settle_id}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND u.dept_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<!--<if test="settle_name !=null and settle_name !=''">-->
+			<!--AND CZ.settle_name like CONCAT(CONCAT(#{settle_name}), '%')-->
+		<!--</if>-->
+		<!--<if test="agent_name !=null and agent_name !=''">-->
+			<!--AND CZ.agent_name like CONCAT(CONCAT(#{agent_name}), '%')-->
+		<!--</if>-->
+		<if test="begindate!=null and begindate !=''">
+		 AND CZ.create_time &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND CZ.create_time &lt;=#{enddate}
+		</if>
+		<!--<if test="begin_date!=null and begin_date !=''">-->
+		 <!--AND RS.create_time &gt;=#{begin_date}-->
+		<!--</if>-->
+		<!--<if test="end_date!=null and end_date !=''">-->
+		 <!--AND RS.create_time &lt;=#{end_date}-->
+		<!--</if>-->
+		<!--<if test="entrance!=null and entrance !=''">-->
+		 <!--AND CZ.entrance =#{entrance}-->
+		<!--</if>-->
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_time desc
+</select>
+
+<select id="queryReportWithdrawalInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		TX.create_time,
+		TX.order_id,
+	    TX.user_name,
+	    U.mobile,
+	    TX.pay_method AS tx_value,
+		B.broker_name,
+		D.dept_name,
+		TX.money,
+		<if test="dept_type&lt;2">
+		concat(dict.dict_name,'(',dict.dict_desc,')') as pay_method,
+		</if>
+
+		<if test="dept_type&gt;2">
+		dict.dict_name as  pay_method,
+		</if>
+		TX.duty_money,
+	    TX.`status`,
+        U.agent_id,
+		ag.dept_id as a_id,
+		ag.dept_name as a_name,
+		ch.dept_id as s_id,
+		ch.dept_name as s_name,
+        U.settle_id,
+	    d1.dict_name
+		FROM t_pay_refund_order TX
+		LEFT OUTER JOIN t_user_info U ON TX.user_id=U.id
+		LEFT OUTER JOIN t_front_broker B ON U.broker_id = B.broker_id
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= U.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=U.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		left JOIN t_back_dict_info dict on dict.dict_value = TX.pay_method
+	    LEFT JOIN  t_back_dict_info d1 ON  d1.dict_code='1027' AND d1.dict_id=TX.status
+		WHERE
+		1 = 1
+		<!--<if test="role_type !=null and role_type !=''">-->
+			<!--AND TX.role_type =#{role_type}-->
+		<!--</if>-->
+		<!--<if test="role_type=='01' and mobile !=null and mobile !=''">		-->
+			<!--AND U.user_mobile =#{mobile}-->
+		<!--</if>-->
+		<!--<if test="use_type !=null and use_type !=''">		-->
+			<!--AND IFNULL(RS.is_use,2) =#{use_type}-->
+		<!--</if>-->
+		<!--<if test="role_type=='02' and mobile !=null and mobile !=''">-->
+			<!--AND B.broker_mobile =#{mobile}-->
+		<!--</if>-->
+		<if test="user_name !=null and user_name !=''">
+			AND TX.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND U.agent_id = #{agent_id}
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND U.settle_id = #{settle_id}
+		</if>
+		<if test="status !=null and status !=''">
+			AND TX.status = #{status}
+		</if>
+		<if test="DID !=null and DID !=''">
+		 AND d.dept_id =#{DID}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND TX.agent_id =#{dept_id}
+		</if>
+		<!--<if test="tx_type !=null and tx_type !=''">-->
+		 <!--AND TX.tx_type =#{tx_type}-->
+		<!--</if>-->
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="begin_date!=null and begin_date !=''">
+		 AND TX.create_time &gt;=#{begin_date}
+		</if>
+		<if test="end_date!=null and end_date !=''">
+		 AND TX.create_time &lt;=#{end_date}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND TX.create_time &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND TX.create_time &lt;=#{enddate}
+		</if>
+		<if test="entrance!=null and entrance !=''">
+		 AND TX.create_time =#{entrance}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by TX.create_time desc
+</select>
+<select id="queryWithdrawalExport" parameterType="hashmap" resultType="map">
+		SELECT
+		IFNULL(RS.create_date,'') '提现到账时间',
+		TX.create_date '提现创建时间',
+		TX.tx_order_id '提现订单ID',
+		TX.user_name '用户名',
+		U.user_mobile '用户电话',
+		B.broker_name '经纪人',
+		D.dept_name '部门',
+		TX.tx_money  '提现金额',
+		<if test="dept_type&lt;2">
+		concat(dict.dict_name,'(',dict.dict_desc,')') '提现类型',
+		</if>
+		<if test="dept_type&gt;2">
+			dict.dict_name '提现类型',
+		</if>
+		TX.entrance '提现入口',
+		TX.tx_receipts '实际提现金额',
+		TX.tx_poundage '提现手续费',
+		IF(IFNULL(RS.is_use,2)=1,'成功','未成功') '提现状态',
+		TX.agent_name '代理商',
+		TX.settle_name '服务商',
+		IFNULL(rs.tx_rs_status,'') '提现处理状态'
+		FROM t_front_tx_order TX
+		left JOIN t_front_tx_order_rs RS ON TX.tx_order_id=RS.tx_order_id
+		LEFT OUTER JOIN t_front_user_info U ON TX.user_id=U.user_id
+		LEFT OUTER JOIN t_front_broker B ON U.broker_id=B.broker_id
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= TX.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=TX.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		left JOIN t_back_dict_info dict on dict.dict_value = TX.tx_type
+		WHERE
+		1 = 1
+		<if test="role_type !=null and role_type !=''">
+			AND TX.role_type =#{role_type}
+		</if>
+		<if test="role_type=='01' and mobile !=null and mobile !=''">
+			AND U.user_mobile =#{mobile}
+		</if>
+		<if test="use_type !=null and use_type !=''">
+			AND IFNULL(RS.is_use,2) =#{use_type}
+		</if>
+		<if test="role_type=='02' and mobile !=null and mobile !=''">
+			AND B.broker_mobile =#{mobile}
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND TX.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND TX.agent_id = #{agent_id}
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND TX.settle_id = #{settle_id}
+		</if>
+		<if test="DID !=null and DID !=''">
+			AND d.dept_id =#{DID}
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+			AND TX.agent_id =#{dept_id}
+		</if>
+		<if test="tx_type !=null and tx_type !=''">
+			AND TX.tx_type =#{tx_type}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND ce.dept_parent_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND TX.settle_name like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND TX.agent_name like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begin_date!=null and begin_date !=''">
+			AND RS.create_date &gt;=#{begin_date}
+		</if>
+		<if test="end_date!=null and end_date !=''">
+			AND RS.create_date &lt;=#{end_date}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+			AND TX.create_date &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+			AND TX.create_date &lt;=#{enddate}
+		</if>
+		<if test="entrance!=null and entrance !=''">
+			AND TX.entrance =#{entrance}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by TX.create_date desc
+</select>
+
+<select id="" parameterType="hashmap" resultType="map">
+		SELECT 
+		IFNULL(SUM(TX.tx_money),0) as TX_MONEYCOUNT,
+		IFNULL(SUM(TX.tx_receipts),0) as TX_RECEIPTSCOUNT
+		FROM t_front_tx_order TX 
+		left JOIN t_front_tx_order_rs RS ON TX.tx_order_id=RS.tx_order_id
+		LEFT OUTER JOIN t_front_user_info U ON TX.user_id=U.user_id
+		<if test="role_type=='02'">
+		LEFT OUTER JOIN t_front_broker B ON TX.user_id=B.broker_id
+		</if>		
+		<if test="role_type=='01'">
+		LEFT OUTER JOIN t_front_broker B ON U.broker_id=B.broker_id
+		</if>		
+		LEFT OUTER JOIN t_back_dept_info D ON B.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= TX.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=TX.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		1 = 1
+		<if test="role_type !=null and role_type !=''">
+			AND TX.role_type =#{role_type}
+		</if>
+		<if test="role_type=='01' and mobile !=null and mobile !=''">		
+			AND U.user_mobile =#{mobile}
+		</if>
+		<if test="use_type !=null and use_type !=''">		
+			AND IFNULL(RS.is_use,2) =#{use_type}
+		</if>
+		<if test="DID !=null and DID !=''">
+		 	AND d.dept_id =#{DID}
+		</if>
+		<if test="role_type=='02' and mobile !=null and mobile !=''">
+			AND B.broker_mobile =#{mobile}
+		</if>	
+		<if test="user_name !=null and user_name !=''">
+			AND TX.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="broker_name !=null and broker_name !=''">
+			AND B.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+		<if test="tx_type !=null and tx_type !=''">
+		 	AND TX.tx_type =#{tx_type}
+		</if>
+		<if test="agent_id !=null and agent_id !=''">
+			AND TX.agent_id = #{agent_id} 
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND TX.settle_id = #{settle_id} 
+		</if>
+		<if test="dept_id !=null and dept_id !=''">
+		 AND TX.agent_id =#{dept_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		 <if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="settle_name !=null and settle_name !=''">
+			AND TX.settle_name like CONCAT(CONCAT(#{settle_name}), '%')
+		</if>
+		<if test="agent_name !=null and agent_name !=''">
+			AND TX.agent_name like CONCAT(CONCAT(#{agent_name}), '%')
+		</if>
+		<if test="begin_date!=null and begin_date !=''">
+		 AND RS.create_date &gt;=#{begin_date}
+		</if>
+		<if test="end_date!=null and end_date !=''">
+		 AND RS.create_date &lt;=#{end_date}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+		 AND TX.create_date &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND TX.create_date &lt;=#{enddate}
+		</if>
+		<if test="entrance!=null and entrance !=''">
+		 AND TX.entrance =#{entrance}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by TX.create_date desc
+</select>
+
+<select id="queryReportRechargeEnsureInfo" parameterType="hashmap" resultType="map">
+		SELECT 
+		CZ.create_date ,
+		CZ.order_money ,
+		CZ.cz_type ,
+		CZ.cz_pc_mobile ,
+		U.user_name ,
+		CZ.settle_name ,
+		IFNULL(RS.is_use,2)
+		FROM 
+		t_front_cz_order_rs RS 
+		LEFT OUTER JOIN t_front_cz_order CZ ON CZ.order_id=RS.order_id
+		LEFT OUTER JOIN t_back_user U ON CZ.user_id=U.user_id
+		LEFT OUTER JOIN t_back_dept_info D ON U.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= cz.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=cz.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		CZ.role_type='03' 
+		<if test="user_name !=null and user_name !=''">
+			AND U.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>		
+		<if test="settle_id !=null and settle_id !=''">
+			AND CZ.settle_id = #{settle_id} 
+		</if>		
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		<if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>		
+		<if test="begindate!=null and begindate !=''">
+		 AND CZ.create_date &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND CZ.create_date &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_date desc
+</select>
+
+<select id="queryEnsureInfoExport" parameterType="hashmap" resultType="map">
+		SELECT
+		CZ.create_date '创建时间',
+		CZ.order_money '保证金',
+		CZ.cz_pc_mobile '充值渠道',
+		U.user_name '用户名',
+		CZ.settle_name '服务商名',
+		IF(IFNULL(RS.is_use,2)=1,'成功','未成功') '充值状态'
+		FROM
+		t_front_cz_order_rs RS
+		LEFT OUTER JOIN t_front_cz_order CZ ON CZ.order_id=RS.order_id
+		LEFT OUTER JOIN t_back_user U ON CZ.user_id=U.user_id
+		LEFT OUTER JOIN t_back_dept_info D ON U.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= cz.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=cz.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		CZ.role_type='03'
+		<if test="user_name !=null and user_name !=''">
+			AND U.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>
+		<if test="settle_id !=null and settle_id !=''">
+			AND CZ.settle_id = #{settle_id}
+		</if>
+		<if test="ce_id!=null and ce_id!=''">
+			AND ce.dept_parent_id=#{ce_id}
+		</if>
+		<if test="ch_id!=null and ch_id!=''">
+			AND ch.dept_parent_id=#{ch_id}
+		</if>
+		<if test="begindate!=null and begindate !=''">
+			AND CZ.create_date &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+			AND CZ.create_date &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_date desc
+	</select>
+
+<select id="queryReportRechargeEnsureCount" parameterType="hashmap" resultType="map">
+		SELECT 
+			IFNULL(SUM(CZ.order_money),0) as ORDER_MONEYCOUNT
+		FROM 
+		t_front_cz_order_rs RS 
+		LEFT OUTER JOIN t_front_cz_order CZ ON CZ.order_id=RS.order_id
+		LEFT OUTER JOIN t_back_user U ON CZ.user_id=U.user_id
+		LEFT OUTER JOIN t_back_dept_info D ON U.dept_id=D.dept_id
+		left OUTER join t_back_dept_info ag on ag.dept_id= cz.agent_id
+		left OUTER join t_back_dept_info ch on ch.dept_id=cz.settle_id
+		left OUTER join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+		WHERE
+		CZ.role_type='03' 
+		<if test="user_name !=null and user_name !=''">
+			AND U.user_name like CONCAT(CONCAT(#{user_name}), '%')
+		</if>		
+		<if test="settle_id !=null and settle_id !=''">
+			AND CZ.settle_id = #{settle_id} 
+		</if>		
+		<if test="ce_id!=null and ce_id!=''">
+		 AND ce.dept_parent_id=#{ce_id}
+		 </if>
+		<if test="ch_id!=null and ch_id!=''">
+		 AND ch.dept_parent_id=#{ch_id}
+		</if>		
+		<if test="begindate!=null and begindate !=''">
+		 AND CZ.create_date &gt;=#{begindate}
+		</if>
+		<if test="enddate!=null and enddate !=''">
+		 AND CZ.create_date &lt;=#{enddate}
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+		order by CZ.create_date desc
+</select>
+</mapper>

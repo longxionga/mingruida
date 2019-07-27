@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd  
+    http://www.springframework.org/schema/context   
+    http://www.springframework.org/schema/context/spring-context-4.1.xsd  
+    http://www.springframework.org/schema/aop   
+    http://www.springframework.org/schema/aop/spring-aop-4.1.xsd  
+    http://www.springframework.org/schema/tx   
+    http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+	<!-- ThreadPoolTaskExecutor线程池 -->
+	<!-- 	orePoolSize:      线程池维护线程的最少数量 
+			maxPoolSize:      线程池维护线程的最大数量 
+			queueCapacity:    线程池所使用的缓冲队列 
+			keepAliveSeconds: 线程池维护线程所允许的空闲时间 
+			rejectedExecutionHandler: 拒绝执行任务的具体操作，
+			 	AbortPolicy 
+			         	 用于被拒绝任务的处理程序，它将抛出 RejectedExecutionException.
+				CallerRunsPolicy 
+			         	 用于被拒绝任务的处理程序，它直接在 execute 方法的调用线程中运行被拒绝的任务；如果执行程序已关闭，则会丢弃该任务。
+				DiscardOldestPolicy 
+			        	  用于被拒绝任务的处理程序，它放弃最旧的未处理请求，然后重试 execute；如果执行程序已关闭，则会丢弃该任务。
+				DiscardPolicy 
+			        	  用于被拒绝任务的处理程序，默认情况下它将丢弃被拒绝的任务。
+	-->
+	 <context:property-placeholder ignore-unresolvable="true"/>
+		<bean id="taskExecutor"
+			class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+			<property name="corePoolSize" value="${task.corePoolSize}" />
+			<property name="maxPoolSize" value="${task.maxPoolSize}" />
+			<property name="queueCapacity" value="${task.queueCapacity}" />
+			<property name="keepAliveSeconds" value="${task.keepAliveSeconds}" />
+			<property name="rejectedExecutionHandler">
+				<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+			</property>
+		</bean>
+</beans>

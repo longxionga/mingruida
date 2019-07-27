@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsOrderDao">
+<select id="queryGoodsOrder" parameterType="hashmap" resultType="map">
+		SELECT
+			a.order_id,
+			a.order_type,
+			a.order_code,
+			a.user_id,
+			a.receiver_mobile,
+			a.receiver_address,
+			a.receiver_name,
+			a.logistics,
+			a.logistics_no,
+			a.logistics_price,
+			a.total_price,
+			a.order_status,
+			a.logistics_status,
+			a.agent_id,
+			DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+			DATE_FORMAT(a.update_time,'%Y-%m-%d %H:%i:%s') as update_time,
+			a.is_use,
+			b.sku_id,
+			b.goods_id,
+			b.goods_name,
+			b.goods_alias,
+			b.quantity,
+			b.spec_name,
+			b.goods_price
+		FROM
+			t_front_mall_order a
+		LEFT JOIN t_front_mall_order_goods b ON a.order_id = b.order_id
+		WHERE 1=1
+		<if test="order_code !=null and order_code !=''">
+		AND a.order_code=#{order_code}
+		</if>
+		<if test="receiver_mobile !=null and receiver_mobile !=''">
+		AND receiver_mobile like CONCAT(CONCAT(#{receiver_mobile}), '%')
+		</if>
+		order by a.create_time,a.update_time DESC
+</select>
+
+<update id="updateGoodsOrder" parameterType="hashmap">
+	UPDATE t_front_mall_order SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="logistics  != null and logistics !=''">logistics=#{logistics},</if>
+			<if test="logistics_no  != null and logistics_no !=''">logistics_no=#{logistics_no},</if>
+			<if test="logistics_status  != null and logistics_status !=''">logistics_status=#{logistics_status},</if>
+	</trim>
+	WHERE order_id=#{order_id}
+</update>
+
+<insert id="insertOrderStatus" parameterType="hashmap">
+	INSERT INTO t_front_mall_order_status 
+	(
+	<trim suffixOverrides=",">
+	<if test="order_id !=null and order_id !=''">order_id,</if>
+	<if test="order_status !=null and order_status !=''">order_status,</if>
+	<if test="process_time !=null and process_time !=''">process_time,</if>
+	<if test="create_time !=null and create_time !=''">create_time,</if>
+	<if test="is_use !=null and is_use !=''">is_use,</if>
+	</trim>
+	)
+	VALUES
+	(
+	<trim suffixOverrides=",">
+	<if test="order_id !=null and order_id !=''">#{order_id},</if>
+	<if test="order_status !=null and order_status !=''">#{order_status},</if>
+	<if test="process_time !=null and process_time !=''">#{process_time},</if>
+	<if test="create_time !=null and create_time !=''">#{create_time},</if>
+	<if test="is_use !=null and is_use !=''">#{is_use},</if>
+	</trim>
+	)
+</insert>
+<select id="queryUserIdByOrderId" parameterType="hashmap" resultType="map">
+SELECT
+	user_id
+FROM
+	t_front_mall_order
+WHERE
+	order_id = #{order_id}
+</select>
+</mapper>

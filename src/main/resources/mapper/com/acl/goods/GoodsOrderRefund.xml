@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.goods.dao.GoodsOrderRefundDao">
+<select id="queryGoodsOrderRefund" parameterType="hashmap" resultType="map">
+	SELECT    
+	o.order_code,
+	r.refund_id,
+	r.order_id,
+	r.user_id,
+	r.refund_type,
+	r.refund_reason,
+	r.refund_money,
+	r.refund_explain,
+	r.reject_status,
+	DATE_FORMAT(r.reject_time,'%Y-%m-%d %H:%i:%s') AS reject_time,
+	r.reject_reason,
+	r.voucher_uri1,
+	r.voucher_uri2,
+	r.voucher_uri3,
+	r.status,
+	r.refund_address,
+	r.logistics,
+	r.logistics_no,
+	r.ship_desc,
+	r.ship_voucher,
+	DATE_FORMAT(r.create_time,'%Y-%m-%d %H:%i:%s') AS create_time,
+	DATE_FORMAT(r.update_time,'%Y-%m-%d %H:%i:%s') AS update_time,
+	r.is_use
+	FROM
+	t_front_mall_order_refund  r, t_front_mall_order o WHERE r.order_id = o.order_id
+	            <if test="order_code != null and order_code !=''">
+	                and o.order_code = #{order_code}
+	            </if>
+</select>
+
+<update id="updateGoodsOrderRefund" parameterType="hashmap">
+	UPDATE t_front_mall_order_refund SET
+	<trim suffix="" suffixOverrides=",">
+			<if test="reject_status  != null and reject_status !=''">reject_status=#{reject_status},</if>
+			<if test="reject_time  != null and reject_time !=''">reject_time=#{reject_time},</if>
+			<if test="reject_reason  != null and reject_reason !=''">reject_reason=#{reject_reason},</if>
+			<if test="status  != null">status=#{status},</if>
+			<if test="logistics  != null and logistics !=''">logistics=#{logistics},</if>
+			<if test="logistics_no  != null and logistics_no !=''">logistics_no=#{logistics_no},</if>
+			<if test="refund_money  != null and refund_money !=''">refund_money=#{refund_money},</if>
+			<if test="refund_reason  != null and refund_reason !=''">refund_reason=#{refund_reason},</if>
+			<if test="update_time  != null ">update_time=#{update_time},</if>
+	</trim>
+	WHERE refund_id=#{refund_id}
+</update>
+
+
+	<select id="getGoodsOrderRefund" parameterType="hashmap" resultType="map">
+		select refund_id,
+			order_id,
+			user_id,
+			refund_type,
+			refund_reason,
+			refund_money,
+			refund_explain,
+			reject_status,
+			reject_time,
+			reject_reason,
+			voucher_uri1,
+			voucher_uri2,
+			voucher_uri3,
+			status,
+			refund_address,
+			logistics,
+			logistics_no,
+			ship_desc,
+			ship_voucher,
+			create_time,
+			update_time,
+			is_use
+		from t_front_mall_order_refund
+		WHERE refund_id=#{refund_id}
+	</select>
+	
+	 
+</mapper>

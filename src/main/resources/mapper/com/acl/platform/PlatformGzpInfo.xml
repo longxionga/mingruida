@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.IPlatformGzpInfoDao">
+	<select id="queryGzpInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			t.gzp_id,
+			t.gzp_name,
+			t.gzp_alias,
+			t.gzp_code,
+			t.gzp_number,
+			t.gzp_order,
+			t.gzp_unit,
+			t.gzp_type,
+			t.is_use,
+			t.is_zc,
+			DATE_FORMAT(t.create_date,'%Y-%m-%d %H:%i:%s') as create_date,
+			t.gzp_money,
+			t.gzp_poundage,		
+			t.gzp_profit,
+			t.gzp_lot,
+			t.gzp_buy_no_date,
+			t.gzp_buy_no_time      
+		FROM
+			t_gzp_info t
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->
+		WHERE
+		1 = 1
+		<if test="gzp_id !=null and gzp_id !=''">
+			AND gzp_id = #{gzp_id} 
+		</if>
+		<if test="gzp_name !=null and gzp_name !=''">
+			AND gzp_name like CONCAT(CONCAT(#{gzp_name}), '%')
+		</if>
+		<!--<if test="sort  != null and sort !=''">
+			order by ${sort} ${order}
+		</if>-->
+	</select>
+
+	<insert id="insertGzpInfo" parameterType="hashmap">
+		insert into t_gzp_info (
+		<trim suffix="" suffixOverrides=",">
+			<if test="gzp_id  != null and gzp_id !=''">gzp_id,</if>
+			<if test="gzp_name  != null and gzp_name !=''">gzp_name,</if>
+			<if test="gzp_alias  != null and gzp_alias !=''">gzp_alias,</if>
+			<if test="gzp_code  != null and gzp_code !=''">gzp_code,</if>
+			<if test="gzp_number  != null and gzp_number !=''">gzp_number,</if>
+			<if test="gzp_order  != null and gzp_order !=''">gzp_order,</if>
+			<if test="gzp_unit  != null and gzp_unit !=''">gzp_unit,</if>
+			<if test="gzp_type  != null and gzp_type !=''">gzp_type,</if>
+			<if test="is_use  != null and is_use !=''">is_use,</if>
+			<if test="create_date  != null and create_date !=''">create_date,</if>
+			<if test="gzp_money  != null and gzp_money !=''">gzp_money,</if>
+			<if test="gzp_poundage  != null and gzp_poundage !=''">gzp_poundage,</if>
+			<if test="gzp_profit  != null and gzp_profit !=''">gzp_profit,</if>
+			<if test="gzp_lot  != null and gzp_lot !=''">gzp_lot,</if>
+			<if test="is_zc  != null and is_zc !=''">is_zc,</if>
+			<if test="gzp_buy_no_time  != null and gzp_buy_no_time !=''">gzp_buy_no_time,</if>
+			<if test="gzp_buy_no_date  != null and gzp_buy_no_date !=''">gzp_buy_no_date,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="gzp_id  != null and gzp_id !=''">#{gzp_id},</if>
+			<if test="gzp_name  != null and gzp_name !=''">#{gzp_name},</if>
+			<if test="gzp_alias  != null and gzp_alias !=''">#{gzp_alias},</if>
+			<if test="gzp_code  != null and gzp_code !=''">#{gzp_code},</if>
+			<if test="gzp_number  != null and gzp_number !=''">#{gzp_number},</if>
+			<if test="gzp_order  != null and gzp_order !=''">#{gzp_order},</if>
+			<if test="gzp_unit  != null and gzp_unit !=''">#{gzp_unit},</if>
+			<if test="gzp_type  != null and gzp_type !=''">#{gzp_type},</if>
+			<if test="is_use  != null and is_use !=''">#{is_use},</if>
+			<if test="create_date  != null and create_date !=''">#{create_date},</if>
+			<if test="gzp_money  != null and gzp_money !=''">#{gzp_money},</if>
+			<if test="gzp_poundage  != null and gzp_poundage !=''">#{gzp_poundage},</if>
+			<if test="gzp_profit  != null and gzp_profit !=''">#{gzp_profit},</if>
+			<if test="gzp_lot  != null and gzp_lot !=''">#{gzp_lot},</if>
+			<if test="is_zc  != null and is_zc !=''">#{is_zc},</if>
+			<if test="gzp_buy_no_time  != null and gzp_buy_no_time !=''">#{gzp_buy_no_time},</if>
+			<if test="gzp_buy_no_date  != null and gzp_buy_no_date !=''">#{gzp_buy_no_date},</if>
+		</trim>
+		)
+	</insert>
+
+	<update id="updateGzpInfo" parameterType="hashmap">
+		UPDATE t_gzp_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="gzp_name  != null and gzp_name !=''">gzp_name=#{gzp_name},</if>
+			<if test="gzp_alias  != null and gzp_alias !=''">gzp_alias=#{gzp_alias},</if>
+			<if test="gzp_code  != null and gzp_code !=''">gzp_code=#{gzp_code},</if>
+			<if test="gzp_number  != null and gzp_number !=''">gzp_number=#{gzp_number},</if>
+			<if test="gzp_order  != null and gzp_order !=''">gzp_order=#{gzp_order},</if>
+			<if test="gzp_unit  != null and gzp_unit !=''">gzp_unit=#{gzp_unit},</if>
+			<if test="gzp_type  != null and gzp_type !=''">gzp_type=#{gzp_type},</if>
+			<if test="is_use  != null and is_use !=''">is_use=#{is_use},</if>
+			<if test="create_date  != null and create_date !=''">create_date=#{create_date},</if>
+			<if test="gzp_money  != null and gzp_money !=''">gzp_money=#{gzp_money},</if>
+			<if test="gzp_poundage  != null and gzp_poundage !=''">gzp_poundage=#{gzp_poundage},</if>
+			<if test="gzp_profit  != null and gzp_profit !=''">gzp_profit=#{gzp_profit},</if>
+			<if test="gzp_lot  != null and gzp_lot !=''">gzp_lot=#{gzp_lot},</if>
+			<if test="is_zc  != null and is_zc !=''">is_zc=#{is_zc},</if>
+			<if test="gzp_buy_no_time  != null and gzp_buy_no_time !=''">gzp_buy_no_time=#{gzp_buy_no_time},</if>
+			<if test="gzp_buy_no_date  != null and gzp_buy_no_date !=''">gzp_buy_no_date=#{gzp_buy_no_date}</if>
+		</trim>
+		WHERE gzp_id=#{gzp_id}
+	</update>
+	
+    <select id="gzpGoodsValidate" parameterType="hashmap" resultType="map">
+	    SELECT gzp_name FROM  t_gzp_info WHERE gzp_name = #{gzp_name}
+	</select>
+
+<insert id="insertDeptGzpInfo" parameterType="hashmap">
+		insert into t_dept_gzp (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id  != null and sys_id !=''">sys_id,</if>
+			<if test="dept_id  != null and dept_id !=''">dept_id,</if>
+			<if test="gzp_id  != null and gzp_id !=''">gzp_id,</if>		
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="sys_id  != null and sys_id !=''">#{sys_id},</if>
+			<if test="dept_id  != null and dept_id !=''">#{dept_id},</if>
+			<if test="gzp_id  != null and gzp_id !=''">#{gzp_id},</if>			
+		</trim>
+		)
+	</insert>
+	<select id="queryGzpDeptInfo" parameterType="hashmap" resultType="map">
+			SELECT
+			t.sys_id,
+			t.dept_id,
+			t.gzp_id    
+		FROM
+			t_dept_gzp t
+		<!-- /*LEFT JOIN t_back_dict_info t1 ON t1.dict_id = t.is_use* 	t1.dict_name	*/ -->
+		WHERE
+		1 = 1		
+		AND gzp_id= #{gzp_id}	
+	</select>
+	
+	<select id="queryGzpRelationDeptInfo" parameterType="hashmap" resultType="map">
+			select 
+			t.gzp_id,
+			t.gzp_name,
+			t.gzp_alias,
+			t.gzp_code,
+			t.gzp_number,
+			t.gzp_order,
+			t.gzp_unit,
+			t.gzp_type,
+			t.is_use,
+			t.is_zc,
+			t.create_date,
+			t.gzp_money,
+			t.gzp_poundage,
+			t.gzp_profit,
+			t.gzp_lot,
+			t.gzp_buy_no_time,
+			t.gzp_buy_no_date,
+			t1.dept_id
+			<if test="db_type !=null and db_type !='' ">
+				from anchol_sim.t_gzp_info t
+			</if>
+			<if test="db_type ==null or db_type =='' ">
+				from t_gzp_info t
+			</if>
+
+			left JOIN t_dept_gzp t1 on t.gzp_id =t1.gzp_id
+			where
+			1=1
+			and t.is_use=1
+	</select>
+	<select id="queryGzpGoodsInfo" parameterType="hashmap" resultType="map">
+			select 
+			t.gzp_id,
+			t.gzp_name,
+			t.gzp_alias,
+			t.gzp_code,
+			t.gzp_number,
+			t.gzp_order,
+			t.gzp_unit,
+			t.gzp_type,
+			t.is_use,
+			t.is_zc,
+			t.create_date,
+			t.gzp_money,
+			t.gzp_poundage,
+			t.gzp_profit,
+			t.gzp_lot,
+			t.gzp_buy_no_time,
+			t.gzp_buy_no_date
+
+			<if test="db_type !=null and db_type !='' ">
+				from anchol_sim.t_gzp_info t
+			</if>
+			<if test="db_type ==null or db_type =='' ">
+				from t_gzp_info t
+			</if>
+			
+			order by gzp_order desc
+	</select>		
+	<select id="deleteGzpDept" parameterType="hashmap" resultType="map">
+	   DELETE from t_dept_gzp where gzp_id=#{gzp_id}
+	</select>
+	
+	<select id="selectGzpGroup" parameterType="hashmap" resultType="map">
+	   <!-- select gzp_type,gzp_name,gzp_number from t_gzp_info t GROUP BY gzp_type-->
+	   select gzp_type,gzp_name,gzp_alias,gzp_number,is_zc,
+		GROUP_CONCAT(distinct CONCAT_WS('$',g.goods_pro,g.goods_desc)ORDER BY g.is_order ASC SEPARATOR '#') goods_detail,
+		GROUP_CONCAT(distinct CONCAT_WS('#',img.goods_url,img.type) ORDER BY type,img.is_order ASC SEPARATOR ',') goods_img	,
+		GROUP_CONCAT(distinct t.is_use) is_use
+		<if test="dept_id !=null and dept_id !='' ">
+			from t_gzp_info t
+		</if>
+		<if test="dept_id ==null or dept_id =='' ">
+			from anchol_sim.t_gzp_info t
+		</if>
+
+	   left JOIN  t_goods_info g ON t.gzp_number = g.goods_code
+	   left JOIN  t_goods_image img ON t.gzp_number = img.goods_code
+	   where t.is_use=1
+		<if test="dept_id !=null and dept_id !='' ">
+	  	and gzp_id in (select gzp_id from t_dept_gzp where dept_id =#{dept_id})
+		</if>
+		<if test="dept_id ==null or dept_id =='' ">
+			and gzp_type !='trq14'
+		</if>
+		 GROUP BY gzp_type order by gzp_number
+	</select>
+
+	<select id="selectGzpDeptGroup" parameterType="hashmap" resultType="map">
+		<!-- select gzp_type,gzp_name,gzp_number from t_gzp_info t GROUP BY gzp_type-->
+		select gzp_type,gzp_name,gzp_alias,gzp_number,is_zc,
+		GROUP_CONCAT(distinct CONCAT_WS('$',g.goods_pro,g.goods_desc)ORDER BY g.is_order ASC SEPARATOR '#') goods_detail,
+		GROUP_CONCAT(distinct CONCAT_WS('#',img.goods_url,img.type) ORDER BY type,img.is_order ASC SEPARATOR ',') goods_img	,
+		GROUP_CONCAT(distinct t.is_use) is_use
+		from t_gzp_info t
+		left JOIN  t_goods_info g ON t.gzp_number = g.goods_code
+		left JOIN  t_goods_image img ON t.gzp_number = img.goods_code
+		where gzp_id in (select gzp_id from t_dept_gzp where dept_id =#{dept_id}) GROUP BY gzp_type order by gzp_number
+
+	</select>
+
+
+	<select id="selectGzpRelation" parameterType="hashmap" resultType="map">
+	   <!--  select dept_id from t_dept_gzp  t GROUP BY dept_id
+	   select dept_id from t_dept_gzp  t GROUP BY dept_id-->
+  	   select t.dept_id from t_dept_gzp t
+	   INNER JOIN t_gzp_info t1
+	   on t.gzp_id = t1.gzp_id    
+	   where  t1.is_use=1 GROUP BY dept_id
+	</select>
+	
+	<select id="selectGzpGoodsInfo" parameterType="hashmap" resultType="map">	   
+	select DISTINCT t.gzp_id,
+			t.gzp_name,
+			t.gzp_alias,
+			t.gzp_code,
+ 		    t.gzp_number,
+			t.gzp_order,
+			t.gzp_unit,
+			t.gzp_type,
+			t.is_use,
+			t.is_zc,
+			t.create_date,
+			t.gzp_money,
+			t.gzp_poundage,
+			t.gzp_profit,
+			t.gzp_lot,
+			t.gzp_buy_no_time,
+			t.gzp_buy_no_date
+
+			<if test="dept_id !=null and dept_id !='' ">
+				from t_gzp_info t
+			</if>
+			<if test="dept_id ==null or dept_id =='' ">
+				from anchol_sim.t_gzp_info t
+			</if>
+
+			INNER JOIN  t_dept_gzp t1 ON t.gzp_id = t1.gzp_id
+			where 
+			1=1 and t.is_use =1
+			<if test="dept_id !=null and dept_id!=''">
+			AND t1.dept_id= #{dept_id}
+			</if>			
+			and t.gzp_type=#{gzp_type}
+			ORDER BY t.gzp_order asc
+	</select>
+
+	<select id="selectGzpDeptGoodsInfo" parameterType="hashmap" resultType="map">
+		select t.gzp_id,
+		t.gzp_name,
+		t.gzp_alias,
+		t.gzp_code,
+		t.gzp_number,
+		t.gzp_order,
+		t.gzp_unit,
+		t.gzp_type,
+		t.is_use,
+		t.is_zc,
+		t.create_date,
+		t.gzp_money,
+		t.gzp_poundage,
+		t.gzp_profit,
+		t.gzp_lot,
+		t.gzp_buy_no_time,
+		t.gzp_buy_no_date
+		from t_gzp_info t INNER JOIN  t_dept_gzp t1 ON t.gzp_id = t1.gzp_id
+		where
+		1=1 and t.is_use =1
+		<if test="dept_id !=null and dept_id!=''">
+			AND t1.dept_id= #{dept_id}
+		</if>
+		and t.gzp_type=#{gzp_type}
+		ORDER BY t.gzp_order asc
+	</select>
+	<select id="queryGzpDeptNoexist" parameterType="hashmap" resultType="map">
+	   select dept_id from t_back_dept_info where dept_type=4
+	   and dept_id not in (select dept_id from t_dept_gzp)
+	</select>	
+	
+</mapper>

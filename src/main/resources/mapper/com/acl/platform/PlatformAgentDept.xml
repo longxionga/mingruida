@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.acl.platform.dao.PlatformAgentDeptDao">
+	<select id="queryAgentDept" parameterType="hashmap" resultType="map">
+	SELECT
+	t.dept_id as dept_id,
+	t.dept_code,
+	t.dept_name,
+	t.dept_mobile,
+	t.create_date,
+	t.is_use,
+	t.dept_money,
+	t.dept_ratio,
+	t.dept_type,
+	t.dept_url,
+	t.broker_url,
+	t.is_tj_man,
+	t.tj_ratio,
+	t.dept_parent_id,
+	t.dept_parent_id+0 _parentId,
+	t.dept_app_id,
+	t.dept_app_secret,
+	v.dept_name as dept_parent_name,
+    v.dept_id as agent_id,
+    s.dept_id as settle_id,
+    ch.dept_id as ch_id,
+    ce.dept_id as ce_id
+	FROM
+	t_back_dept_info	t
+	LEFT JOIN t_back_dept_info v
+	ON t.dept_parent_id=v.dept_id
+    LEFT JOIN t_back_dept_info s
+    ON s.dept_id=v.dept_parent_id
+    LEFT JOIN t_back_dept_info ch
+    ON ch.dept_id=s.dept_parent_id
+    LEFT JOIN t_back_dept_info ce
+    ON ce.dept_id=ch.dept_parent_id
+	WHERE t.dept_type=5 and IFNULL(t.dept_mobile,0) !='-1'	
+	 <if test="ce_id!=null and ce_id!=''">
+	  AND ce.dept_id=#{ce_id}
+	 </if>
+	  <if test="ch_id!=null and ch_id!=''">
+	  AND ch.dept_id=#{ch_id}
+	 </if>
+	  <if test="settle_id!=null and settle_id!=''">
+	  AND s.dept_id=#{settle_id}
+	 </if>
+	  <if test="agent_id!=null and agent_id!=''">
+	 AND v.dept_id=#{agent_id}
+	 </if>
+	 <if test="dept_id!=null and dept_id!=''">
+	 AND 1=2
+	 </if>
+	<if test="dept_name!=null and dept_name!=''">
+		AND t.dept_name like CONCAT(CONCAT(#{dept_name}), '%')
+	</if>
+		ORDER BY 
+			t.dept_type,t.create_date
+	</select>
+	<!-- 查询代理商部门下面的经纪人 -->
+	<select id="queryAgentDeptBrokerInfo" parameterType="hashmap" resultType="map">
+		SELECT broker_id,broker_name,dept_name ,
+		DATE_FORMAT(t.create_date,'%Y-%m-%d %H:%i:%s') as create_date
+		FROM t_front_broker t 
+		LEFT JOIN t_back_dept_info v ON
+		t.dept_id=v.dept_id 
+		WHERE t.broker_parent_id!='-1' and t.dept_code = (select dept_code from t_back_dept_info where dept_id=(select dept_parent_id from t_back_dept_info where dept_id=#{dept_id}))
+		<if test="broker_name!=null and broker_name!=''">
+			AND broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+		</if>
+	</select>
+	
+	<!-- 删除经纪人部门关系临时表中的历史数据 -->
+	 <delete id="deleteAgentdeptBrokers" parameterType="hashmap">
+		DELETE FROM t_front_broker_dept_temp 		
+		  WHERE broker_id in(
+		   <foreach collection="brokers_id" item="brokers_id" separator=",">
+			 #{brokers_id}
+		   </foreach>
+		  )
+	</delete>
+	<!-- 删除经纪人部门关系临时表中的历史数据 -->
+	 <insert id="insertAgentdeptBrokers" parameterType="hashmap">
+		INSERT INTO t_front_broker_dept_temp(
+		<trim suffixOverrides=",">
+		<if test="sys_id!=null and sys_id!=''">sys_id,</if>
+		<if test="broker_id!=null and broker_id!=''">broker_id,</if>
+		<if test="dept_id!=null and dept_id!=''">dept_id,</if>
+		</trim>
+		)VALUES(
+		<trim suffixOverrides=",">
+		<if test="sys_id!=null and sys_id!=''">#{sys_id},</if>
+		<if test="broker_id!=null and broker_id!=''">#{broker_id},</if>
+		<if test="dept_id!=null and dept_id!=''">#{dept_id},</if>
+		</trim>
+		) 				 
+	</insert>
+	<insert id="insertAgentDept" parameterType="hashmap">
+		insert into t_back_dept_info (
+		<trim suffix="" suffixOverrides=",">
+			<if test="dept_id  != null and dept_id!=''">dept_id,</if>
+			<if test="dept_name  != null and  dept_name!=''">dept_name,</if>
+			<if test="create_date  != null and create_date!=''">create_date,</if>
+			<if test="dept_parent_id   != null and dept_parent_id!=''">dept_parent_id,</if>
+			<if test="dept_code   != null and dept_code!=''">dept_code,</if>
+			<if test="is_use   != null and is_use!=''">is_use,</if>
+			<if test="dept_money   != null and dept_money!=''">dept_money,</if>
+			<if test="dept_type   != null and dept_type!=''">dept_type,</if>
+			<if test="dept_ratio   != null and dept_ratio!=''">dept_ratio,</if>
+			<if test="dept_mobile   != null and dept_mobile!=''">dept_mobile,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="dept_id  != null and dept_id!=''">#{dept_id},</if>
+			<if test="dept_name  != null and  dept_name!=''">#{dept_name},</if>
+			<if test="create_date  != null and create_date!=''">#{create_date},</if>
+			<if test="dept_parent_id   != null and dept_parent_id!=''">#{dept_parent_id},</if>
+			<if test="dept_code   != null and dept_code!=''">#{dept_code},</if>
+			<if test="is_use   != null and is_use!=''">#{is_use},</if>
+			<if test="dept_money   != null and dept_money!=''">#{dept_money},</if>
+			<if test="dept_type   != null and dept_type!=''">#{dept_type},</if>
+			<if test="dept_ratio   != null and dept_ratio!=''">#{dept_ratio},</if>
+			<if test="dept_mobile   != null and dept_mobile!=''">#{dept_mobile},</if>
+		</trim>
+		)
+   </insert>
+
+
+    	<!-- 更新代理商基本信息 -->
+    <update id="updateAgentdept" parameterType="hashmap">
+		UPDATE t_back_dept_info SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="dept_name  != null and dept_name!=''">dept_name=#{dept_name},</if>
+			<if test="dept_mobile  != null and dept_mobile!=''">dept_mobile=#{dept_mobile},</if>
+		</trim>
+		WHERE dept_id=#{dept_id}
+	</update>
+	<!-- 设置经纪人到不同的部门 -->
+	 <update id="updateAgentdeptBrokers" parameterType="hashmap">
+		UPDATE t_front_broker SET
+		<trim suffix="" suffixOverrides=",">
+			<if test="dept_id  != null and dept_id!=''">dept_id=#{dept_id},</if>
+		</trim>
+		  WHERE broker_id in(
+		   <foreach collection="brokers_id" item="brokers_id" separator=",">
+			 #{brokers_id}
+		   </foreach>
+		  )
+	</update>
+	
+	<select id="queryDeptForMon" parameterType="hashmap" resultType="map">
+	  SELECT
+	dept_id,
+	dept_code,
+	dept_name,
+	dept_mobile,
+	create_date,
+	is_use,
+	dept_money,
+	dept_ratio,
+	dept_type,
+	dept_url,
+	dept_parent_id,
+	dept_app_id,
+	dept_app_secret,
+	is_tj_man,
+	tj_ratio,
+	broker_url,
+	ce_allot,
+	ch_allot,
+	s_allot
+FROM
+	t_back_dept_info
+	WHERE dept_type='5'
+	</select>
+</mapper>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportSettleDayAndMonthDao">
+<select id="queryReportSettleDay" parameterType="hashmap" resultType="map">
+SELECT
+ t.settle_id,
+ t.statistics_day,
+ t.settle_name,
+ t.recharge_day,
+ t.counter_fee_day,
+ t.withdrawals_day,
+ t.profit_loss_day,
+ t.balance_day,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_day_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+ order by t.statistics_day desc
+</select>
+<select id="queryReportSettleMonth" parameterType="hashmap" resultType="map">
+SELECT
+ t.settle_id,
+ t.statistics_day,
+ t.settle_name,
+ t.recharge_month,
+ t.counter_fee_month,
+ t.withdrawals_month,
+ t.profit_loss_month,
+ t.balance_month,
+ t.bad_month,
+ t.for_year,
+ t.for_month,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_month_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+ order by t.statistics_day desc
+</select>
+
+<select id="querySettleDayResultExport" parameterType="hashmap" resultType="map">
+SELECT
+ t.settle_id,
+ t.statistics_day,
+ t.settle_name,
+ t.recharge_day,
+ t.counter_fee_day,
+ t.withdrawals_day,
+ t.profit_loss_day,
+ t.balance_day,
+ t.bad_day,
+ t.for_year,
+ t.for_month,
+ t.for_week,
+ t.for_day,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_day_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+ order by t.statistics_day desc
+</select>
+<select id="querySettleMonthResultExport" parameterType="hashmap" resultType="map">
+SELECT
+ t.settle_id,
+ t.statistics_day,
+ t.settle_name,
+ t.recharge_month,
+ t.counter_fee_month,
+ t.withdrawals_month,
+ t.profit_loss_month,
+ t.balance_month,
+ t.bad_month,
+ t.for_year,
+ t.for_month,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_month_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+  order by t.statistics_day desc
+</select>
+
+<select id="querySettleDaySum" parameterType="hashmap" resultType="map">
+SELECT
+ IFNULL(sum(t.recharge_day),0) as recharge_day_count,
+ IFNULL(sum(t.counter_fee_day),0) as counter_fee_day_count,
+ IFNULL(sum(t.withdrawals_day),0)as withdrawals_day_count,
+ IFNULL(sum(t.profit_loss_day),0) as profit_loss_day_count,
+ IFNULL(sum(t.balance_day),0) as balance_day_count,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_day_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+ <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+ <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+
+</select>
+<select id="querySettleMonthSum" parameterType="hashmap" resultType="map">
+SELECT
+ IFNULL(sum(t.recharge_month),0) as recharge_month_count ,
+ IFNULL(sum(t.counter_fee_month),0) as counter_fee_month_count,
+ IFNULL(sum(t.withdrawals_month),0) as withdrawals_month_count,
+ IFNULL(sum(t.profit_loss_month),0) as profit_loss_month_count,
+ IFNULL(sum(t.balance_month),0) as balance_month_count,
+ ch.dept_parent_id as ch_id,
+ ce.dept_parent_id as ce_id
+ FROM
+ t_report_month_settle_statistics t
+ left join t_back_dept_info ch on ch.dept_id=t.settle_id
+ left join t_back_dept_info ce on ce.dept_id= ch.dept_parent_id
+ WHERE 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND statistics_day &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+ AND statistics_day &lt;=#{end_date}
+ </if>
+ <if test="settle_id!=null and settle_id!=''">
+ AND settle_id=#{settle_id}
+ </if>
+  <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_parent_id=#{ce_id}
+ </if>
+ <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_parent_id=#{ch_id}
+ </if>
+ <if test="dept_id!=null and dept_id!=''">
+ AND 1=2
+ </if>
+</select>
+</mapper>

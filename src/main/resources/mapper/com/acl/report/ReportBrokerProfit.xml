@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.report.dao.IReportBrokerProfitDao">
+<select id="queryReportBrokerProfit" parameterType="hashmap" resultType="map">
+ SELECT
+ b.broker_id,
+ b.broker_name,
+ b.dept_id,
+ d.dept_name,
+ p.dept_name AS agent_name,
+ s.dept_name AS settle_name,
+ ch.dept_name AS ch_name,
+ ce.dept_name AS ce_name,
+ IFNULL(tx.tx_money, 0) AS tx_money,
+ IFNULL(cz.cz_money, 0) AS cz_money,
+ IFNULL(cz.cz_money,0) - IFNULL(tx.tx_money,0) AS profit
+ FROM
+ t_front_broker b
+ LEFT JOIN (
+ SELECT
+ sum(tx_money) AS tx_money,
+ u.broker_id
+ FROM
+(select rs.user_id,rs.create_date,rs.is_use,rs.tx_order_id from t_front_tx_order_rs rs where 1=1
+ <if test="start_date!=null and start_date!=''">
+  AND rs.create_date &gt;=#{start_date}
+ </if>
+ <if test="end_date!=null and end_date!=''">
+  AND rs.create_date &lt;=#{end_date}
+ </if>)
+ t
+ INNER JOIN t_front_tx_order tx ON t.tx_order_id = tx.tx_order_id
+ INNER JOIN t_front_user_info u
+ WHERE
+ t.is_use = 1
+ AND t.user_id = u.user_id
+ GROUP BY
+ u.broker_id
+ ) tx ON b.broker_id = tx.broker_id
+ LEFT JOIN (
+ SELECT
+ sum(order_money) AS cz_money,
+ broker_id
+ FROM
+ (select rs.user_id,rs.create_date,rs.order_id from t_front_cz_order_rs rs where 1=1
+ <if test="start_date!=null and start_date!=''">
+ AND rs.create_date &gt;=#{start_date}
+</if>
+ <if test="end_date!=null and end_date!=''">
+  AND rs.create_date &lt;=#{end_date}
+ </if>) t
+ INNER JOIN t_front_cz_order cz ON t.order_id = cz.order_id
+ INNER JOIN t_front_user_info u
+ WHERE
+ t.user_id = u.user_id
+ GROUP BY
+ broker_id
+ ) cz ON b.broker_id = cz.broker_id
+ LEFT JOIN t_back_dept_info d ON b.dept_id = d.dept_id
+ LEFT JOIN t_back_dept_info p ON d.dept_parent_id = p.dept_id
+ LEFT JOIN t_back_dept_info s ON p.dept_parent_id = s.dept_id
+ LEFT JOIN t_back_dept_info ch ON ch.dept_id = s.dept_parent_id
+ LEFT JOIN t_back_dept_info ce ON ce.dept_id = ch.dept_parent_id
+ WHERE
+ b.is_use = 1
+ <if test="broker_name!=null and broker_name!=''">
+ AND b.broker_name like CONCAT(CONCAT(#{broker_name}), '%')
+ </if>
+  <if test="ce_id!=null and ce_id!=''">
+ AND ce.dept_id=#{ce_id}
+ </if>
+  <if test="ch_id!=null and ch_id!=''">
+ AND ch.dept_id=#{ch_id}
+ </if>
+  <if test="settle_id!=null and settle_id!=''">
+ AND s.dept_id=#{settle_id}
+ </if>
+  <if test="agent_id!=null and agent_id!=''">
+ AND p.dept_id=#{agent_id}
+ </if>
+  <if test="DID!=null and DID!=''">
+ AND b.dept_id=#{DID}
+ </if>
+</select>
+</mapper>

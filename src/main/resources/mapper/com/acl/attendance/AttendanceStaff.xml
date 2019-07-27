@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.attendance.dao.AttendanceStaffDao">
+<select id="querystaffworkattendanceinfo" parameterType="hashmap" resultType="map">
+	SELECT
+	t.id,
+	t.attendance_status,
+	t.attendance_time,
+	t.day_count,
+	t.create_time,
+	t.update_time,
+	t.detailid
+	FROM
+	t_data_staff_attendance t
+	 	WHERE 1=1
+   order by t.attendance_time ASC
+</select>
+
+
+<insert id="insertstaffworkattendanceinfo" parameterType="hashmap">
+	INSERT INTO t_data_staff_attendance(
+	<trim suffixOverrides=",">
+		<if test="id!=null and id!=''">id,</if>
+		<if test="attendance_status!=null and attendance_status!=''">attendance_status,</if>
+		<if test="attendance_time!=null and attendance_time!=''">attendance_time,</if>
+		<if test="day_count!=null and day_count!=''">day_count,</if>
+		<if test="create_time!=null and create_time!=''">create_time,</if>
+		<if test="update_time!=null and update_time!=''">update_time,</if>
+		<if test="detailid!=null and detailid!=''">detailid,</if>
+	</trim>
+	) VALUES(
+	<trim suffixOverrides=",">
+		<if test="id!=null and id!=''">#{id},</if>
+		<if test="attendance_status!=null and attendance_status!=''">#{attendance_status},</if>
+		<if test="attendance_time!=null and attendance_time!=''">#{attendance_time},</if>
+		<if test="day_count!=null and day_count!=''">#{day_count},</if>
+		<if test="create_time!=null and create_time!=''">#{create_time},</if>
+		<if test="update_time!=null and update_time!=''">#{update_time},</if>
+		<if test="detailid!=null and detailid!=''">#{detailid},</if>
+	</trim>
+	)
+</insert>
+
+<update id="updatestaffworkattendanceinfo" parameterType="hashmap">
+ 	UPDATE
+	t_data_staff_attendance
+ 	  SET
+ 	  <trim suffix="" suffixOverrides=",">
+ 	  <if test="attendance_status !=null and attendance_status !=''">attendance_status=#{attendance_status},</if>
+ 	  <if test="day_count !=null and day_count !=''">day_count=#{day_count},</if>
+	  <if test="attendance_time !=null and attendance_time !=''">attendance_time=#{attendance_time},</if>
+ 	  <if test="update_time !=null and update_time !=''">update_time=#{update_time},</if>
+ 	  </trim> 	 
+ 	 WHERE id=#{id}
+</update>
+
+	<delete id="deletestaffworkattendancedetail" parameterType="hashmap">
+		delete from t_data_staff_attendance_detail
+		<where>
+			<if test="attendanceid != null">
+				and attendance_id = #{attendanceid,jdbcType=VARCHAR}
+			</if>
+
+		</where>
+	</delete>
+
+	<insert id="insertstaffworkattendancedetail" parameterType="hashmap">
+		INSERT INTO t_data_staff_attendance_detail (
+		id,
+		attendance_id,
+		staff_name,
+		department,
+		staff_code,
+		position,
+		entry_time,
+		departure_time,
+		state,
+		attendance_days,
+		rest_days,
+		working_hours,
+		late_ness,
+		late_arrival_time,
+		severe_lateness,
+		severe_arrival_time,
+		ads_late_days,
+		early_time,
+		early_hours,
+		goto_absence_num,
+		gooff_absence_num,
+		abs_days,
+		goout,
+		compassionate_leave,
+		marriage_leave,
+		special_leave,
+		sick_leave,
+		road_leave,
+		h_1,
+		h_2,
+		h_3,
+		h_4,
+		h_5,
+		h_6,
+		h_7,
+		h_8,
+		h_9,
+		h_10,
+		h_11,
+		h_12,
+		h_13,
+		h_14,
+		h_15,
+		h_16,
+		h_17,
+		h_18,
+		h_19,
+		h_20,
+		h_21,
+		h_22,
+		h_23,
+		h_24,
+		h_25,
+		h_26,
+		h_27,
+		h_28,
+		h_29,
+		h_30,
+		h_31,
+		h_32,
+		h_33,
+		h_34,
+		h_35
+		)
+		VALUES
+		<foreach collection="itemMap" separator="," item="item">
+			(#{item.id},#{item.attendance_id},#{item.staff_name},#{item.department},#{item.staff_code},#{item.position},
+			#{item.entry_time},#{item.departure_time},#{item.state},#{item.attendance_days},#{item.rest_days},#{item.working_hours},#{item.late_ness},#{item.late_arrival_time},
+			#{item.severe_lateness},#{item.severe_arrival_time},#{item.ads_late_days},#{item.early_time},#{item.early_hours},#{item.goto_absence_num},#{item.gooff_absence_num},#{item.abs_days},
+			#{item.goout},#{item.compassionate_leave},#{item.marriage_leave},#{item.special_leave},#{item.sick_leave},#{item.road_leave},#{item.h_1},#{item.h_2},
+			#{item.h_3},#{item.h_4},#{item.h_5},#{item.h_6},#{item.h_7},#{item.h_8},#{item.h_9},#{item.h_10},
+			#{item.h_11},#{item.h_12},#{item.h_13},#{item.h_14},#{item.h_15},#{item.h_16},#{item.h_17},#{item.h_18},
+			#{item.h_19},#{item.h_20},#{item.h_21},#{item.h_22},#{item.h_23},#{item.h_24},#{item.h_25},#{item.h_26},
+			#{item.h_27},#{item.h_28},#{item.h_29},#{item.h_30},#{item.h_31},#{item.h_32},#{item.h_33},#{item.h_34},#{item.h_34}
+			)
+		</foreach>
+	</insert>
+</mapper>

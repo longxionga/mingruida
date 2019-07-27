@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.report.dao.ReportLotteryDao">
+    <!-- 查询时时彩信息 -->
+    <select id="queryLotteryInfo" parameterType="hashmap" resultType="map">
+       SELECT
+            t.id,
+            t.lottery_no,
+            t.lottery_type,
+            t.lottery_result,
+            t.task_date,
+            t.`status`,
+            t.lottery_ticket,
+            t.lottery_time,
+            DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') AS create_time,
+            DATE_FORMAT(t.update_time,'%Y-%m-%d %H:%i:%s') AS update_time
+        FROM
+	        t_lottery_task t
+        WHERE 1=1
+        <if test="lottery_no!=null and lottery_no!=''">AND t.lottery_no=#{lottery_no}</if>
+        <if test="lottery_result!=null and lottery_result!=''">AND t.lottery_result=#{lottery_result}</if>
+        <if test="status!=null and status!=''">AND t.status=#{status}</if>
+        ORDER  BY t.create_time DESC
+
+    </select>
+</mapper>

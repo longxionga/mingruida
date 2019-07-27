@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.platform.dao.PlatformBankCardDao">
+<select id="queryBankCard" parameterType="hashmap" resultType="map">
+   select 
+      t.user_id,      
+	  a.name,
+	  a.agent_id,
+	  a.settle_id,
+	  a.ch_id,
+	  a.ce_id,
+	  a.mobile,
+	  b.dept_name as agent_name,
+	  c.dept_name as settle_name,
+	  d.dept_name as ch_name,
+	  e.dept_name as ce_name from (select user_id from t_pay_bank_info GROUP BY user_id)  t
+	LEFT JOIN t_user_info a ON  t.user_id=a.id
+	LEFT JOIN t_back_dept_info b ON a.agent_id = b.dept_id
+	LEFT JOIN t_back_dept_info c ON a.settle_id = c.dept_id
+	LEFT JOIN t_back_dept_info d ON a.ch_id = d.dept_id
+	LEFT JOIN t_back_dept_info e ON a.ce_id = e.dept_id
+	WHERE 1=1
+	 <if test="name!=null and name!=''">
+	  AND a.name  like CONCAT(CONCAT(#{name}), '%')
+	 </if>
+	 <if test="settle_id!=null and settle_id!=''">
+	        AND a.settle_id=#{settle_id}
+	  </if>
+	  <if test="agent_id!=null and agent_id!=''">
+	        AND a.agent_id=#{agent_id}
+	  </if>
+	  <if test="dept_type!=null and dept_type !=''  and dept_type!=0">
+	        AND 1=2
+	  </if>
+</select>
+
+<select id="queryBankCardInfo" parameterType="hashmap" resultType="map">
+   SELECT
+	t.user_bank_no,
+	t.user_bank_type,
+	t.user_name as name,
+	t.user_mobile as mobile,
+	DATE_FORMAT(t.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+	t.status,
+	d.dict_name
+FROM
+	t_pay_bank_info t
+	LEFT JOIN  t_back_dict_info d ON  d.dict_code='1028' AND d.dict_id=t.status
+	WHERE
+	user_id = #{user_id}
+	<if test="dept_type!=null and dept_type !=''  and dept_type!=0">
+	        AND 1=2
+	  </if>
+</select>
+</mapper>

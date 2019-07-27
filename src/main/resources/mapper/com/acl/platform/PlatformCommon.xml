@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.acl.platform.dao.IPlatformCommonDao">
+	<!-- 查询ACCESS_TOKEN -->
+	<select id="getWxAccessTokenByAgentId" parameterType="string" resultType="map">
+		select dept_id, app_id, securet, wx_token,	create_date	from t_front_wxtonken where dept_id = #{agent_id}
+	</select>
+	<!-- 更新ACCESS_TOKEN -->
+	<update id="updateWxAccessTokenByAgentId" parameterType="map">
+		update t_front_wxtonken set wx_token = #{wx_token},create_date = #{create_date} where dept_id = #{agent_id}
+	</update>
+	<!-- 新增ACCESS_TOKEN -->
+	<insert id="insertWxAccessToken" parameterType="map">
+	  insert into t_front_wxtonken (
+		<trim suffix="" suffixOverrides=",">
+			<if test="token_id    != null">token_id,</if>
+			<if test="wx_token    != null">wx_token,</if>
+			<if test="create_date != null">create_date,</if>
+			<if test="app_id      != null">app_id,</if>
+			<if test="securet     != null">securet,</if>
+			<if test="dept_id  	  != null">dept_id,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="token_id    != null">#{token_id},</if>
+			<if test="wx_token    != null">#{wx_token},</if>
+			<if test="create_date != null">#{create_date},</if>
+			<if test="app_id      != null">#{app_id},</if>
+			<if test="securet     != null">#{securet},</if>
+			<if test="dept_id     != null">#{dept_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	<!-- 新增消息 -->
+	<insert id="insertMsgSend" parameterType="map">
+	  insert into t_front_msg_send (
+		<trim suffix="" suffixOverrides=",">
+			<if test="id         != null">id,</if>
+			<if test="agent_id   != null">agent_id,</if>
+			<if test="agent_name != null">agent_name,</if>
+			<if test="user_id    != null">user_id,</if>
+			<if test="user_name  != null">user_name,</if>
+			<if test="mobile  	 != null">mobile,</if>
+			<if test="wx_open_id != null">wx_open_id,</if>
+			<if test="content    != null">content,</if>
+			<if test="status     != null">status,</if>
+		</trim>
+		) values (
+		<trim suffix="" suffixOverrides=",">
+			<if test="id         != null">#{id},</if>
+			<if test="agent_id   != null">#{agent_id},</if>
+			<if test="agent_name != null">#{agent_name},</if>
+			<if test="user_id    != null">#{user_id},</if>
+			<if test="user_name  != null">#{user_name},</if>
+			<if test="mobile  	 != null">#{mobile},</if>
+			<if test="wx_open_id != null">#{wx_open_id},</if>
+			<if test="content    != null">#{content},</if>
+			<if test="status     != null">#{status},</if>
+		</trim>
+		)
+	</insert>
+	<!-- 查询规则 -->
+	<select id="getPaymentRule" parameterType="map" resultType="map">
+	SELECT  
+		rule.bank_type as type,
+		<if test="tx_is_use !=null and tx_is_use !=''">
+		rule.tx_min_money as withminrange,
+		rule.tx_max_money as withmaxrange,
+		</if>
+		<if test="type !=null and type !=''">
+    rule.cz_time as cz_time,
+		rule.cz_date as cz_date,
+		rule.cz_min_money as cz_min_money,
+		rule.cz_max_money as cz_max_money,
+		rule.tx_time as tx_time,
+		rule.tx_date as tx_date,
+    rule.tx_min_money as tx_min_money,
+		rule.tx_max_money as tx_max_money,
+		rule.tx_fee as tx_fee,
+		rule.tx_day_max_money as tx_day_max_money,
+		</if>
+		<if test="cz_is_use !=null and cz_is_use !=''">
+		rule.cz_min_money as reminrange,
+		rule.cz_max_money as remaxrange,
+		</if>
+		info.dict_name as name,
+		rule.rule_context as content
+	FROM t_bank_rule rule LEFT JOIN t_back_dict_info info
+			on info.dict_code = '1008' and rule.bank_type = info.dict_id
+	WHERE 1=1
+		<if test="type !=null and type !=''">
+			AND bank_type = #{type}
+		</if>
+		<if test="tx_is_use !=null and tx_is_use !=''">
+			AND tx_is_use = #{tx_is_use}
+		</if>
+		<if test="cz_is_use !=null and cz_is_use !=''">
+			AND cz_is_use = #{cz_is_use}
+	</if>
+	ORDER BY order_id
+	</select>
+	
+	<select id="queryWithdrawalsUserAccessLimit" parameterType="map"  resultType="map">
+	SELECT IFNULL((ProfitLoss - ProfitLoss2), 0) as usermoneylimit
+	FROM(
+		SELECT 
+			IFNULL(SUM(CASE money_type WHEN '06' THEN user_money ELSE 0 END), 0) as ProfitLoss, 
+			IFNULL(SUM(CASE money_type WHEN '07' THEN user_money ELSE 0 END), 0) as ProfitLoss2 
+		from  t_front_user_profitloss
+		WHERE user_id= #{UID} AND (money_type='06' OR money_type='07' )
+			AND create_date Between (SELECT concat(current_date() ,' 00:00:00') as datetime) And (select now())
+	)	T
+	</select>
+	
+	<select id="queryWithdrawalsBrokersAccessLimit" parameterType="map"  resultType="map">
+	SELECT IFNULL((ProfitLoss - ProfitLoss2), 0) as brokersmoneylimit
+	FROM(
+		SELECT 
+			IFNULL(SUM(CASE money_type WHEN '06' THEN broker_money ELSE 0 END), 0) as ProfitLoss, 
+			IFNULL(SUM(CASE money_type WHEN '07' THEN broker_money ELSE 0 END), 0) as ProfitLoss2 
+		from  t_front_broker_profitloss
+		WHERE  broker_id= #{BID} AND (money_type='06' OR money_type='07' )
+			AND create_date Between (SELECT concat(current_date() ,' 00:00:00') as datetime) And (select now())
+	)	T
+	</select>
+</mapper>

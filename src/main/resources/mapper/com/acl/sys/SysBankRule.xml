@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysBankRuleDao">
+	<select id="queryBankRule" parameterType="hashmap"
+		resultType="map">
+		SELECT
+		a.id,
+		a.tx_time,
+		a.tx_date,
+		a.tx_min_money,
+		a.tx_max_money,
+		a.tx_day_max_money,
+		a.cz_time,
+		a.cz_date,
+		a.cz_min_money,
+		a.cz_max_money,
+		a.cz_day_max_money,
+		a.cz_is_use,
+		a.tx_is_use,
+		DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time,
+		a.cash_money,
+		a.cz_rate,
+		a.tx_rate,
+		a.cz_sum_money,
+		a.tx_sum_money
+		FROM
+		t_pay_bank_rule a
+		WHERE 1=1
+		order by create_time asc
+	</select>
+	<!--<insert id="insertBankRule" parameterType="hashmap">-->
+		<!--INSERT INTO t_bank_rule(-->
+		<!--<trim suffixOverrides=",">-->
+			<!--<if test="sys_id!=null and sys_id!=''">SYS_ID,</if>-->
+			<!--<if test="tx_time!=null and tx_time!=''">TX_TIME,</if>-->
+			<!--<if test="tx_date!=null and tx_date!=''">TX_DATE,</if>-->
+			<!--<if test="tx_min_money!=null and tx_min_money!=''">TX_MIN_MONEY,</if>-->
+			<!--<if test="tx_max_money!=null and tx_max_money!=''">TX_MAX_MONEY,</if>-->
+			<!--<if test="tx_day_max_money!=null and tx_day_max_money!=''">TX_DAY_MAX_MONEY,</if>			-->
+			<!--<if test="tx_fee!=null and tx_fee!=''">tx_fee,</if>-->
+			<!--<if test="cz_time!=null and cz_time!=''">CZ_TIME,</if>-->
+			<!--<if test="cz_date!=null and cz_date!=''">CZ_DATE,</if>		-->
+			<!--<if test="cz_min_money!=null and cz_min_money!=''">CZ_MIN_MONEY,</if>-->
+			<!--<if test="cz_max_money!=null and cz_max_money!=''">CZ_MAX_MONEY,</if>-->
+			<!--<if test="cz_day_max_money!=null and cz_day_max_money!=''">cz_day_max_money,</if>-->
+			<!--<if test="bank_type!=null and bank_type!=''">BANK_TYPE,</if>		-->
+			<!--<if test="rule_context!=null and rule_context!=''">RULE_CONTEXT,</if>-->
+			<!--<if test="cz_is_use!=null and cz_is_use!=''">CZ_IS_USE,</if>			-->
+			<!--<if test="tx_is_use!=null and tx_is_use!=''">TX_IS_USE,</if>			-->
+			<!--<if test="create_date!=null and create_date!=''">CREATE_DATE,</if>-->
+			<!--<if test="order_id!=null and order_id!=''">ORDER_ID,</if>-->
+			<!--<if test="cash_money!=null and cash_money!=''">cash_money,</if>-->
+			<!--<if test="entrance!=null and entrance!=''">entrance,</if>-->
+			<!--<if test="cz_rate!=null and cz_rate!=''">cz_rate,</if>-->
+			<!--<if test="tx_rate!=null and tx_rate!=''">tx_rate,</if>-->
+			<!--<if test="cz_day_all_max_money!=null and cz_day_all_max_money!=''">cz_day_all_max_money,</if>-->
+			<!--<if test="tx_day_all_max_money!=null and tx_day_all_max_money!=''">tx_day_all_max_money,</if>-->
+		<!--</trim>-->
+		<!--) VALUES(-->
+		<!--<trim suffixOverrides=",">-->
+			<!--<if test="sys_id!=null and sys_id!=''">#{sys_id},</if>-->
+			<!--<if test="tx_time!=null and tx_time!=''">#{tx_time},</if>-->
+			<!--<if test="tx_date!=null and tx_date!=''">#{tx_date},</if>-->
+			<!--<if test="tx_min_money!=null and tx_min_money!=''">#{tx_min_money},</if>-->
+			<!--<if test="tx_max_money!=null and tx_max_money!=''">#{tx_max_money},</if>-->
+			<!--<if test="tx_day_max_money!=null and tx_day_max_money!=''">#{tx_day_max_money},</if>			-->
+			<!--<if test="tx_fee!=null and tx_fee!=''">#{tx_fee},</if>-->
+			<!--<if test="cz_time!=null and cz_time!=''">#{cz_time},</if>-->
+			<!--<if test="cz_date!=null and cz_date!=''">#{cz_date},</if>		-->
+			<!--<if test="cz_min_money!=null and cz_min_money!=''">#{cz_min_money},</if>-->
+			<!--<if test="cz_max_money!=null and cz_max_money!=''">#{cz_max_money},</if>-->
+			<!--<if test="cz_day_max_money!=null and cz_day_max_money!=''">#{cz_day_max_money},</if>-->
+			<!--<if test="bank_type!=null and bank_type!=''">#{bank_type},</if>		-->
+			<!--<if test="rule_context!=null and rule_context!=''">#{rule_context},</if>-->
+			<!--<if test="cz_is_use!=null and cz_is_use!=''">#{cz_is_use},</if>			-->
+			<!--<if test="tx_is_use!=null and tx_is_use!=''">#{tx_is_use},</if>			-->
+			<!--<if test="create_date!=null and create_date!=''">#{create_date},</if>-->
+			<!--<if test="order_id!=null and order_id!=''">#{order_id},</if>-->
+			<!--<if test="cash_money!=null and cash_money!=''">#{cash_money},</if>-->
+			<!--<if test="entrance!=null and entrance!=''">#{entrance},</if>-->
+			<!--<if test="cz_rate!=null and cz_rate!=''">#{cz_rate},</if>-->
+			<!--<if test="tx_rate!=null and tx_rate!=''">#{tx_rate},</if>-->
+			<!--<if test="cz_day_all_max_money!=null and cz_day_all_max_money!=''">#{cz_day_all_max_money},</if>-->
+			<!--<if test="tx_day_all_max_money!=null and tx_day_all_max_money!=''">#{tx_day_all_max_money},</if>-->
+		<!--</trim>-->
+		<!--)-->
+	<!--</insert>-->
+	<update id="updateBankRule" parameterType="hashmap">
+		UPDATE t_pay_bank_rule
+		<set>
+			<trim suffixOverrides=",">
+			<if test="tx_time!=null and tx_time!=''">tx_time=#{tx_time},</if>
+			<if test="tx_date!=null and tx_date!=''">tx_date=#{tx_date},</if>
+			<if test="tx_min_money!=null and tx_min_money!=''">tx_min_money=#{tx_min_money},</if>
+			<if test="tx_max_money!=null and tx_max_money!=''">tx_max_money=#{tx_max_money},</if>
+			<if test="tx_day_max_money!=null and tx_day_max_money!=''">tx_day_max_money=#{tx_day_max_money},</if>
+			<if test="cz_time!=null and cz_time!=''">cz_time=#{cz_time},</if>
+			<if test="cz_date!=null and cz_date!=''">cz_date=#{cz_date},</if>		
+			<if test="cz_min_money!=null and cz_min_money!=''">cz_min_money=#{cz_min_money},</if>
+			<if test="cz_max_money!=null and cz_max_money!=''">cz_max_money=#{cz_max_money},</if>
+			<if test="cz_day_max_money!=null and cz_day_max_money!=''">cz_day_max_money=#{cz_day_max_money},</if>
+			<if test="cz_is_use!=null and cz_is_use!=''">cz_is_use=#{cz_is_use},</if>			
+			<if test="tx_is_use!=null and tx_is_use!=''">tx_is_use=#{tx_is_use},</if>			
+			<if test="create_time!=null and create_time!=''">create_time=#{create_time},</if>
+			<if test="cash_money!=null and cash_money!=''">cash_money=#{cash_money},</if>
+			<if test="cz_rate!=null and cz_rate!=''">cz_rate=#{cz_rate},</if>
+			<if test="tx_rate!=null and tx_rate!=''">tx_rate=#{tx_rate},</if>
+			<if test="cz_sum_money!=null and cz_sum_money!=''">cz_sum_money=#{cz_sum_money},</if>
+			<if test="tx_sum_money!=null and tx_sum_money!=''">tx_sum_money=#{tx_sum_money}</if>
+			</trim>
+		</set>
+		WHERE id=#{id}
+	</update>
+	<!--<delete id="deleteBankRule" parameterType="hashmap">-->
+		<!--DELETE-->
+		<!--FROM-->
+		<!--t_bank_rule-->
+		<!--WHERE-->
+		<!--sys_id=#{sys_id}		-->
+	<!--</delete>-->
+
+	<select id="queryBrandRule" parameterType="hashmap"
+			resultType="map">
+		SELECT
+		a.id,
+		a.name,
+		a.activation_subsidy,
+		a.activation_total,
+		a.un_activation_total,
+		a.standard_total,
+		a.un_standard_total,
+		a.create_time,
+		a.update_time,
+		a.del_tag,
+		a.status
+		FROM
+		t_front_brand_rule a
+		WHERE 1=1
+		order by create_time asc
+	</select>
+</mapper>

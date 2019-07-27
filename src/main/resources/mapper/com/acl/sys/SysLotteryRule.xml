@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.SysLotteryRuleDao">
+	<select id="queryLotteryRule" parameterType="hashmap"
+		resultType="map">
+		SELECT
+			a.id,
+			a.lottery_type,
+			a.lottery_service_rate,
+			a.lottery_limit_number,
+			a.`status`,
+			DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') as create_time
+		FROM
+		    t_lottery_rule a
+		WHERE 1=1
+		order by create_time asc
+	</select>
+	<update id="updateLotteryRule" parameterType="hashmap">
+		UPDATE t_lottery_rule SET
+		<trim suffix="" suffixOverrides=",">
+		<if test="lottery_type  != null and lottery_type!=''">lottery_type=#{lottery_type},</if>
+		<if test="lottery_service_rate  != null and lottery_service_rate!=''">lottery_service_rate=#{lottery_service_rate},</if>
+		<if test="lottery_limit_number  != null and lottery_limit_number!=''">lottery_limit_number=#{lottery_limit_number},</if>
+		<if test="status  != null and status!=''">status=#{status},</if>
+		</trim>
+		WHERE id=#{id}
+	</update>
+</mapper>

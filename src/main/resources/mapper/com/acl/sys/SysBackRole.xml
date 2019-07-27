@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.SysBackRoleDao">
+	<select id="queryBackRole" parameterType="hashmap" resultType="map">
+		SELECT
+		t.role_id,
+		t.role_name ,
+		t.role_desc,
+		DATE_FORMAT(t.CREATE_DATE,'%Y-%m-%d %H:%i:%s') AS create_date,
+	    t.is_use,
+		t.dict_id,
+		v.dict_name as dict_name
+		FROM
+		T_BACK_ROLE t LEFT JOIN t_back_dict_info v
+		ON t.dict_id=v.dict_id AND v.dict_code='1001'
+		WHERE 1=1
+		<if test="role_name!=null and role_name!=''">
+			AND ROLE_NAME like CONCAT(CONCAT('%', #{role_name}), '%')
+		</if>
+	</select>
+
+	<insert id="insertBackRole" parameterType="hashmap">
+		INSERT INTO T_BACK_ROLE(
+		<trim suffixOverrides=",">
+			<if test="role_id!=null and role_id!=''">ROLE_ID,</if>
+			<if test="role_name!=null and role_name!=''">ROLE_NAME,</if>
+			<if test="role_desc!=null and role_desc!=''">ROLE_DESC,</if>
+			<if test="create_date!=null and create_date!=''">CREATE_DATE,</if>
+			<if test="is_use!=null and is_use!=''">IS_USE,</if>	
+			<if test="dict_id!=null and dict_id!=''">DICT_ID,</if>			
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="role_id!=null and role_id!=''">#{role_id},</if>
+			<if test="role_name!=null and role_name!=''">#{role_name},</if>
+			<if test="role_desc!=null and role_desc!=''">#{role_desc},</if>
+			<if test="create_date!=null and create_date!=''">#{create_date},</if>
+			<if test="is_use!=null and is_use!=''">#{is_use},</if>
+			<if test="dict_id!=null and dict_id!=''">#{dict_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	<update id="updateBackRole" parameterType="hashmap">
+		UPDATE T_BACK_ROLE
+		<set>
+			<trim suffixOverrides=",">
+				<if test="role_name!=null and role_name!=''">ROLE_NAME=#{role_name},</if>
+				<if test="role_desc!=null and role_desc!=''">ROLE_DESC=#{role_desc},</if>
+				<if test="create_date!=null and create_date!=''">CREATE_DATE=#{create_date},</if>
+				<if test="is_use!=null and is_use!=''">IS_USE=#{is_use},</if>
+				<if test="dict_id!=null and dict_id!=''">DICT_ID=#{dict_id},</if>
+			</trim>
+		</set>
+		WHERE ROLE_ID=#{role_id}
+	</update>
+	
+	<delete id="deleteBackRole" parameterType="hashmap">
+		DELETE
+		FROM
+		T_BACK_ROLE
+		WHERE
+		ROLE_ID=#{role_id}
+	</delete>
+	
+	<select id="queryTreeUser" parameterType="map" resultType="map">
+	<!-- SELECT USER_ID AS user_id ,USER_NAME AS user_name,USER_NICK_NAME AS user_nick_name FROM T_BACK_USER WHERE DEPT_ID IN
+	(SELECT DEPT_ID FROM t_back_dept_info WHERE DEPT_TYPE=
+	(SELECT DICT_ID FROM T_BACK_DICT_INFO WHERE DICT_NAME=#{role_name})) -->
+	
+	SELECT user_id ,user_name, user_nick_name 
+	FROM t_back_user WHERE dept_id IN
+	(SELECT dept_id FROM t_back_dept_info WHERE dept_type=#{dict_id})
+	AND user_id NOT IN (SELECT user_id FROM t_back_user_role WHERE role_id!=#{role_id})
+	</select>
+
+	<select id="roleValidate" parameterType="map" resultType="map">
+		SELECT
+		role_name FROM T_BACK_ROLE WHERE role_name = #{name}
+	</select>
+	
+	<delete id="deleteBackRoleMenu" parameterType="hashmap">
+		DELETE
+		FROM
+		t_back_role_menu
+		WHERE
+		role_id=#{role_id}
+	</delete>
+	
+	<delete id="deleteBackRoleUser" parameterType="hashmap">
+		DELETE
+		FROM
+		T_BACK_USER_ROLE
+		WHERE
+		ROLE_ID=#{role_id}
+	</delete>
+	
+	<delete id="deleteBackRoleUserByUser" parameterType="hashmap">
+		DELETE
+		FROM
+		T_BACK_USER_ROLE
+		WHERE
+		user_id=#{user_id}
+	</delete>
+	
+	<insert id="insertBackRoleMenu" parameterType="hashmap">
+		INSERT INTO T_BACK_ROLE_MENU(
+		<trim suffixOverrides=",">
+			<if test="sys_id!=null and sys_id!=''">SYS_ID,</if>
+			<if test="role_id!=null and role_id!=''">ROLE_ID,</if>
+			<if test="menu_id!=null and menu_id!=''">MENU_ID,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="sys_id!=null and sys_id!=''">#{sys_id},</if>
+			<if test="role_id!=null and role_id!=''">#{role_id},</if>
+			<if test="menu_id!=null and menu_id!=''">#{menu_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	<insert id="insertBackRoleUser" parameterType="hashmap">
+		INSERT INTO t_back_user_role(
+		<trim suffixOverrides=",">
+			<if test="sys_id!=null and sys_id!=''">sys_id,</if>
+			<if test="role_id!=null and role_id!=''">role_id,</if>
+			<if test="user_id!=null and user_id!=''">user_id,</if>
+		</trim>
+		) VALUES(
+		<trim suffixOverrides=",">
+			<if test="sys_id!=null and sys_id!=''">#{sys_id},</if>
+			<if test="role_id!=null and role_id!=''">#{role_id},</if>
+			<if test="user_id!=null and user_id!=''">#{user_id},</if>
+		</trim>
+		)
+	</insert>
+	
+	 <select id="queryMenuForRole" parameterType="hashmap" resultType="map">
+		SELECT t.MENU_ID 
+		,t.MENU_NAME,
+		t.MENU_URL,
+		t.IS_USE
+		,(select COUNT(R.MENU_ID) FROM t_back_role_menu r 
+		WHERE r.menu_id=t.menu_id AND r.role_id=#{role_id}) AS checks
+		FROM t_back_menu t
+		WHERE t.menu_parent_id=#{menu_id}
+		ORDER BY menu_index asc
+	</select> 
+	
+	
+	<select id="queryRoleMenu" parameterType="hashmap" resultType="map">
+			SELECT
+			t.sys_id,
+			t.role_id,
+			t.menu_id    
+		FROM
+			t_back_role_menu t
+		WHERE
+		1 = 1	
+		<if test="role_id!=null and role_id!=''">
+		AND role_id= #{role_id}	
+		</if>		
+	</select>
+	
+	<select id="queryRoleUser" parameterType="hashmap" resultType="map">
+			SELECT
+			t.sys_id,
+			t.role_id,
+			t.user_id    
+		FROM
+			t_back_user_role t
+		WHERE
+		1 = 1	
+		<if test="role_id!=null and role_id!=''">
+		AND role_id= #{role_id}	
+		</if>		
+	</select>
+
+	<select id="fandBackRole" parameterType="hashmap" resultType="map">
+		SELECT
+		t.role_id,
+		t.role_name ,
+		t.role_desc,
+		DATE_FORMAT(t.CREATE_DATE,'%Y-%m-%d %H:%i:%s') AS create_date,
+		t.is_use,
+		t.dict_id,
+		v.dict_name as dict_name
+		FROM
+		T_BACK_ROLE t LEFT JOIN t_back_dict_info v
+		ON t.dict_id=v.dict_id AND v.dict_code='1001'
+		WHERE 1=1
+		<if test="role_name!=null and role_name!=''">
+			AND ROLE_NAME like CONCAT(CONCAT('%', #{role_name}), '%')
+		</if>
+	</select>
+</mapper>

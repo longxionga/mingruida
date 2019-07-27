@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.acl.sys.dao.ISysIndexDao">
+	<select id="queryLoginInfo" parameterType="hashmap" resultType="map">
+		SELECT
+		    u.user_id,
+		    u.user_name,
+		    u.user_password,
+		    u.user_nick_name,
+		    u.user_gender,
+		    u.user_mobile,
+		    u.user_qq,
+		    u.is_use user_use,
+		    u.user_ip,
+		    u.login_date,
+		    u.error_count,
+		    u.auth_code,
+		    u.decryption_code,
+		    d.dept_id,
+		    d.dept_code,
+		    d.dept_name,
+		    d.dept_mobile,
+		    d.is_use dept_use,
+		    d.dept_money,
+		    d.dept_ratio,
+		    d.dept_type,
+		    d.dept_url,
+		    d.dept_parent_id,
+		    d.dept_app_id,
+		    r.role_id,
+		    r.role_name,
+		    r.role_use,
+		    IFNULL(c.conf_values,'1') as prop_values
+		   	    
+		FROM
+		    t_back_user u
+		LEFT JOIN
+		    t_back_dept_info d
+		ON
+		    u.dept_id = d.dept_id
+		
+		LEFT JOIN
+		    v_user_role r
+		ON
+		    u.user_id = r.user_id
+		LEFT JOIN 
+			t_back_config_info c
+		ON  
+			c.conf_code='1002' and c.is_use='1'
+		    
+		WHERE
+		    u.is_use = 1
+		AND d.is_use = 1
+		AND	u.user_name = #{loginName}
+	</select>
+	<select id="queryParentDeptIds" parameterType="String" resultType="map">
+		SELECT
+			dept_id,
+		    dept_code,
+		    dept_name,
+		    dept_type
+		FROM
+		    t_back_dept_info
+		WHERE 1=1
+			AND FIND_IN_SET(dept_id,getDeptParentList(#{value} ))
+		ORDER BY 
+			dept_type
+	</select>
+	<select id="queryUserRole" parameterType="hashmap" resultType="map">
+		SELECT
+		    sys_id,
+		    user_id,
+		    role_id
+		FROM
+		    t_back_user_role
+		WHERE
+		    1=1
+		<if test="sys_id !=null and sys_id !=''">
+			AND sys_id = #{sys_id}
+		</if>
+		<if test="user_id !=null and user_id !=''">
+			AND user_id = #{user_id}
+		</if>
+		<if test="role_id !=null and role_id !=''">
+			AND role_id = #{role_id}
+		</if>
+	</select>
+	<select id="queryUserRoleByView" parameterType="hashmap" resultType="map">
+		select
+			user_id,
+			user_name,
+			user_nick_name,
+			role_id,
+			role_name
+		from
+			v_user_role
+		where
+			user_use = 1
+			and role_use = 1
+		<if test="user_id !=null and user_id !=''">
+			AND user_id = #{user_id}
+		</if>
+		<if test="user_name !=null and user_name !=''">
+			AND user_name = #{user_name}
+		</if>
+		<if test="user_nick_name !=null and user_nick_name !=''">
+			AND user_nick_name = #{user_nick_name}
+		</if>
+		<if test="role_id !=null and role_id !=''">
+			AND role_id = #{role_id}
+		</if>
+		<if test="role_name !=null and role_name !=''">
+			AND role_name = #{role_name}
+		</if>
+	</select>
+	<!-- 菜单权限查询 -->
+<select id="queryAuthorization" parameterType="map" resultType="map">
+				SELECT bm.menu_id as MENU_ID,bm.menu_url as URL,bm.menu_name as MENU_NAME,bm.menu_icon as MENU_ICON FROM t_back_role_menu  rm
+				LEFT OUTER JOIN t_back_menu bm
+				ON rm.menu_id=bm.menu_id
+				WHERE rm.role_id 
+				in(
+				SELECT role_id FROM t_back_user_role
+				 WHERE user_id=#{USER_ID}
+				)
+				AND
+				bm.menu_parent_id=#{PID}
+	</select>
+	<select id="queryUserRoleForShiro" parameterType="String" resultType="String">
+		SELECT
+			role_id
+		FROM
+			v_user_role
+		WHERE
+			user_name = #{value}
+	</select>
+	<select id="queryMenuRoleForShiro" parameterType="String" resultType="String">
+		SELECT
+			menu_url
+		FROM
+			v_menu_role
+		WHERE
+			role_id = #{value}
+	</select>
+	<select id="queryUserRoleMenuForShiro" parameterType="String" resultType="map">
+		SELECT
+			m.role_id,
+			m.menu_url
+		FROM
+			V_user_role u left join v_menu_role m on
+			u.role_id = m.role_id
+		WHERE
+			u.user_name = #{value}
+			AND m.menu_url is not null
+	</select>
+	<select id="countFrontUser" parameterType="map" resultType="java.lang.Integer">
+		SELECT
+		    COUNT( 0 )
+		FROM
+		    t_user_info u LEFT JOIN t_front_broker b on b.broker_id = u.broker_id
+		WHERE
+		    1 = 1
+		   <if test="dept_id !=null and dept_id !=''">
+		AND(
+		        agent_id = #{dept_id}
+		    OR  settle_id = #{dept_id}
+		    OR  ch_id = #{dept_id}
+		    OR  ce_id = #{dept_id}
+		    OR  p_id = #{dept_id}
+		    OR  b.dept_id = #{dept_id}
+		    )
+		    </if>
+			AND settle_id !=3
+		<if test="create_time !=null and create_time !=''">
+			AND u.create_time > #{create_time}
+		</if>
+	</select>
+	
+	<select id="sumFrontUserWallet" parameterType="map" resultType="java.math.BigDecimal">
+		SELECT
+		    SUM( amount )
+		FROM
+		    t_user_capital
+		WHERE
+		    user_id IN
+		    (
+		        SELECT
+		            id
+		        FROM
+		            t_user_info u LEFT JOIN t_front_broker b on b.broker_id = u.broker_id
+		        WHERE
+		            1 = 1
+		         <if test="dept_id !=null and dept_id !=''">
+		        AND(
+				        agent_id = #{dept_id}
+				    OR  settle_id = #{dept_id}
+				    OR  ch_id = #{dept_id}
+				    OR  ce_id = #{dept_id}
+				    OR  p_id = #{dept_id}
+				    OR  b.dept_id = #{dept_id}
+		             )
+		         </if>
+				AND settle_id !=3
+		     )
+	</select>
+	<select id="sumFrontUserBrokerage" parameterType="map" resultType="java.math.BigDecimal">
+		SELECT sum(order_amount)
+		FROM t_trade_order b
+			LEFT JOIN t_user_info u on b.user_id = u.id
+			LEFT JOIN t_front_broker k on u.broker_id = k.broker_id
+		WHERE 1=1
+		 <if test="dept_id !=null and dept_id !=''">
+			AND ( u.agent_id = #{dept_id}
+			    OR  u.settle_id = #{dept_id}
+			    OR  u.ch_id = #{dept_id}
+			    OR  u.ce_id = #{dept_id}
+			    OR  u.p_id = #{dept_id}
+				OR k.dept_id=#{dept_id}
+			)
+			</if>
+			AND u.settle_id !=3
+		<if test="create_time !=null and create_timesumFrontCZ !=''">
+			AND b.create_time > #{create_time}
+		</if>
+	</select>
+	<select id="sumFrontCZ" parameterType="map" resultType="java.math.BigDecimal">
+	<!-- 	SELECT
+		    SUM( o.order_rs_fee )
+		FROM
+		    t_front_cz_order_rs o
+		    left join  t_front_user_info u on o.user_id = u.user_id
+		    left join t_front_broker b on u.broker_id = b.broker_id
+		WHERE
+		    o.is_use = 1
+		   AND(
+			        u.agent_id = #{dept_id}
+			    OR  u.settle_id = #{dept_id}
+			    OR  u.ch_id = #{dept_id}
+			    OR  u.ce_id = #{dept_id}
+			    OR  u.p_id = #{dept_id}
+			    OR  b.dept_id= #{dept_id}
+			    )
+			AND u.settle_id !=3
+		<if test="create_date !=null and create_date !=''">
+			AND o.create_date > #{create_date}
+		</if> -->
+				SELECT
+				SUM( o.money )
+				FROM
+		        t_pay_payment_order o
+				left join t_user_info u on u.id = o.user_id
+				left join t_front_broker b on u.broker_id = b.broker_id		
+				WHERE
+				o.status = 2
+				<if test="dept_id!=null and dept_id!=''">
+				AND(
+				u.agent_id = #{dept_id}
+				OR u.settle_id = #{dept_id}
+				OR u.ch_id = #{dept_id}
+				OR u.ce_id = #{dept_id}
+				OR b.dept_id= #{dept_id}				
+				)
+				</if>				
+				AND u.settle_id !=3
+		<if test="create_time !=null and create_time !=''">
+			AND o.create_time > #{create_time}
+		</if>
+	</select>
+	<select id="sumFrontTX" parameterType="map" resultType="java.math.BigDecimal">
+		<!-- SELECT
+		    SUM( o.tx_rs_money )
+		FROM
+		    t_front_tx_order_rs o
+		    left join  t_front_user_info u on o.user_id = u.user_id
+		    left join t_front_broker b on u.broker_id = b.broker_id
+		WHERE
+		    o.is_use = 1
+			AND(
+			        u.agent_id = #{dept_id}
+			    OR  u.settle_id = #{dept_id}
+			    OR  u.ch_id = #{dept_id}
+			    OR  u.ce_id = #{dept_id}
+			    OR  u.p_id = #{dept_id}
+			    OR  b.dept_id= #{dept_id}
+			    )
+			AND u.settle_id !=3
+		<if test="create_date !=null and create_date !=''">
+			AND o.create_date > #{create_date}
+		</if> -->
+			SELECT
+			SUM( o.money )
+			FROM
+		    t_pay_refund_order o
+			left join t_user_info u on u.id = o.user_id
+			left join t_front_broker b on u.broker_id = b.broker_id
+			left join t_back_dept_info d on d.dept_id=b.dept_id
+			left join t_back_dept_info a on a.dept_id=d.dept_parent_id
+			left join t_back_dept_info s on s.dept_id=a.dept_parent_id
+			left join t_back_dept_info ch on ch.dept_id=s.dept_parent_id
+			left join t_back_dept_info ce on ce.dept_id=ch.dept_parent_id
+			WHERE
+		    o.status = 2
+		    <if test="dept_id!=null and dept_id!=''">
+		    AND(
+			        u.agent_id = #{dept_id}
+			    OR  u.settle_id = #{dept_id}
+			    OR  u.ch_id = #{dept_id}
+			    OR  u.ce_id = #{dept_id}
+			    OR  b.dept_id= #{dept_id}
+			    )
+		    </if>			
+			AND u.settle_id !=3
+		<if test="create_time !=null and create_time !=''">
+			AND o.create_time > #{create_time}
+		</if>
+	</select>
+	
+	<select id="countFrontUserMonth" parameterType="hashmap" resultType="map">
+	select
+		count( 0 ) num
+		<if test="create_time !=null and create_time !=''">
+			,year(u.create_time) year
+			,month(u.create_time) month
+			,day(u.create_time) day
+		</if>
+	from
+		t_user_info  u LEFT JOIN t_front_broker b on b.broker_id = u.broker_id
+	where
+		1 = 1
+		and(
+		        agent_id = #{dept_id}
+		    OR  settle_id = #{dept_id}
+		    OR  ch_id = #{dept_id}
+		    OR  ce_id = #{dept_id}
+		    OR  p_id = #{dept_id}
+		    OR  b.dept_id= #{dept_id}
+		)
+		AND settle_id !=3
+		<if test="create_time !=null and create_time !=''">
+			AND u.create_time > #{create_time}
+		group by
+			month(u.create_time),
+			day(u.create_time)
+		order by year,month,day
+		</if>
+	</select>
+	<select id="countFrontUserBrokerageMonth" parameterType="hashmap" resultType="map">
+		SELECT
+			YEAR(b.create_time) year,
+			MONTH(b.create_time) month,
+			DAY(b.create_time) day,
+			IFNULL(SUM(b.order_amount),0) num
+		FROM
+		   t_trade_order  b
+		LEFT JOIN t_user_info u on b.user_id = u.id
+		LEFT JOIN t_front_broker k ON u.broker_id = k.broker_id
+		WHERE
+		    1=1
+		AND (
+		        u.agent_id = #{dept_id}
+		    OR  u.settle_id = #{dept_id}
+		    OR  u.ch_id = #{dept_id}
+		    OR  u.ce_id = #{dept_id}
+		    OR  u.p_id = #{dept_id}
+		    OR  k.dept_id=#{dept_id} )
+		AND u.create_time !=3
+		AND b.create_time > #{create_time}
+		GROUP BY
+		    MONTH(b.create_time),
+		    DAY(b.create_time)
+		order by year,month,day
+	</select>
+	<select id="queryParentsDeptIdList" parameterType="String" resultType="map">
+		SELECT
+		    d.dept_id,
+		    d.dept_type
+		FROM
+		    t_back_dept_info d
+		WHERE
+		    FIND_IN_SET(d.dept_id,getDeptParentList(#{value}))
+		ORDER BY
+		    d.dept_type
+	</select>
+</mapper>

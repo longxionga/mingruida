@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.acl.report.dao.IReprotSalesGoodsDao">
+    <!-- 查询商品报表 -->
+    <select id="queryReportSalesGoods" parameterType="hashmap" resultType="map">
+        SELECT
+        t.id,
+        t.user_id,
+        t.order_type,
+        t.order_state,
+        t.pay_type,
+        t.unionpay_merchant_code,
+        t.auth_code,
+        t.settle_mode,
+        t.settle_state,
+        t.settle_merchant_code,
+        t.settle_merchant_name,
+        t.settle_total_amount,
+        t.settle_service_amount,
+        t.settle_service_ratio,
+        t.machine_code,
+        t.card_type,
+        t.card_code,
+        t.total_amount,
+        t.amount,
+        t.real_amount,
+        t.trade_day,
+        t.trade_time,
+        t.`status`,
+        t.notes,
+        t.broker_id,
+        t.settle_id,
+        t.agent_id,
+        t.create_day,
+        t.create_time,
+        a.dept_name as agent_name,
+        s.dept_name as settle_name,
+        u.mobile,u.name,u.nick_name,
+        t3.dept_name,
+        t2.broker_name,
+        t2.dept_id
+        FROM
+        t_trade_records t
+        INNER JOIN t_front_broker t2 ON t2.broker_id = t.broker_id
+        INNER JOIN t_back_dept_info t3 ON t3.dept_id = t2.dept_id
+        LEFT JOIN t_back_dept_info a ON a.dept_id = t.agent_id
+        LEFT JOIN t_back_dept_info s ON s.dept_id = t.settle_id
+        LEFT JOIN t_user_info u ON u.id=t.user_id
+        WHERE 1=1
+        <if test="product_name!=null and product_name!=''">
+            AND t.product_name=#{product_name}
+        </if>
+        <if test="start_date!=null and start_date!=''">
+            AND t.create_time &gt;=#{start_date}
+        </if>
+        <if test="end_date!=null and end_date!=''">
+            AND t.create_time &lt;=#{end_date}
+        </if>
+        <if test="ce_id!=null and ce_id!=''">
+            AND t.ce_id=#{ce_id}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND t.ch_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t.dept_id=#{DID}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND u.mobile=#{mobile}
+        </if>
+        <if test="name!=null and name!=''">
+            AND u.name like CONCAT(CONCAT(#{name}), '%')
+        </if>
+        <if test="nick_name!=null and nick_name!=''">
+            AND u.nick_name like CONCAT(CONCAT(#{nick_name}), '%')
+        </if>
+        ORDER  BY create_time DESC
+    </select>
+    <!-- 统计 -->
+    <select id="queryReportSalesSum" parameterType="hashmap" resultType="map">
+        SELECT
+        IFNULL(sum(t.total_amount),0) as salesSum,
+        IFNULL(COUNT(t.id),0) as productSum
+        FROM
+        t_trade_records t
+        LEFT JOIN t_user_info u ON u.id=t.user_id
+        WHERE 1=1
+        <if test="product_name!=null and product_name!=''">
+            AND t.product_name=#{product_name}
+        </if>
+        <if test="start_date!=null and start_date!=''">
+            AND t.create_time &gt;=#{start_date}
+        </if>
+        <if test="end_date!=null and end_date!=''">
+            AND t.create_time &lt;=#{end_date}
+        </if>
+        <if test="ce_id!=null and ce_id!=''">
+            AND t.ce_id=#{ce_id}
+        </if>
+        <if test="ch_id!=null and ch_id!=''">
+            AND t.ch_id=#{ch_id}
+        </if>
+        <if test="settle_id!=null and settle_id!=''">
+            AND t.settle_id=#{settle_id}
+        </if>
+        <if test="agent_id!=null and agent_id!=''">
+            AND t.agent_id=#{agent_id}
+        </if>
+        <if test="DID!=null and DID!=''">
+            AND t.dept_id=#{DID}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND u.mobile=#{mobile}
+        </if>
+        <if test="name!=null and name!=''">
+            AND u.name like CONCAT(CONCAT(#{name}), '%')
+        </if>
+        <if test="nick_name!=null and nick_name!=''">
+            AND u.nick_name like CONCAT(CONCAT(#{nick_name}), '%')
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            AND u.mobile=#{mobile}
+        </if>
+        <if test="name!=null and name!=''">
+            AND u.name like CONCAT(CONCAT(#{name}), '%')
+        </if>
+        <if test="nick_name!=null and nick_name!=''">
+            AND u.nick_name like CONCAT(CONCAT(#{nick_name}), '%')
+        </if>
+    </select>
+</mapper>
