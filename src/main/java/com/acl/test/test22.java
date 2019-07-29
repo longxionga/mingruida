@@ -14,6 +14,6 @@ public class test22 {
         m.put("s",sm+3);
         int smw = Integer.valueOf(m.get("s").toString());
         int qwe = Integer.valueOf(m.get("s").toString());
-        int aaa = Integer.valueOf(m.get("aaas").toString());
+        int aaa = Integer.valueOf(m.get("aaas111").toString());
     }
 }
